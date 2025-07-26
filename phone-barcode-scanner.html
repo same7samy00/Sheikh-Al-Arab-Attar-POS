@@ -231,7 +231,7 @@
                             scannedValue: decodedText,
                             status: 'scanned', // للإشارة إلى أن المسح قد تم
                             scannedAt: new Date().toISOString() 
-                        }, { merge: true });
+                        }, { merge: true }); // setDoc مع merge:true لإنشاء/تحديث
                         
                         phoneScannerStatus.textContent = 'تم الإرسال بنجاح! امسح باركود آخر.';
                         phoneScannerStatus.classList.add('success-message');
@@ -340,9 +340,10 @@
             if (sessionUnsubscribePhone) {
                 sessionUnsubscribePhone();
                 sessionUnsubscribePhone = null;
-                // يمكن هنا إرسال إشارة للكمبيوتر بأن الهاتف قطع الاتصال
-                // ولكن لأغراض هذا المشروع، لن نفعل ذلك لتجنب تعقيد زائد
             }
+            // يمكن هنا إرسال إشارة للكمبيوتر بأن الهاتف قطع الاتصال
+            // لتنظيف الجلسة من جانب الكمبيوتر أيضاً إذا لم تكن قد تمت
+            // ولكن لأغراض هذا المشروع، لن نفعل ذلك لتجنب تعقيد زائد حالياً
         });
     </script>
 </body>
