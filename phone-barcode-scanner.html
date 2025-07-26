@@ -115,6 +115,13 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .tap-to-scan-message {
+            font-size: 1.2em;
+            color: #3f51b5;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+        }
 
         /* Responsive */
         @media (max-width: 600px) {
@@ -136,6 +143,7 @@
         <h2>امسح الباركود بهاتفك</h2>
         <div id="reader-phone"></div> <p class="status-message" id="phone-scanner-status"></p>
         <div class="loader" id="phone-scanner-loader" style="display: none;"></div>
+        <p class="tap-to-scan-message" id="tap-to-scan-message" style="display: none;">انقر للشروع بمسح جديد</p>
     </div>
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -168,11 +176,13 @@
         const readerPhoneDiv = document.getElementById('reader-phone');
         const phoneScannerStatus = document.getElementById('phone-scanner-status');
         const phoneScannerLoader = document.getElementById('phone-scanner-loader');
+        const tapToScanMessage = document.getElementById('tap-to-scan-message');
 
         // --- منطق الصفحة ---
         let html5QrCode = null;
         let sessionId = null;
         let sessionUnsubscribePhone = null; // للاستماع من جانب الهاتف
+        let isCameraPaused = false; // لتتبع حالة توقف الكاميرا مؤقتاً
 
         // الحصول على sessionId من URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -204,8 +214,8 @@
          * دالة لبدء الماسح الضوئي.
          */
         function startScanner() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                // الماسح يعمل بالفعل، لا تفعل شيئاً
+            if (html5QrCode && html5QrCode.isScanning && !isCameraPaused) {
+                // الماسح يعمل بالفعل ولم يتم إيقافه مؤقتاً، لا تفعل شيئاً
                 return;
             }
             if (!html5QrCode) { // إذا لم يتم تهيئته بعد
@@ -217,17 +227,21 @@
             phoneScannerStatus.textContent = 'الكاميرا نشطة. امسح الباركود الآن.';
             phoneScannerStatus.classList.remove('error-message', 'success-message');
             phoneScannerLoader.style.display = 'none';
+            tapToScanMessage.style.display = 'none'; // أخفِ رسالة "انقر للمسح"
 
             html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, 
                 async (decodedText, decodedResult) => {
                     // عند المسح الناجح
-                    // أوقف الكاميرا مؤقتًا لمنع المسح المتكرر لنفس الباركود
-                    stopScanner(); 
                     phoneScannerLoader.style.display = 'block';
                     phoneScannerStatus.textContent = 'تم المسح! جاري إرسال البيانات...';
                     phoneScannerStatus.classList.remove('error-message', 'success-message');
 
                     try {
+                        // أوقف الكاميرا مؤقتاً لمنع المسح المتكرر
+                        isCameraPaused = true;
+                        await html5QrCode.stop(); // إيقاف الكاميرا فعلياً
+                        readerPhoneDiv.innerHTML = ''; // تنظيف الحاوية
+
                         const sessionDocRef = doc(db, 'scannerSessions', sessionId);
                         await setDoc(sessionDocRef, {
                             scannedValue: decodedText,
@@ -235,25 +249,26 @@
                             scannedAt: new Date().toISOString() 
                         }, { merge: true }); // setDoc مع merge:true لإنشاء/تحديث
                         
-                        phoneScannerStatus.textContent = 'تم الإرسال بنجاح! امسح باركود آخر.';
+                        phoneScannerStatus.textContent = 'تم الإرسال بنجاح!';
                         phoneScannerStatus.classList.add('success-message');
                         phoneScannerLoader.style.display = 'none';
-                        // أعد تشغيل الماسح بعد ثانية واحدة ليكون جاهزاً للمسح التالي
-                        setTimeout(() => {
-                            startScanner();
-                        }, 1000); // انتظر ثانية واحدة
+                        tapToScanMessage.style.display = 'block'; // أظهر رسالة "انقر للمسح"
+
+                        // لا يتم إعادة تشغيل الماسح هنا تلقائياً، بل ينتظر نقرة المستخدم
                     } catch (e) {
                         console.error("Error sending scanned value to Firestore:", e);
                         phoneScannerStatus.textContent = 'خطأ في إرسال البيانات: ' + e.message;
                         phoneScannerStatus.classList.add('error-message');
                         phoneScannerLoader.style.display = 'none';
                         // في حالة الخطأ، أعد تشغيل الماسح بعد فترة
-                        setTimeout(startScanner, 2000); 
+                        setTimeout(() => {
+                             isCameraPaused = false; // أعد تعيين الحالة قبل إعادة التشغيل
+                             startScanner();
+                        }, 2000); 
                     }
                 },
                 (errorMessage) => {
                     // عند حدوث خطأ في المسح (ليس بالضرورة خطأ، قد يكون عدم وجود باركود)
-                    // console.warn(`QR Code Scan Error: ${errorMessage}`);
                     // لا نفعل شيئاً هنا عند الأخطاء المتكررة لتجنب إزعاج المستخدم
                 }
             ).catch(err => {
@@ -272,6 +287,7 @@
                 html5QrCode.stop().then(() => {
                     console.log("QR Code scanner stopped.");
                     readerPhoneDiv.innerHTML = ''; // تنظيف الحاوية
+                    isCameraPaused = true; // ضع علامة على أن الكاميرا متوقفة مؤقتاً
                 }).catch(err => {
                     console.error("Error stopping QR Code scanner:", err);
                 });
@@ -295,24 +311,35 @@
                     if (data.status === 'readyForNextScan' && !data.scannedValue) {
                         // الكمبيوتر أعطى إشارة لإعادة المسح
                         console.log("Desktop signaled 'readyForNextScan'. Re-arming scanner.");
-                        startScanner(); // أعد تشغيل الماسح ليكون جاهزاً
+                        // إذا كانت الكاميرا متوقفة، أعد تشغيلها
+                        if (isCameraPaused) {
+                            isCameraPaused = false; // أعد تعيين الحالة
+                            startScanner(); 
+                        }
                         phoneScannerStatus.textContent = 'جاهز للمسح... امسح الباركود الآن.';
                         phoneScannerStatus.classList.remove('error-message', 'success-message');
+                        tapToScanMessage.style.display = 'none'; // أخفِ رسالة "انقر للمسح"
                     } else if (data.status === 'closedByDesktop') {
                         // الكمبيوتر أغلق الجلسة
                         console.log("Desktop closed session. Stopping scanner and notifying.");
                         stopScanner();
                         phoneScannerStatus.textContent = 'الجلسة انتهت من الكمبيوتر. يمكنك إغلاق هذه الصفحة.';
                         phoneScannerStatus.classList.add('error-message');
+                        tapToScanMessage.style.display = 'none';
                         if (sessionUnsubscribePhone) {
                             sessionUnsubscribePhone();
                             sessionUnsubscribePhone = null;
                         }
                     } else if (data.status === 'connecting' || data.status === 'active' || data.status === 'scanned') {
                         // حالات الاتصال الأولية أو بعد المسح
-                        startScanner(); // تأكد من تشغيل الماسح إذا لم يكن
+                        // إذا كانت الكاميرا متوقفة، أعد تشغيلها
+                        if (!html5QrCode || !html5QrCode.isScanning) {
+                             isCameraPaused = false; // أعد تعيين الحالة
+                             startScanner();
+                        }
                         phoneScannerStatus.textContent = 'الكاميرا نشطة. امسح الباركود الآن.';
                         phoneScannerStatus.classList.remove('error-message', 'success-message');
+                        tapToScanMessage.style.display = 'none';
                     }
                     // أي حالات أخرى تُترك كما هي
                 } else {
@@ -321,6 +348,7 @@
                     stopScanner();
                     phoneScannerStatus.textContent = 'الجلسة انتهت أو تم إغلاقها من الكمبيوتر.';
                     phoneScannerStatus.classList.add('error-message');
+                    tapToScanMessage.style.display = 'none';
                     if (sessionUnsubscribePhone) {
                         sessionUnsubscribePhone();
                         sessionUnsubscribePhone = null;
@@ -331,13 +359,23 @@
                 phoneScannerStatus.textContent = 'خطأ في الاتصال بجلسة المسح.';
                 phoneScannerStatus.classList.add('error-message');
                 stopScanner();
+                tapToScanMessage.style.display = 'none';
             });
 
             // تحديث حالة المستند لتأكيد أن الهاتف جاهز للاستقبال
-            setDoc(sessionDocRef, { status: 'phoneReady' }, { merge: true })
+            setDoc(doc(db, 'scannerSessions', sessionId), { status: 'phoneReady' }, { merge: true })
                 .then(() => console.log("Phone signaled 'phoneReady' for session:", sessionIdToListen))
                 .catch(e => console.error("Error signaling phoneReady:", e));
         }
+
+        // --- مستمعي الأحداث لإعادة تشغيل الماسح بالنقر ---
+        document.body.addEventListener('click', () => {
+            if (isCameraPaused) {
+                console.log("Tap detected. Restarting scanner.");
+                isCameraPaused = false;
+                startScanner();
+            }
+        });
 
         // إيقاف الماسح وإلغاء الاشتراك عند مغادرة الصفحة
         window.addEventListener('beforeunload', () => {
