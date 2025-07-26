@@ -193,6 +193,7 @@
             flex-grow: 1;
             max-width: 400px;
             align-items: center; /* لمحاذاة زر الأيقونة */
+            position: relative; /* لتموضع Loader البحث */
         }
 
         .search-bar input {
@@ -201,6 +202,40 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
+        }
+
+        /* Loader داخل حقل البحث */
+        .search-bar .scan-loader {
+            position: absolute;
+            left: 10px; /* Adjust based on RTL direction */
+            top: 50%;
+            transform: translateY(-50%);
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3f51b5;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+        /* Loader داخل حقل الباركود في نموذج المنتج */
+        .form-group .barcode-scan-buttons .scan-loader {
+            position: absolute;
+            left: 10px; /* Adjust based on RTL direction */
+            top: 50%;
+            transform: translateY(-50%);
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3f51b5;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* أيقونة زر الهاتف */
@@ -321,11 +356,30 @@
             background-color: rgba(0,0,0,0.6);
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px); /* خلفية ضبابية */
             -webkit-backdrop-filter: blur(5px);
         }
 
-        .modal-content {
+        /* أيقونة الإغلاق في الزاوية العلوية اليمنى (لـ RTL) */
+        .close-button {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute; /* لتحديد الموضع بدقة */
+            top: 10px;
+            right: 15px; /* في الزاوية اليمنى لـ RTL */
+            left: unset; /* إزالة float: left */
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* --- تنسيقات مودال المنتج (شاشة كاملة ومنسقة) --- */
+        #product-modal .modal-content {
             background-color: #fefefe;
             padding: 30px;
             border-radius: 8px;
@@ -335,45 +389,41 @@
             animation-duration: 0.4s;
             box-sizing: border-box;
 
-            width: 95vw;
-            height: 95vh;
-            max-width: 1200px;
-            max-height: 800px;
+            width: 95vw; /* تقريبا ملء الشاشة */
+            height: 95vh; /* تقريبا ملء الشاشة */
+            max-width: 1000px; /* أقصى عرض على الشاشات الكبيرة جداً */
+            max-height: 700px; /* أقصى ارتفاع */
             overflow-y: auto;
         }
 
-        @keyframes animatetop {
-            from {top: -300px; opacity: 0}
-            to {top: 0; opacity: 1}
-        }
-
-        .close-button {
-            color: #aaa;
-            float: left;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .modal-content h4 {
+        #product-modal .modal-content h4 {
             text-align: center;
             color: #3f51b5;
             margin-bottom: 25px;
             font-size: 1.5em;
         }
-
-        /* تنسيقات حقول النموذج داخل المودال */
-        .form-group {
-            margin-bottom: 15px;
+        
+        #product-form {
+            display: flex;
+            flex-wrap: wrap; /* لجعل العناصر بجانب بعضها */
+            gap: 20px; /* مسافة بين الخانات */
+            justify-content: space-between; /* توزيع الخانات */
+        }
+        #product-form .form-group {
+            flex: 1 1 calc(50% - 10px); /* خانتان في الصف، مع مراعاة الفجوة */
+            margin-bottom: 0; /* إزالة الهامش السفلي لأن الفجوة هي من تتولى المسافات */
+        }
+        /* لجعل حقول الوصف والباركود تأخذ عرضاً كاملاً */
+        #product-form .form-group:nth-last-child(2), /* الباركود */
+        #product-form .form-group:last-child { /* الوصف */
+            flex: 1 1 100%;
+        }
+        #product-form .submit-btn {
+            flex: 1 1 100%; /* زر الحفظ يأخذ عرضاً كاملاً */
+            margin-top: 20px;
         }
 
+        /* تنسيقات حقول النموذج داخل المودال */
         .form-group label {
             display: block;
             margin-bottom: 5px;
@@ -386,7 +436,7 @@
         .form-group select,
         .form-group textarea {
             font-family: 'Cairo', sans-serif;
-            width: calc(100% - 24px);
+            width: 100%; /* عرض كامل داخل الـ form-group */
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -404,20 +454,28 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            position: relative; /* لتموضع Loader المسح */
         }
         .form-group .barcode-scan-buttons input {
             margin-bottom: 0;
         }
 
-        /* --- تنسيقات لمودال الاتصال بالهاتف (ملء الشاشة) --- */
-        /* هذا المودال أصبح للتحكم في حالة الهاتف وعرض QR فقط عند الحاجة */
+
+        /* --- تنسيقات لمودال الاتصال بالهاتف (صغير الحجم) --- */
         #phone-connection-modal .modal-content {
-            width: 95vw;
-            height: 95vh;
-            max-width: 500px; /* حجم معقول لعرض حالة الاتصال والـ QR */
-            max-height: 550px;
+            background-color: #fefefe;
             padding: 20px;
-            border-radius: 8px; /* استعادة الحواف المستديرة */
+            border-radius: 8px; /* حواف مستديرة */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            box-sizing: border-box;
+
+            width: 90vw; /* حجم مناسب للجوال */
+            height: auto; /* ارتفاع تلقائي */
+            max-width: 450px; /* حجم ثابت للكمبيوتر */
+            max-height: 500px; /* حجم ثابت للكمبيوتر */
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -433,19 +491,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 15px; /* بادينغ أقل قليلاً */
             border: 1px dashed #ccc;
             border-radius: 8px;
             background-color: #f8f8f8;
-            width: 100%; /* ياخذ عرضاً أكبر داخل المودال */
-            max-width: 300px; /* أقصى عرض لـ QR Container */
+            width: 100%;
+            max-width: 280px; /* أصغر ليتناسب مع المودال الصغير */
             box-sizing: border-box;
             margin-top: 15px;
         }
         #phone-connection-modal #qr-code-display {
-            width: 200px;
-            height: 200px;
-            margin: 15px auto;
+            width: 180px; /* أصغر قليلاً */
+            height: 180px;
+            margin: 10px auto;
             border: 1px solid #ddd;
             padding: 5px;
             border-radius: 8px;
@@ -466,8 +524,8 @@
         }
         #phone-connection-modal p.instruction, #phone-connection-modal p.status-message {
             color: #555;
-            font-size: 1em;
-            margin-top: 10px;
+            font-size: 0.9em;
+            margin-top: 5px;
         }
         #phone-connection-modal p.error-message {
             color: #f44336;
@@ -478,6 +536,15 @@
 
         /* --- تنسيقات مودال كلمة السر الاحترافي --- */
         #password-modal .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            box-sizing: border-box;
+
             width: 90%;
             max-width: 400px;
             height: auto;
@@ -614,7 +681,16 @@
                 font-size: 0.9em;
             }
             /* المودالات تملأ الشاشة بالكامل في الجوال */
-            .modal-content, #phone-connection-modal .modal-content, #password-modal .modal-content {
+            #product-modal .modal-content, #password-modal .modal-content {
+                width: 100vw;
+                height: 100vh;
+                max-width: none;
+                max-height: none;
+                padding: 15px;
+                border-radius: 0;
+            }
+            /* مودال اتصال الهاتف يتكيف ليملأ الشاشة في الجوال */
+            #phone-connection-modal .modal-content {
                 width: 100vw;
                 height: 100vh;
                 max-width: none;
@@ -633,6 +709,10 @@
                 min-width: unset;
                 max-width: unset;
                 width: 100%;
+            }
+            /* ترتيب الخانات في مودال المنتج على الجوال لخانة واحدة في الصف */
+            #product-form .form-group {
+                flex: 1 1 100%;
             }
         }
     </style>
@@ -671,7 +751,7 @@
                     <button id="add-product-btn" class="main-action-btn" disabled><i class="fas fa-plus"></i> إضافة منتج جديد</button>
                     <div class="search-bar">
                         <input type="text" id="inventory-search" placeholder="ابحث باسم المنتج أو الباركود...">
-                        <button id="scan-barcode-inventory-search" class="secondary-action-btn"><i class="fas fa-barcode"></i> مسح باركود</button>
+                        <span class="scan-loader" id="inventory-search-loader"></span> <button id="scan-barcode-inventory-search" class="secondary-action-btn"><i class="fas fa-barcode"></i> مسح باركود</button>
                         <button id="phone-connect-btn" class="secondary-action-btn">
                             <i class="fas fa-mobile-alt"></i>
                         </button>
@@ -702,7 +782,8 @@
                         <span class="close-button" id="close-product-modal-btn">&times;</span>
                         <h4 id="modal-title">إضافة منتج جديد</h4>
                         <form id="product-form">
-                            <input type="hidden" id="product-id"> <div class="form-group">
+                            <input type="hidden" id="product-id"> 
+                            <div class="form-group">
                                 <label for="product-name">اسم المنتج:</label>
                                 <input type="text" id="product-name" required>
                             </div>
@@ -762,7 +843,7 @@
                                 <label for="product-barcode">باركود/QR:</label>
                                 <div class="barcode-scan-buttons">
                                     <input type="text" id="product-barcode" style="flex-grow: 1;">
-                                    <button type="button" id="scan-barcode-form-btn-product" class="secondary-action-btn"><i class="fas fa-qrcode"></i> مسح بالهاتف</button>
+                                    <span class="scan-loader" id="product-barcode-loader"></span> <button type="button" id="scan-barcode-form-btn-product" class="secondary-action-btn"><i class="fas fa-qrcode"></i> مسح بالهاتف</button>
                                 </div>
                             </div>
 
@@ -849,6 +930,7 @@
         const inventorySearchInput = document.getElementById('inventory-search');
         const scanBarcodeInventorySearchBtn = document.getElementById('scan-barcode-inventory-search');
         const productsTableBody = document.querySelector('#products-table tbody');
+        const inventorySearchLoader = document.getElementById('inventory-search-loader'); // Loader for search input
 
         const productModal = document.getElementById('product-modal');
         const closeButtonProductModal = document.getElementById('close-product-modal-btn');
@@ -863,7 +945,9 @@
         const productSalePriceInput = document.getElementById('product-sale-price');
         const productBarcodeInput = document.getElementById('product-barcode');
         const productDescriptionInput = document.getElementById('product-description');
-        const scanBarcodeFormBtnProduct = document.getElementById('scan-barcode-form-btn-product'); // تم تغيير ID هنا
+        const scanBarcodeFormBtnProduct = document.getElementById('scan-barcode-form-btn-product');
+        const productBarcodeLoader = document.getElementById('product-barcode-loader'); // Loader for product barcode input
+
 
         const passwordModal = document.getElementById('password-modal');
         const closePasswordModalBtn = document.getElementById('close-password-modal-btn');
@@ -940,6 +1024,19 @@
                     break;
             }
             phoneConnectBtn.title = title;
+        }
+
+        /**
+         * لإظهار أو إخفاء Loader المسح.
+         * @param {string} target - 'search' or 'productBarcode'
+         * @param {boolean} show - true لإظهار، false لإخفاء
+         */
+        function toggleScanLoader(target, show) {
+            if (target === 'search') {
+                inventorySearchLoader.style.display = show ? 'block' : 'none';
+            } else if (target === 'productBarcode') {
+                productBarcodeLoader.style.display = show ? 'block' : 'none';
+            }
         }
 
 
@@ -1217,17 +1314,30 @@
             const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
             
             // تحقق من وجود المستند، إذا لم يكن موجودًا، قم بإنشائه.
-            const docSnap = await getDoc(sessionDocRef);
-            if (!docSnap.exists()) {
-                console.log("Creating shared session document in Firestore.");
-                await setDoc(sessionDocRef, {
-                    status: 'disconnected', // Initial status
-                    createdAt: Timestamp.now(),
-                    lastAction: 'desktop_initialized'
-                });
-            } else {
-                console.log("Shared session document already exists.");
+            try {
+                const docSnap = await getDoc(sessionDocRef);
+                if (!docSnap.exists()) {
+                    console.log("Creating shared session document in Firestore.");
+                    await setDoc(sessionDocRef, {
+                        status: 'disconnected', // Initial status
+                        createdAt: Timestamp.now(),
+                        lastAction: 'desktop_initialized'
+                    });
+                } else {
+                    console.log("Shared session document already exists.");
+                    // تحديث الحالة لضمان أن الكمبيوتر يرسل حالة صحيحة عند إعادة الاتصال
+                    // إذا كان الهاتف متصلاً من قبل، فلا تُغير حالته
+                    if (docSnap.data().status !== 'phoneReady' && docSnap.data().status !== 'scanning' && docSnap.data().status !== 'scanRequested') {
+                         await updateDoc(sessionDocRef, { status: 'disconnected', lastAction: 'desktop_reinitialized' });
+                    }
+                }
+            } catch (e) {
+                console.error("Error checking/creating shared session document:", e);
+                showToast("خطأ في إعداد جلسة الماسح المشتركة. حاول تحديث الصفحة.", "error");
+                updatePhoneConnectionButtonStatus('error');
+                return;
             }
+
 
             phoneSessionUnsubscribe = onSnapshot(sessionDocRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -1258,10 +1368,9 @@
                         
                         if (purposeFromSession === 'addEdit') {
                             productBarcodeInput.value = scannedValue;
+                            // هنا لا نغلق المودال
                             showToast('تم مسح الباركود بنجاح في نموذج المنتج.', 'success');
-                            if (productModal.style.display === 'flex') { // Only close if product modal is open
-                                closeProductModal(); 
-                            }
+                            // productModal.style.display remains 'flex'
                         } else if (purposeFromSession === 'search') {
                             inventorySearchInput.value = scannedValue;
                             const event = new Event('input', { bubbles: true });
@@ -1272,6 +1381,9 @@
                             showToast('تم مسح الباركود، ولكن الغرض غير واضح.', 'info');
                         }
                         
+                        // Stop loader after scan
+                        toggleScanLoader(purposeFromSession === 'search' ? 'search' : 'productBarcode', false);
+
                         // Signal phone to be ready for next scan
                         updateDoc(sessionDocRef, {
                             scannedValue: null,
@@ -1280,7 +1392,7 @@
                         }).catch(e => console.error("Error resetting session doc after processing:", e));
 
                         // Close phone connection modal if it was open for scanning
-                        if(phoneConnectionModal.style.display === 'flex' && data.status !== 'phoneReady') {
+                        if(phoneConnectionModal.style.display === 'flex') {
                             closePhoneConnectionModal();
                         }
                         
@@ -1295,12 +1407,14 @@
                         // Close phone connection modal if open
                         closePhoneConnectionModal();
                     } else if (data.status === 'scanRequested') {
-                         showToast('الهاتف جاهز للمسح الآن.', 'info');
-                         // Phone just confirmed it's ready to scan
+                         // Phone just confirmed it's ready to scan, no action needed here
+                         // Loader should already be active from requestScanFromPhone
                     } else if (data.status === 'scanning') {
                          phoneConnectionStatusMessage.textContent = 'الهاتف يقوم بالمسح... انتظر.';
                          phoneConnectionStatusMessage.className = 'status-message info';
-                         phoneQrLoader.style.display = 'block';
+                         phoneQrLoader.style.display = 'block'; // Show loader in modal while scanning
+                    } else if (data.status === 'disconnected') { // If phone sets status to disconnected
+                        updatePhoneConnectionButtonStatus('disconnected');
                     }
                 } else {
                     console.log("Shared session document deleted from Firestore. Unsubscribing desktop listener.");
@@ -1358,7 +1472,7 @@
                 qrCodeInstance = new QRious({
                     element: qrCodeDisplayCanvas,
                     value: SHARED_SCANNER_SESSION_ID, // QR will contain the shared ID
-                    size: 200 
+                    size: 180 
                 });
                 
                 phoneQrLoader.style.display = 'none';
@@ -1392,6 +1506,9 @@
                     return;
                 }
 
+                // Show loader while waiting for scan
+                toggleScanLoader(purpose === 'search' ? 'search' : 'productBarcode', true);
+
                 await updateDoc(sessionDocRef, {
                     purpose: purpose,
                     scannedValue: null,
@@ -1415,6 +1532,7 @@
             } catch (e) {
                 console.error("Error requesting scan from phone:", e);
                 showToast('حدث خطأ أثناء طلب المسح من الهاتف: ' + e.message, "error");
+                toggleScanLoader(purpose === 'search' ? 'search' : 'productBarcode', false); // Hide loader on error
             }
         }
 
