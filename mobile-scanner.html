@@ -17,7 +17,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Align content to start from top */
             min-height: 100vh;
             color: #333;
         }
@@ -33,6 +33,7 @@
             overflow: hidden; /* Ensure video fills container */
             margin-bottom: 20px;
             display: none; /* Hidden by default until scan requested */
+            background-color: #eee; /* Placeholder background */
         }
         #reader-container video {
             width: 100% !important;
