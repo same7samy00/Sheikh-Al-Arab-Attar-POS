@@ -145,6 +145,7 @@
         let scanPurpose = null; // The purpose received from desktop (addEdit/search)
         let sessionUnsubscribe = null; // Firestore listener unsubscribe function
         let isScannerActive = false; // Flag to track if the scanner is actively running
+        let connectionAttemptInterval = null; // للمحاولة الدورية للاتصال
 
         // Function to update status messages directly on the page
         function updateStatusPhone(message, type = 'info') {
@@ -256,6 +257,12 @@
                 sessionUnsubscribe();
                 sessionUnsubscribe = null;
             }
+            // Clear reconnection interval if active
+            if (connectionAttemptInterval) {
+                clearInterval(connectionAttemptInterval);
+                connectionAttemptInterval = null;
+            }
+
             if (sessionId) {
                 try {
                     await updateDoc(doc(db, 'scannerSessions', sessionId), {
@@ -268,29 +275,45 @@
                 }
                 scanPurpose = null;
             }
-            updateStatusPhone('تم قطع الاتصال بنجاح.', 'info');
+            updateStatusPhone('تم قطع الاتصال بنجاح. الماسح غير نشط.', 'info');
             pageTitlePhone.textContent = 'ماسح الباركود بالهاتف';
-            // Phone will remain connected to the shared session, just not actively scanning
-            // and waiting for desktop commands
+            // Start attempting to reconnect after disconnect, or wait for user to re-engage
+            startPeriodicConnectionAttempt(); 
         }
 
         // Function to connect to the shared Firebase session
         async function connectToSharedSession() {
+            if (sessionUnsubscribe) {
+                return; // Already listening
+            }
             updateStatusPhone('جاري الاتصال بجلسة الماسح المشتركة...', 'loading');
 
             const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
             
             // Check if session document exists, if not, create it
-            const docSnap = await getDoc(sessionDocRef);
-            if (!docSnap.exists()) {
-                console.log("Shared session document not found, creating it.");
-                await setDoc(sessionDocRef, {
-                    status: 'connecting', // Initial status
-                    createdAt: Timestamp.now(),
-                    lastAction: 'phone_initialized'
-                });
-            } else {
-                console.log("Shared session document already exists.");
+            // This is crucial for initial setup
+            try {
+                const docSnap = await getDoc(sessionDocRef);
+                if (!docSnap.exists()) {
+                    console.log("Shared session document not found, creating it.");
+                    await setDoc(sessionDocRef, {
+                        status: 'connecting', // Initial status
+                        createdAt: Timestamp.now(),
+                        lastAction: 'phone_initialized'
+                    });
+                } else {
+                    console.log("Shared session document already exists. Attempting to update status.");
+                    // Update status to show phone is trying to connect
+                    await updateDoc(sessionDocRef, {
+                        status: 'connecting', // Phone is trying to connect
+                        connectedAt: Timestamp.now()
+                    });
+                }
+            } catch (e) {
+                console.error("Error checking/creating shared session document:", e);
+                updateStatusPhone('خطأ في إعداد الاتصال: ' + e.message, 'error');
+                // Don't start listener if creation/check fails
+                return;
             }
 
             // Set up the Firestore listener for the session document
@@ -304,6 +327,8 @@
                         // Desktop confirms phone is ready, but not scanning yet
                         updateStatusPhone('الهاتف متصل وجاهز. الجهاز الرئيسي في انتظار طلب المسح.', 'success');
                         await stopScanner(); // Ensure scanner is off if not requested
+                        clearInterval(connectionAttemptInterval); // Stop periodic attempts if successfully connected
+                        connectionAttemptInterval = null;
                     } else if (data.status === 'scanRequested') {
                         // Desktop requested a scan! Start product barcode scanner
                         scanPurpose = data.purpose; // Get the specific purpose for this scan
@@ -322,17 +347,17 @@
                         updateStatusPhone('تم المسح. الجهاز الرئيسي جاري المعالجة...', 'info');
                     }
                 } else {
-                    updateStatusPhone('الجلسة انتهت أو تم حذفها من الجهاز الرئيسي.', 'info');
-                    await disconnect();
+                    updateStatusPhone('الجلسة انتهت أو تم حذفها من الجهاز الرئيسي. يرجى إعادة الاتصال.', 'info');
+                    await disconnect(); // Force disconnect if session document disappears
                     return;
                 }
             }, (error) => {
                 console.error("Error listening to session document on phone:", error);
-                updateStatusPhone('خطأ في الاتصال بالجهاز الرئيسي.', 'error');
-                disconnect();
+                updateStatusPhone('خطأ في الاتصال بالجهاز الرئيسي. سيتم إعادة المحاولة تلقائياً.', 'error');
+                disconnect(); // Disconnect and allow periodic attempts to re-engage
             });
-
-            // Signal desktop that phone is attempting to connect to this session
+            
+            // Signal desktop that phone is now ready to receive requests (initial state)
             try {
                 await updateDoc(sessionDocRef, {
                     status: 'phoneReady', // Phone is ready to receive scan requests
@@ -340,9 +365,29 @@
                 });
             } catch (e) {
                 console.error("Error signaling phoneReady status to desktop:", e);
-                updateStatusPhone('خطأ في الاتصال بالجهاز الرئيسي: ' + e.message, 'error');
-                disconnect();
+                updateStatusPhone('خطأ في إرسال حالة الاتصال للجهاز الرئيسي: ' + e.message, 'error');
+                // Do not disconnect immediately, let the onSnapshot handle it
             }
+        }
+
+        // Start periodic attempts to connect to shared session
+        function startPeriodicConnectionAttempt() {
+            if (connectionAttemptInterval) {
+                clearInterval(connectionAttemptInterval);
+            }
+            connectionAttemptInterval = setInterval(() => {
+                console.log("Attempting to reconnect/check session status...");
+                if (!sessionUnsubscribe) { // Only try to connect if not already listening
+                   connectToSharedSession();
+                } else {
+                    // If listener is active, just update own status if desktop shows disconnected
+                    getDoc(doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID)).then(docSnap => {
+                        if (docSnap.exists() && docSnap.data().status === 'disconnected') {
+                            updateStatusPhone('الماسح غير متصل. في انتظار الجهاز الرئيسي لتفعيله.', 'info');
+                        }
+                    }).catch(e => console.error("Error checking session status for periodic update:", e));
+                }
+            }, 10000); // Attempt every 10 seconds
         }
 
 
@@ -363,6 +408,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Phone will immediately try to connect to the shared session
             connectToSharedSession();
+            // Start periodic connection attempts to handle disconnections
+            startPeriodicConnectionAttempt();
         });
 
         // Handle page visibility changes (optional, for battery saving)
