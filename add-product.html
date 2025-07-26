@@ -113,6 +113,7 @@
         }
         .barcode-scan-buttons input {
             margin-bottom: 0;
+            padding-left: 35px; /* مسافة لـ Loader */
         }
 
         /* Loader داخل حقل الباركود في النموذج */
@@ -453,7 +454,14 @@
                     showToast("لم يتم إعداد جلسة الماسح بعد. يرجى فتح صفحة المخزون أولاً.", "info");
                     isPhoneScannerConnected = false;
                 } else {
-                    isPhoneScannerConnected = (docSnap.data().status === 'phoneReady' || docSnap.data().status === 'scanning' || docSnap.data().status === 'scanRequested');
+                    // إذا كان المستند موجودًا، تحقق من حالته
+                    const status = docSnap.data().status;
+                    isPhoneScannerConnected = (status === 'phoneReady' || status === 'scanning' || status === 'scanRequested');
+                    if (!isPhoneScannerConnected) { // إذا كانت حالة غير متصلة
+                         showToast("الماسح غير متصل. يرجى التأكد من تشغيله.", "error");
+                    } else {
+                         showToast("الماسح متصل وجاهز.", "success");
+                    }
                 }
             } catch (e) {
                 console.error("Error checking shared session document:", e);
@@ -465,12 +473,9 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    if (data.status === 'phoneReady') {
+                    if (data.status === 'phoneReady' || data.status === 'connecting' || data.status === 'scanning' || data.status === 'scanRequested') {
                         isPhoneScannerConnected = true;
-                        showToast('الماسح متصل وجاهز.', 'success');
-                    } else if (data.status === 'connecting' || data.status === 'scanning' || data.status === 'scanRequested') {
-                        isPhoneScannerConnected = true;
-                        showToast('الماسح متصل (جاري المسح أو ينتظر).', 'info');
+                        // لا نُظهر توست متكرر هنا، فقط نُحدث الحالة الداخلية
                     } else if (data.status === 'scanned') { 
                         const scannedValue = data.scannedValue;
                         const purposeFromSession = data.purpose;
@@ -480,7 +485,7 @@
                             showToast('تم مسح الباركود بنجاح.', "success");
                         } else {
                             console.warn("Received scanned value but purpose is not 'addEdit'. Ignoring.");
-                            showToast('تم مسح باركود لغرض مختلف.', "info");
+                            showToast('تم مسح باركود لغرض مختلف (ليس إضافة).', "info");
                         }
                         
                         toggleScanLoader('productBarcode', false); // إخفاء Loader
@@ -585,6 +590,7 @@
                 await addDoc(collection(db, 'products'), productData);
                 showToast('تم إضافة المنتج بنجاح!', "success");
                 productAddForm.reset(); // مسح النموذج بعد الإضافة
+                productNameInput.focus(); // ركز على أول حقل
             } catch (error) {
                 console.error("Error adding product:", error);
                 showToast('حدث خطأ أثناء إضافة المنتج. يرجى المحاولة مرة أخرى.', "error");
@@ -595,6 +601,7 @@
         addAnotherProductBtn.addEventListener('click', () => {
             productAddForm.reset();
             showToast("النموذج جاهز لإضافة منتج جديد.", "info");
+            productNameInput.focus(); // ركز على أول حقل
         });
 
         // زر العودة لإدارة المخزون
