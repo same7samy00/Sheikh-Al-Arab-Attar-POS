@@ -233,16 +233,26 @@
             background-color: #1976D2;
         }
         /* سلوك Loader داخل الزر الأيقونة */
-        .action-icon-btn .scan-loader-inside-button {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #fff; /* لون أبيض ليتناسب مع الزر */
-            border-radius: 50%;
-            width: 15px;
-            height: 15px;
-            animation: spin 1s linear infinite;
-            display: none;
-            margin-right: 0; /* لا يوجد هامش للأيقونة */
-        }
+     .action-icon-btn {
+    /* ... (احتفظ بباقي التنسيقات الموجودة هنا) ... */
+    position: relative; /* مهم جداً: ليكون العنصر الأب للـ Loader المطلق */
+    overflow: hidden; /* لإخفاء أي جزء من Loader قد يخرج عن الزر إذا كان أكبر */
+}
+.action-icon-btn .scan-loader-inside-button { /* سلوك Loader داخل الزر الأيقونة */
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #fff; /* لون أبيض ليتناسب مع الزر */
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    animation: spin 1s linear infinite;
+    display: none;
+    
+    /* التعديلات لجعله في المنتصف */
+    position: absolute; /* وضع مطلق داخل الزر */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* لتحريكه بدقة للمنتصف بناءً على حجمه */
+}
         .action-icon-btn.loading i {
             display: none;
         }
