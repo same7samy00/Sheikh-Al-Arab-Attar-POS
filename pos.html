@@ -17,7 +17,7 @@
         /* Gray: #333, #555, #ddd, #f4f7f6, #e0e0e0, #f9f9f9 */
         /* أخضر (تأكيد): #4CAF50, #45a049 */
         /* أحمر (خطأ/إلغاء): #f44336, #d32f2f */
-        /* الحواف المستديرة: 8px */
+        /* حواف مستديرة: 8px */
         /* الخطوط: 'Cairo' بالكامل */
 
         body {
@@ -175,135 +175,6 @@
             outline: none;
         }
 
-        /* --- توحيد تصميم الأزرار --- */
-        /* هذا النمط الأساسي يطبق على جميع الأزرار ذات الصلة */
-        .primary-btn, /* الأزرار الرئيسية مثل إتمام البيع */
-        .secondary-btn, /* الأزرار الثانوية مثل إلغاء البيع / إضافة خصم / طباعة */
-        .action-icon-btn, /* أزرار الأيقونات مثل مسح الباركود */
-        .modal-btn /* الأزرار داخل النوافذ العائمة */ {
-            font-family: 'Cairo', sans-serif;
-            padding: 12px 25px; /* بادينغ موحد لمعظم الأزرار */
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.05em; /* حجم خط موحد */
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px; /* مسافة بين الأيقونة والنص */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* ظل خفيف موحد */
-            position: relative; /* لتمكين تأثير الوميض */
-            overflow: hidden; /* لضمان عدم خروج الوميض عن الزر */
-        }
-        /* تأثيرات Hover و Active الموحدة */
-        .primary-btn:hover, .secondary-btn:hover, .action-icon-btn:hover, .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .primary-btn:active, .secondary-btn:active, .action-icon-btn:active, .modal-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        /* ألوان محددة لأنواع الأزرار */
-        .primary-btn { /* لإتمام البيع، إضافة عميل */
-            background-color: #4CAF50; /* أخضر */
-            color: white;
-        }
-        .primary-btn:hover { background-color: #45a049; }
-
-        .secondary-btn { /* إلغاء البيع، إضافة خصم، طباعة إيصال */
-            background-color: #607d8b; /* رمادي مزرق */
-            color: white;
-        }
-        .secondary-btn:hover { background-color: #546e7a; }
-
-        /* الأزرار داخل المودالات (تصميم موحد) */
-        .modal-btn {
-            background-color: #3f51b5; /* أزرق داكن */
-            color: white;
-            padding: 10px 20px; /* بادينغ أصغر قليلاً */
-            font-size: 1em;
-        }
-        .modal-btn:hover { background-color: #303f9f; }
-
-        .modal-btn.cancel-modal-btn {
-            background-color: #f44336; /* أحمر للإلغاء داخل المودال */
-            color: white;
-        }
-        .modal-btn.cancel-modal-btn:hover { background-color: #d32f2f; }
-
-        .action-icon-btn { /* زر مسح الباركود (أيقونة فقط) */
-            background-color: #3f51b5; /* أزرق داكن */
-            color: white;
-            padding: 10px; /* بادينغ متساوي للأيقونة */
-            width: 45px; /* عرض ثابت لجعله دائريًا تقريبًا */
-            height: 45px; /* ارتفاع ثابت */
-            border-radius: 50%; /* لجعل الزر دائريًا */
-            gap: 0; /* لا يوجد gap للأزرار الأيقونية */
-        }
-        .action-icon-btn i {
-            font-size: 1.2em; /* حجم الأيقونة */
-            margin: 0;
-        }
-        .action-icon-btn:hover {
-            background-color: #303f9f;
-        }
-        
-        /* Loader داخل الزر (يختفي ويظهر الأيقونة) */
-        .action-icon-btn .button-loader,
-        .secondary-action-btn .button-loader { /* لودر لزر الطباعة أيضاً */
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #fff; /* لون أبيض ليتناسب مع لون الزر */
-            border-radius: 50%;
-            width: 15px;
-            height: 15px;
-            animation: spin 1s linear infinite;
-            display: none; /* مخفي افتراضياً */
-            margin-right: 8px; /* مسافة بين الـ loader والنص */
-        }
-        .action-icon-btn.loading i,
-        .secondary-action-btn.loading i {
-            display: none;
-        }
-        .action-icon-btn.loading .button-loader,
-        .secondary-action-btn.loading .button-loader {
-            display: block;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* --- تأثير الوميض (Pulse Effect) للأزرار أثناء المسح --- */
-        .action-icon-btn.scanning-pulse {
-            animation: scan-button-pulse 1s infinite alternate;
-        }
-        @keyframes scan-button-pulse {
-            0% { 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(33, 150, 243, 0.4); /* لون أزرق */
-                background-color: #2196F3; /* لون خلفية زر المسح بالهاتف */
-            }
-            100% { 
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(33, 150, 243, 0);
-                background-color: #2196F3;
-            }
-        }
-        .secondary-action-btn.scanning-pulse {
-            animation: default-button-pulse 1s infinite alternate;
-        }
-        @keyframes default-button-pulse {
-            0% { 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(96, 125, 139, 0.4); /* لون رمادي مزرق */
-                background-color: #607d8b;
-            }
-            100% { 
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(96, 125, 139, 0);
-                background-color: #607d8b;
-            }
-        }
-
         /* قائمة المنتجات المعروضة بعد البحث */
         #product-search-results {
             max-height: 300px; /* ارتفاع أقصى مع التمرير */
@@ -311,19 +182,17 @@
             border: 1px solid #eee;
             border-radius: 8px;
             margin-bottom: 15px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* ظل داخلي خفيف */
         }
         #product-search-results .product-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 15px; /* بادينغ أكبر */
-            border-bottom: 1px solid #f0f0f0; /* خط فاصل أفتح */
+            padding: 10px;
+            border-bottom: 1px solid #f9f9f9;
             background-color: #fff;
-            transition: background-color 0.2s ease;
         }
         #product-search-results .product-item:hover {
-            background-color: #f9f9f9;
+            background-color: #f0f0f0;
             cursor: pointer;
         }
         #product-search-results .product-item:last-child {
@@ -336,11 +205,11 @@
         .product-item .info h5 {
             margin: 0 0 5px 0;
             color: #333;
-            font-size: 1.05em; /* حجم خط أكبر */
+            font-size: 1em;
         }
         .product-item .info span {
             color: #555;
-            font-size: 0.88em; /* حجم خط أكبر قليلاً */
+            font-size: 0.85em;
         }
         .product-item .add-btn {
             background-color: #4CAF50;
@@ -349,30 +218,27 @@
             border-radius: 5px;
             padding: 8px 12px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: background-color 0.3s ease;
             font-family: 'Cairo', sans-serif;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .product-item .add-btn:hover {
             background-color: #45a049;
-            transform: translateY(-1px);
         }
 
         /* سلة التسوق (Cart) */
         #cart-items {
             flex-grow: 1;
-            max-height: 400px;
+            max-height: 400px; /* ارتفاع أقصى لسلة التسوق */
             overflow-y: auto;
             border: 1px solid #eee;
             border-radius: 8px;
             margin-bottom: 15px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
         #cart-items .cart-item {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 10px;
+            border-bottom: 1px solid #f9f9f9;
             background-color: #fff;
         }
         #cart-items .cart-item:last-child {
@@ -386,47 +252,34 @@
         .cart-item .details h5 {
             margin: 0 0 5px 0;
             color: #333;
-            font-size: 1.05em;
+            font-size: 1em;
         }
         .cart-item .details span {
             color: #555;
-            font-size: 0.88em;
+            font-size: 0.85em;
         }
         .cart-item .quantity-controls {
             display: flex;
             align-items: center;
             gap: 5px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            overflow: hidden;
         }
         .cart-item .quantity-controls button {
-            background-color: #e0e0e0;
-            border: none;
-            padding: 6px 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 8px;
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.2s ease;
+            font-family: 'Cairo', sans-serif; /* تطبيق خط كايرو */
         }
         .cart-item .quantity-controls button:hover {
-            background-color: #d0d0d0;
+            background-color: #e0e0e0;
         }
         .cart-item .quantity-controls span {
-            min-width: 25px;
+            min-width: 20px;
             text-align: center;
             font-weight: bold;
-            color: #333;
-        }
-        /* لتحديد كمية الجرامات */
-        .cart-item .quantity-controls input[type="number"] {
-            font-family: 'Cairo', sans-serif;
-            width: 60px; /* عرض مناسب */
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px;
-            font-size: 0.9em;
-            box-sizing: border-box;
         }
         .cart-item .remove-btn {
             background-color: #f44336;
@@ -438,7 +291,6 @@
             transition: background-color 0.3s ease;
             font-family: 'Cairo', sans-serif;
             margin-right: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .cart-item .remove-btn:hover {
             background-color: #d32f2f;
@@ -453,12 +305,12 @@
         .cart-summary-totals div {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px; /* مسافة أكبر */
-            font-size: 1.05em;
+            margin-bottom: 8px;
+            font-size: 1em;
         }
         .cart-summary-totals .total {
             font-weight: bold;
-            font-size: 1.3em; /* حجم أكبر للإجمالي الكلي */
+            font-size: 1.2em;
             color: #3f51b5; /* أزرق */
         }
 
@@ -467,7 +319,7 @@
             padding-top: 15px;
             border-top: 1px solid #eee;
         }
-        .payment-section .modal-form-group { /* استخدام modal-form-group للتنسيق الموحد */
+        .payment-section .form-group {
             margin-bottom: 15px;
         }
         .payment-section label {
@@ -475,12 +327,12 @@
             margin-bottom: 5px;
             font-weight: bold;
             color: #555;
-            font-size: 1em;
         }
         .payment-section input[type="number"],
+        .payment-section input[type="text"], /* أضفت text ليتناسق مع حقول العملاء */
         .payment-section select {
             font-family: 'Cairo', sans-serif;
-            width: 100%;
+            width: calc(100% - 24px); /* عرض كامل مع بادينغ */
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -490,61 +342,202 @@
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .payment-section input[type="number"]:focus,
+        .payment-section input[type="text"]:focus,
         .payment-section select:focus {
             border-color: #3f51b5;
             box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
             outline: none;
         }
-        /* تنسيق خاص لـ customer-search-results */
-        #customer-search-results {
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid #eee;
+        /* تنسيق زر إضافة عميل جديد */
+        #customer-select-group #add-new-customer-btn {
+            font-family: 'Cairo', sans-serif;
+            background-color: #3f51b5; /* أزرق داكن */
+            color: white;
+            border: none;
             border-radius: 8px;
-            margin-top: 5px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-        }
-        #customer-search-results .customer-item {
-            padding: 8px 10px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 10px 20px;
             cursor: pointer;
-            text-align: right;
+            font-size: 0.9em;
+            margin-top: 10px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        #customer-search-results .customer-item:hover {
-            background-color: #f9f9f9;
+        #customer-select-group #add-new-customer-btn:hover {
+            background-color: #303f9f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        #customer-search-results .customer-item:last-child {
-            border-bottom: none;
+        #customer-select-group #add-new-customer-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-
-
+        
         /* أزرار الإجراءات في نقطة البيع (إتمام البيع، إلغاء، إضافة خصم) */
         .pos-actions {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* مسافة أكبر */
-            margin-top: 25px; /* مسافة أكبر */
+            gap: 10px;
+            margin-top: 20px;
         }
-        /* الأزرار هنا تستخدم primary-btn و secondary-btn */
-        .pos-actions .primary-btn, .pos-actions .secondary-btn {
-            width: 100%; /* تأخذ عرضاً كاملاً */
-            padding: 14px 25px; /* بادينغ أكبر */
-            font-size: 1.15em; /* حجم خط أكبر */
+        /* توحيد الأزرار الرئيسية في نقطة البيع */
+        .pos-actions button {
+            font-family: 'Cairo', sans-serif;
+            padding: 14px 30px; /* بادينغ أكبر للأزرار الرئيسية */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em; /* حجم خط أكبر */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .pos-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .pos-actions button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .pos-actions .complete-sale-btn {
+            background-color: #4CAF50; /* أخضر */
+            color: white;
+        }
+        .pos-actions .complete-sale-btn:hover {
+            background-color: #45a049;
+        }
+
+        .pos-actions .cancel-sale-btn {
+            background-color: #f44336; /* أحمر */
+            color: white;
+        }
+        .pos-actions .cancel-sale-btn:hover {
+            background-color: #d32f2f;
         }
         .pos-actions .add-discount-btn {
-            background-color: #3f51b5;
+            background-color: #3f51b5; /* أزرق داكن */
+            color: white;
+            font-size: 1.1em; /* أصغر قليلاً من الأزرار الرئيسية */
+            padding: 12px 25px;
         }
         .pos-actions .add-discount-btn:hover {
             background-color: #303f9f;
         }
-        .pos-actions .print-receipt-btn {
-            background-color: #A1E3F9; /* لون مميز للطباعة (Light Blue) */
-            color: #3674B5; /* لون نص داكن */
-            font-weight: bold;
+        /* زر الطباعة */
+        .print-receipt-btn {
+            background-color: #555; /* رمادي لزر الطباعة */
+            color: white;
+            font-size: 1.1em;
+            padding: 12px 25px;
         }
-        .pos-actions .print-receipt-btn:hover {
-            background-color: #8acfe5;
-            color: #3674B5;
+        .print-receipt-btn:hover {
+            background-color: #333;
+        }
+        /* Loader داخل زر الطباعة */
+        .print-receipt-btn.loading {
+            background-color: #555; /* لون عند التحميل */
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .print-receipt-btn .button-loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-right: 8px;
+        }
+        .print-receipt-btn.loading i { display: none; }
+        .print-receipt-btn.loading .button-loader { display: block; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        /* زر أيقونة الهاتف (نسخ من تصميمك الموحد) */
+        .action-icon-btn {
+            background-color: #3f51b5; /* أزرق داكن */
+            color: white;
+            padding: 10px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .action-icon-btn i {
+            font-size: 1.2em;
+            margin: 0;
+        }
+        .action-icon-btn:hover {
+            background-color: #303f9f;
+        }
+        .action-icon-btn.status-disconnected {
+            background-color: #f44336;
+        }
+        .action-icon-btn.status-disconnected:hover {
+            background-color: #d32f2f;
+        }
+        .action-icon-btn.status-connecting {
+            background-color: #FFA000;
+            animation: pulse 1s infinite alternate;
+        }
+        .action-icon-btn.status-connected {
+            background-color: #4CAF50;
+        }
+        .action-icon-btn.status-connected:hover {
+            background-color: #45a049;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        /* Loader داخل الأزرار (وميض) */
+        .action-icon-btn.scanning-pulse {
+            animation: scan-button-pulse 1s infinite alternate;
+        }
+        @keyframes scan-button-pulse {
+            0% { 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(33, 150, 243, 0.4); /* لون أزرق */
+                background-color: #2196F3; /* لون خلفية زر المسح بالهاتف */
+            }
+            100% { 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(33, 150, 243, 0);
+                background-color: #2196F3;
+            }
+        }
+        .secondary-action-btn.scanning-pulse { /* زر مسح الباركود بجوار البحث */
+            animation: search-button-pulse 1s infinite alternate;
+        }
+        @keyframes search-button-pulse {
+            0% { 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(96, 125, 139, 0.4); /* لون رمادي مزرق */
+                background-color: #607d8b;
+            }
+            100% { 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(96, 125, 139, 0);
+                background-color: #607d8b;
+            }
         }
 
 
@@ -574,16 +567,15 @@
             animation-duration: 0.4s;
             box-sizing: border-box;
             width: 90vw;
-            max-width: 500px; /* حجم معقول للمودالات */
+            max-width: 500px;
             height: auto;
             max-height: 90vh;
-            text-align: center;
+            text-align: right; /* محاذاة لليمين للنصوص داخل المودال */
         }
         @keyframes animatetop {
             from {top: -300px; opacity: 0}
             to {top: 0; opacity: 1}
         }
-        /* أيقونة الإغلاق في الزاوية العلوية اليمنى (لـ RTL) */
         .close-button {
             color: #aaa;
             font-size: 28px;
@@ -591,15 +583,14 @@
             cursor: pointer;
             position: absolute;
             top: 10px;
-            right: 15px; /* في الزاوية اليمنى لـ RTL */
-            left: unset;
+            right: 15px; /* الزاوية العلوية اليمنى لـ RTL */
         }
         .close-button:hover, .close-button:focus {
             color: black;
             text-decoration: none;
         }
         .modal-content h4 {
-            text-align: center;
+            text-align: center; /* عنوان المودال في المنتصف */
             color: #3f51b5;
             margin-bottom: 25px;
             font-size: 1.5em;
@@ -624,53 +615,58 @@
             font-size: 1em;
             direction: rtl;
             box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
-        /* الأزرار داخل المودالات (تستخدم الآن .modal-btn) */
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end; /* محاذاة لليسار في RTL */
-            gap: 10px;
-            margin-top: 20px;
+        .modal-form-group input[type="text"]:focus,
+        .modal-form-group input[type="number"]:focus,
+        .modal-form-group select:focus {
+            border-color: #3f51b5;
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+            outline: none;
         }
-        /* لا حاجة لـ submit-btn-modal و cancel-btn-modal منفصلين، نستخدم .modal-btn */
-        /* .modal-form-group .submit-btn-modal, .modal-form-group .cancel-btn-modal { ... } */
-
-
-        /* --- تنسيقات التوست (نسخ من تصميمك الموحد) --- */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-start;
-        }
-        .toast {
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
+        /* توحيد أزرار المودال بنفس نمط الأزرار الموحدة */
+        .modal-form-group .submit-btn-modal,
+        .modal-form-group .cancel-btn-modal {
+            font-family: 'Cairo', sans-serif;
+            padding: 12px 25px;
+            border: none;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            opacity: 0;
-            transform: translateY(100%);
-            animation: slideInToast 0.5s forwards;
-            min-width: 250px;
-            max-width: 350px;
-            text-align: right;
-            font-size: 0.9em;
+            cursor: pointer;
+            font-size: 1.05em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: inline-flex; /* ليتناسب مع أزرار inline */
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .toast.success { background-color: #4CAF50; }
-        .toast.error { background-color: #f44336; }
-        .toast.hide { animation: fadeOutToast 0.5s forwards; }
-        @keyframes slideInToast {
-            from { opacity: 0; transform: translateY(100%); }
-            to { opacity: 1; transform: translateY(0); }
+        .modal-form-group .submit-btn-modal:hover,
+        .modal-form-group .cancel-btn-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        @keyframes fadeOutToast {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(100%); }
+        .modal-form-group .submit-btn-modal:active,
+        .modal-form-group .cancel-btn-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .modal-form-group .submit-btn-modal {
+            background-color: #4CAF50; /* أخضر */
+            color: white;
+            margin-top: 15px; /* مسافة أعلى */
+        }
+        .modal-form-group .submit-btn-modal:hover {
+            background-color: #45a049;
+        }
+        .modal-form-group .cancel-btn-modal {
+            background-color: #f44336; /* أحمر */
+            color: white;
+            margin-top: 15px;
+            margin-right: 10px; /* مسافة بين زرين */
+        }
+        .modal-form-group .cancel-btn-modal:hover {
+            background-color: #d32f2f;
         }
 
 
@@ -725,16 +721,6 @@
             .modal-content {
                 width: 95vw;
                 padding: 15px;
-            }
-            .action-button, .primary-btn, .secondary-btn, .modal-btn {
-                padding: 12px 15px; /* تصغير البادينغ على الجوال */
-                font-size: 1em;
-            }
-            .action-icon-btn {
-                width: 40px;
-                height: 40px;
-                padding: 8px;
-                font-size: 1.1em;
             }
         }
     </style>
@@ -820,7 +806,7 @@
                             <label for="customer-search-input">العميل (للدين):</label>
                             <input type="text" id="customer-search-input" placeholder="ابحث عن عميل أو أضف جديد">
                             <div id="customer-search-results" style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; margin-top: 5px;"></div>
-                            <button id="add-new-customer-btn" class="modal-btn" style="width: 100%; margin-top: 10px; font-size:0.9em; gap:5px;"><i class="fas fa-user-plus"></i> إضافة عميل جديد</button>
+                            <button id="add-new-customer-btn" class="add-discount-btn" style="width: 100%; margin-top: 10px; font-size:0.9em; gap:5px;"><i class="fas fa-user-plus"></i> إضافة عميل جديد</button>
                         </div>
                         <div class="modal-form-group" id="change-due-group">
                             <span>الباقي للعميل:</span>
@@ -828,942 +814,1120 @@
                         </div>
 
                         <div class="pos-actions">
-                            <button id="complete-sale-btn" class="primary-btn"><i class="fas fa-check"></i> إتمام البيع</button>
-                            <button id="cancel-sale-btn" class="secondary-btn"><i class="fas fa-times"></i> إلغاء البيع</button>
-                            <button id="add-discount-btn" class="secondary-btn"><i class="fas fa-tags"></i> إضافة خصم</button>
-                            <button id="print-receipt-btn" class="secondary-btn print-receipt-btn"><span class="button-loader"></span><i class="fas fa-print"></i> طباعة إيصال</button>
+                            <button id="complete-sale-btn" class="complete-sale-btn"><i class="fas fa-check"></i> إتمام البيع</button>
+                            <button id="cancel-sale-btn" class="cancel-sale-btn"><i class="fas fa-times"></i> إلغاء البيع</button>
+                            <button id="add-discount-btn" class="add-discount-btn"><i class="fas fa-tags"></i> إضافة خصم</button>
+                            <button id="print-receipt-btn" class="print-receipt-btn"><span class="button-loader"></span><i class="fas fa-print"></i> طباعة إيصال</button>
                         </div>
                     </div>
                 </div>
             </section>
-        </main>
-    </div>
 
-    <div id="discount-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="close-discount-modal-btn">&times;</span>
-            <h4>تطبيق خصم</h4>
-            <div class="modal-form-group">
-                <label for="discount-type">نوع الخصم:</label>
-                <select id="discount-type">
-                    <option value="percentage">نسبة مئوية (%)</option>
-                    <option value="fixed">مبلغ ثابت</option>
-                </select>
-            </div>
-            <div class="modal-form-group">
-                <label for="discount-value">قيمة الخصم:</label>
-                <input type="number" id="discount-value" step="0.01" min="0" value="0.00">
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn" id="apply-discount-btn">تطبيق الخصم</button>
-                <button class="modal-btn cancel-modal-btn" id="remove-discount-btn">إزالة الخصم</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="add-customer-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="close-add-customer-modal-btn">&times;</span>
-            <h4>إضافة عميل جديد</h4>
-            <div class="modal-form-group">
-                <label for="new-customer-name">اسم العميل:</label>
-                <input type="text" id="new-customer-name" required>
-            </div>
-            <div class="modal-form-group">
-                <label for="new-customer-phone">رقم الهاتف (اختياري):</label>
-                <input type="text" id="new-customer-phone">
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn" id="save-new-customer-btn">حفظ العميل</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="password-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="close-password-modal-btn">&times;</span>
-            <h4>تأكيد صلاحيات المسؤول</h4>
-            <form id="password-form">
-                <div class="modal-form-group">
-                    <input type="password" id="password-input" placeholder="أدخل كلمة السر" required>
+            <div id="discount-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" id="close-discount-modal-btn">&times;</span>
+                    <h4>تطبيق خصم</h4>
+                    <div class="modal-form-group">
+                        <label for="discount-type">نوع الخصم:</label>
+                        <select id="discount-type">
+                            <option value="percentage">نسبة مئوية (%)</option>
+                            <option value="fixed">مبلغ ثابت</option>
+                        </select>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="discount-value">قيمة الخصم:</label>
+                        <input type="number" id="discount-value" step="0.01" min="0" value="0.00">
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <button class="submit-btn-modal" id="apply-discount-btn">تطبيق الخصم</button>
+                        <button class="cancel-btn-modal" id="remove-discount-btn">إزالة الخصم</button>
+                    </div>
                 </div>
-                <div class="modal-actions">
-                    <button type="submit" class="modal-btn"><i class="fas fa-check"></i> تأكيد</button>
+            </div>
+
+            <div id="add-customer-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" id="close-add-customer-modal-btn">&times;</span>
+                    <h4>إضافة عميل جديد</h4>
+                    <div class="modal-form-group">
+                        <label for="new-customer-name">اسم العميل:</label>
+                        <input type="text" id="new-customer-name" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="new-customer-phone">رقم الهاتف (اختياري):</label>
+                        <input type="text" id="new-customer-phone">
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <button class="submit-btn-modal" id="save-new-customer-btn">حفظ العميل</button>
+                        <button class="cancel-btn-modal" id="cancel-new-customer-btn">إلغاء</button>
+                    </div>
                 </div>
-                <p id="password-error-message" style="display: none; color: #f44336; margin-top: 10px; font-size: 0.9em;">كلمة السر غير صحيحة.</p>
-            </form>
-        </div>
-    </div>
+            </div>
 
-    <div id="toast-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; align-items: flex-start;"></div>
+            <div id="fractional-quantity-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" id="close-fractional-quantity-modal-btn">&times;</span>
+                    <h4 id="fractional-modal-title">أدخل الكمية</h4>
+                    <div class="modal-form-group">
+                        <label id="fractional-quantity-label" for="fractional-quantity-input">الكمية (بالجرام/مليلتر):</label>
+                        <input type="number" id="fractional-quantity-input" step="0.01" min="0.01" required>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <button class="submit-btn-modal" id="add-fractional-to-cart-btn">إضافة إلى الفاتورة</button>
+                        <button class="cancel-btn-modal" id="cancel-fractional-add-btn">إلغاء</button>
+                    </div>
+                </div>
+            </div>
 
-    <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, doc, getDoc, runTransaction, increment, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+            <div id="password-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" id="close-password-modal-btn">&times;</span>
+                    <h4>تأكيد صلاحيات المسؤول</h4>
+                    <form id="password-form">
+                        <div class="modal-form-group">
+                            <input type="password" id="password-input" placeholder="أدخل كلمة السر" required>
+                        </div>
+                        <div style="display: flex; justify-content: center; gap: 10px;">
+                            <button type="submit" class="submit-btn-modal"><i class="fas fa-check"></i> تأكيد</button>
+                            <button type="button" class="cancel-btn-modal" id="cancel-password-btn">إلغاء</button>
+                        </div>
+                        <p id="password-error-message" style="display: none; color: #f44336; margin-top: 10px; font-size: 0.9em;">كلمة السر غير صحيحة.</p>
+                    </form>
+                </div>
+            </div>
 
-        // معلومات تهيئة تطبيق Firebase الخاص بك (تأكد من مطابقتها)
-        const firebaseConfig = {
-          apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
-          authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
-          projectId: "pharmacy-inventory-bf04a",
-          storageBucket: "pharmacy-inventory-bf04a.firebasestorage.app",
-          messagingSenderId: "937788650384",
-          appId: "1:937788650384:web:6451225d00e648f3a0b915",
-          measurementId: "G-ZGC9EQ55SL"
-        };
+            <div id="toast-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; align-items: flex-start;"></div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // --- معرف الجلسة المشترك (يجب أن يتطابق مع inventory.html و mobile-scanner.html) ---
-        const SHARED_SCANNER_SESSION_ID = "SHEIKH_ALARAB_SCANNER_SESSION"; // !!! قم بتغيير هذا ليكون معرفًا فريدًا لمتجرك !!!
-        const MANAGER_PASSWORD = "0000"; // كلمة السر للمسؤول
-
-        let managerAccessEnabled = localStorage.getItem('managerAccessEnabled') === 'true'; // حالة صلاحيات المسؤول
-        let phoneSessionUnsubscribe = null; // لمراقبة جلسة الماسح
-        let isPhoneScannerConnected = false; // حالة اتصال ماسح الهاتف
-
-        // --- عناصر DOM الرئيسية ---
-        const currentUserSpan = document.getElementById('current-user-name');
-        const logoutBtn = document.getElementById('logout-btn');
-        const managerAccessBtn = document.getElementById('manager-access-btn');
-
-        const productSearchInput = document.getElementById('product-search-input');
-        const scanBarcodePosBtn = document.getElementById('scan-barcode-pos-btn');
-        const productSearchResults = document.getElementById('product-search-results');
-        const cartItemsContainer = document.getElementById('cart-items');
-
-        const subtotalDisplay = document.getElementById('subtotal-display');
-        const discountDisplay = document.getElementById('discount-display');
-        const totalDisplay = document.getElementById('total-display');
-
-        const paymentMethodSelect = document.getElementById('payment-method');
-        const cashPaidGroup = document.getElementById('cash-paid-group');
-        const cashPaidInput = document.getElementById('cash-paid');
-        const customerSelectGroup = document.getElementById('customer-select-group');
-        const customerSearchInput = document.getElementById('customer-search-input');
-        const customerSearchResults = document.getElementById('customer-search-results');
-        const addNewCustomerBtn = document.getElementById('add-new-customer-btn');
-        const changeDueDisplay = document.getElementById('change-due-display');
-
-        const completeSaleBtn = document.getElementById('complete-sale-btn');
-        const cancelSaleBtn = document.getElementById('cancel-sale-btn');
-        const addDiscountBtn = document.getElementById('add-discount-btn');
-        const printReceiptBtn = document.getElementById('print-receipt-btn');
-
-        // Modals
-        const discountModal = document.getElementById('discount-modal');
-        const closeDiscountModalBtn = document.getElementById('close-discount-modal-btn');
-        const discountTypeSelect = document.getElementById('discount-type');
-        const discountValueInput = document.getElementById('discount-value');
-        const applyDiscountBtn = document.getElementById('apply-discount-btn');
-        const removeDiscountBtn = document.getElementById('remove-discount-btn');
-
-        const addCustomerModal = document.getElementById('add-customer-modal');
-        const closeAddCustomerModalBtn = document.getElementById('close-add-customer-modal-btn');
-        const newCustomerNameInput = document.getElementById('new-customer-name');
-        const newCustomerPhoneInput = document.getElementById('new-customer-phone');
-        const saveNewCustomerBtn = document.getElementById('save-new-customer-btn');
-
-        const passwordModal = document.getElementById('password-modal');
-        const closePasswordModalBtn = document.getElementById('close-password-modal-btn');
-        const passwordForm = document.getElementById('password-form');
-        const passwordInput = document.getElementById('password-input');
-        const passwordErrorMessage = document.getElementById('password-error-message');
-
-        const toastContainer = document.getElementById('toast-container');
-
-        // --- متغيرات حالة نقطة البيع ---
-        let cart = []; // تخزين المنتجات في سلة التسوق
-        let currentDiscount = { type: 'fixed', value: 0 }; // نوع الخصم (نسبة مئوية/ثابت) وقيمته
-        let selectedCustomer = null; // العميل الحالي للفاتورة (إذا كان هناك دين)
-        let allProducts = []; // لتخزين جميع المنتجات لجلب أسرع
-
-        // --- دالة لإظهار الإشعارات العائمة (Toasts) (نسخ من تصميمك الموحد) ---
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.classList.add('toast', type);
-            toast.textContent = message;
-            toastContainer.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.add('hide');
-                toast.addEventListener('animationend', () => {
-                    toast.remove();
-                });
-            }, 3000);
-        }
-
-        /**
-         * لإظهار أو إخفاء Loader/وميض الزر.
-         * @param {HTMLElement} buttonElement - زر المسح الذي سيومض.
-         * @param {boolean} activate - true لتفعيل الوميض/اللودر، false لإزالته.
-         */
-        function toggleScanningPulse(buttonElement, activate) {
-            const loader = buttonElement.querySelector('.button-loader');
-            const icon = buttonElement.querySelector('i');
-            
-            if (activate) {
-                if (icon) icon.style.display = 'none'; // إخفاء الأيقونة
-                if (loader) loader.style.display = 'block'; // إظهار Loader
-                buttonElement.classList.add('loading', 'scanning-pulse'); // إضافة كلاسات التحكم
-            } else {
-                if (icon) icon.style.display = 'block'; // إظهار الأيقونة
-                if (loader) loader.style.display = 'none'; // إخفاء Loader
-                buttonElement.classList.remove('loading', 'scanning-pulse'); // إزالة كلاسات التحكم
-            }
-        }
-
-        // --- وظائف صلاحيات المسؤول (نسخ من تصميمك الموحد) ---
-        function setAccessButtonsState(enabled) {
-            // هنا يمكنك تمكين/تعطيل أزرار معينة في نقطة البيع إذا كانت تتطلب صلاحيات
-            // مثلاً: completeSaleBtn.disabled = !enabled;
-            // حالياً، صلاحيات المسؤول تستخدم لتطبيق الخصومات المعقدة أو المرتجعات
-            managerAccessBtn.classList.toggle('active-access', enabled);
-            if (enabled) {
-                showToast("تم تفعيل صلاحيات المسؤول", "success");
-            } else {
-                showToast("تم إلغاء صلاحيات المسؤول", "info");
-            }
-            localStorage.setItem('managerAccessEnabled', enabled);
-        }
-
-        function openPasswordModal(message) {
-            passwordModal.style.display = 'flex';
-            passwordInput.value = '';
-            passwordErrorMessage.style.display = 'none';
-            passwordModal.querySelector('h4').textContent = message;
-
-            return new Promise((resolve, reject) => {
-                passwordForm.onsubmit = (e) => {
-                    e.preventDefault();
-                    resolve(passwordInput.value);
-                    closePasswordModal();
+            <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
+            <script type="module">
+                // تم نقل جميع أكواد JavaScript إلى أسفل لضمان تحميل DOM أولاً
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+                import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, doc, getDoc, runTransaction, increment, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+                import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+                
+                // معلومات تهيئة تطبيق Firebase الخاص بك (تأكد من مطابقتها)
+                const firebaseConfig = {
+                  apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
+                  authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
+                  projectId: "pharmacy-inventory-bf04a",
+                  storageBucket: "pharmacy-inventory-bf04a.firebasestorage.app",
+                  messagingSenderId: "937788650384",
+                  appId: "1:937788650384:web:6451225d00e648f3a0b915",
+                  measurementId: "G-ZGC9EQ55SL"
                 };
-                closePasswordModalBtn.onclick = () => {
-                    reject("User cancelled password prompt.");
-                    closePasswordModal();
-                };
-                passwordModal.onclick = (event) => {
-                    if (event.target === passwordModal) {
-                        reject("User cancelled password prompt.");
-                        closePasswordModal();
+
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
+
+                // --- معرف الجلسة المشترك (يجب أن يتطابق مع inventory.html و mobile-scanner.html) ---
+                const SHARED_SCANNER_SESSION_ID = "YOUR_STORE_UNIQUE_SCANNER_ID_12345"; // !!! يجب أن يتطابق مع الملفات الأخرى !!!
+                const MANAGER_PASSWORD = "0000"; // كلمة السر للمسؤول
+
+                let managerAccessEnabled = localStorage.getItem('managerAccessEnabled') === 'true'; // حالة صلاحيات المسؤول
+                let phoneSessionUnsubscribe = null; // لمراقبة جلسة الماسح
+                let isPhoneScannerConnected = false; // حالة اتصال ماسح الهاتف
+
+                // --- عناصر DOM الرئيسية ---
+                const currentUserSpan = document.getElementById('current-user-name');
+                const logoutBtn = document.getElementById('logout-btn');
+                const managerAccessBtn = document.getElementById('manager-access-btn');
+
+                const productSearchInput = document.getElementById('product-search-input');
+                const scanBarcodePosBtn = document.getElementById('scan-barcode-pos-btn');
+                const productSearchResults = document.getElementById('product-search-results');
+                const cartItemsContainer = document.getElementById('cart-items');
+
+                const subtotalDisplay = document.getElementById('subtotal-display');
+                const discountDisplay = document.getElementById('discount-display');
+                const totalDisplay = document.getElementById('total-display');
+
+                const paymentMethodSelect = document.getElementById('payment-method');
+                const cashPaidGroup = document.getElementById('cash-paid-group');
+                const cashPaidInput = document.getElementById('cash-paid');
+                const customerSelectGroup = document.getElementById('customer-select-group');
+                const customerSearchInput = document.getElementById('customer-search-input');
+                const customerSearchResults = document.getElementById('customer-search-results');
+                const addNewCustomerBtn = document.getElementById('add-new-customer-btn');
+                const changeDueDisplay = document.getElementById('change-due-display');
+
+                const completeSaleBtn = document.getElementById('complete-sale-btn');
+                const cancelSaleBtn = document.getElementById('cancel-sale-btn');
+                const addDiscountBtn = document.getElementById('add-discount-btn');
+                const printReceiptBtn = document.getElementById('print-receipt-btn');
+
+                // Modals
+                const discountModal = document.getElementById('discount-modal');
+                const closeDiscountModalBtn = document.getElementById('close-discount-modal-btn');
+                const discountTypeSelect = document.getElementById('discount-type');
+                const discountValueInput = document.getElementById('discount-value');
+                const applyDiscountBtn = document.getElementById('apply-discount-btn');
+                const removeDiscountBtn = document.getElementById('remove-discount-btn');
+
+                const addCustomerModal = document.getElementById('add-customer-modal');
+                const closeAddCustomerModalBtn = document.getElementById('close-add-customer-modal-btn');
+                const newCustomerNameInput = document.getElementById('new-customer-name');
+                const newCustomerPhoneInput = document.getElementById('new-customer-phone');
+                const saveNewCustomerBtn = document.getElementById('save-new-customer-btn');
+                const cancelNewCustomerBtn = document.getElementById('cancel-new-customer-btn'); // زر إلغاء إضافة عميل
+
+                const fractionalQuantityModal = document.getElementById('fractional-quantity-modal');
+                const closeFractionalQuantityModalBtn = document.getElementById('close-fractional-quantity-modal-btn');
+                const fractionalModalTitle = document.getElementById('fractional-modal-title');
+                const fractionalQuantityLabel = document.getElementById('fractional-quantity-label');
+                const fractionalQuantityInput = document.getElementById('fractional-quantity-input');
+                const addFractionalToCartBtn = document.getElementById('add-fractional-to-cart-btn');
+                const cancelFractionalAddBtn = document.getElementById('cancel-fractional-add-btn');
+
+                const passwordModal = document.getElementById('password-modal');
+                const closePasswordModalBtn = document.getElementById('close-password-modal-btn');
+                const passwordForm = document.getElementById('password-form');
+                const passwordInput = document.getElementById('password-input');
+                const passwordErrorMessage = document.getElementById('password-error-message');
+                const cancelPasswordBtn = document.getElementById('cancel-password-btn'); // زر إلغاء كلمة السر
+
+                const toastContainer = document.getElementById('toast-container');
+
+                // --- متغيرات حالة نقطة البيع ---
+                let cart = []; // تخزين المنتجات في سلة التسوق
+                let currentDiscount = { type: 'fixed', value: 0 }; // نوع الخصم (نسبة مئوية/ثابت) وقيمته
+                let selectedCustomer = null; // العميل الحالي للفاتورة (إذا كان هناك دين)
+                let allProducts = []; // لتخزين جميع المنتجات لجلب أسرع
+                let currentProductToAddFractional = null; // لتخزين المنتج الذي يتم إدخال كميته المجزأة
+
+                // --- دالة لإظهار الإشعارات العائمة (Toasts) (نسخ من تصميمك الموحد) ---
+                function showToast(message, type = 'info') {
+                    const toast = document.createElement('div');
+                    toast.classList.add('toast', type);
+                    toast.textContent = message;
+                    toastContainer.appendChild(toast);
+
+                    // إزالة التوست بعد فترة
+                    setTimeout(() => {
+                        toast.classList.add('hide');
+                        toast.addEventListener('animationend', () => {
+                            toast.remove();
+                        });
+                    }, 3000); // 3 ثواني قبل بدء حركة الإخفاء
+                }
+
+                /**
+                 * لإظهار أو إخفاء Loader/وميض الزر.
+                 * @param {HTMLElement} buttonElement - زر المسح الذي سيومض.
+                 * @param {boolean} activate - true لتفعيل الوميض/اللودر، false لإزالته.
+                 */
+                function toggleScanningPulse(buttonElement, activate) {
+                    const loader = buttonElement.querySelector('.button-loader');
+                    const icon = buttonElement.querySelector('i');
+                    
+                    if (activate) {
+                        if (icon) icon.style.display = 'none'; // إخفاء الأيقونة
+                        if (loader) loader.style.display = 'block'; // إظهار Loader
+                        buttonElement.classList.add('loading', 'scanning-pulse'); // إضافة كلاسات التحكم
+                    } else {
+                        if (icon) icon.style.display = 'block'; // إظهار الأيقونة
+                        if (loader) loader.style.display = 'none'; // إخفاء Loader
+                        buttonElement.classList.remove('loading', 'scanning-pulse'); // إزالة كلاسات التحكم
                     }
-                };
-            }).catch((error) => {
-                console.warn(error);
-                showToast("عملية إلغاء. لم يتم تأكيد كلمة السر.", "info");
-                return null;
-            });
-        }
-
-        function closePasswordModal() {
-            passwordModal.style.display = 'none';
-            passwordForm.onsubmit = null;
-            closePasswordModalBtn.onclick = null;
-            passwordModal.onclick = null;
-        }
-
-        managerAccessBtn.addEventListener('click', async () => {
-            if (managerAccessEnabled) {
-                managerAccessEnabled = false;
-                setAccessButtonsState(false);
-            } else {
-                const password = await openPasswordModal("تفعيل صلاحيات المسؤول");
-                if (password === MANAGER_PASSWORD) {
-                    managerAccessEnabled = true;
-                    setAccessButtonsState(true);
-                } else if (password !== null) {
-                    passwordErrorMessage.style.display = 'block';
-                    showToast("كلمة السر غير صحيحة.", "error");
                 }
-            }
-        });
 
-        // --- منطق المصادقة وتسجيل الخروج (نسخ من تصميمك الموحد) ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUserSpan.textContent = user.email;
-                setAccessButtonsState(managerAccessEnabled); // تطبيق حالة المسؤول المحفوظة
-                startListeningToSharedScannerSession(); // بدء الاستماع للماسح
-                fetchAllProductsForSearch(); // جلب المنتجات للبحث
-                console.log("User is logged in on pos.html:", user.email);
-            } else {
-                console.log("User is not logged in. Redirecting to login.html.");
-                window.location.replace('login.html');
-            }
-        });
-
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                // إرسال إشارة للهاتف بالانفصال قبل تسجيل الخروج
-                if (phoneSessionUnsubscribe) {
-                    await updateDoc(doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID), {
-                        status: 'closedByDesktop',
-                        disconnectedAt: Timestamp.now()
-                    }, { merge: true }).catch(e => console.warn("Error signaling phone on logout:", e));
-                    phoneSessionUnsubscribe();
-                    phoneSessionUnsubscribe = null;
+                // --- وظائف صلاحيات المسؤول (نسخ من تصميمك الموحد) ---
+                function setAccessButtonsState(enabled) {
+                    // هنا يمكنك تمكين/تعطيل أزرار معينة في نقطة البيع إذا كانت تتطلب صلاحيات
+                    // مثلاً: completeSaleBtn.disabled = !enabled;
+                    // حالياً، صلاحيات المسؤول تستخدم لتطبيق الخصومات المعقدة أو المرتجعات
+                    managerAccessBtn.classList.toggle('active-access', enabled);
+                    if (enabled) {
+                        showToast("تم تفعيل صلاحيات المسؤول", "success");
+                    } else {
+                        showToast("تم إلغاء صلاحيات المسؤول", "info");
+                    }
+                    localStorage.setItem('managerAccessEnabled', enabled);
                 }
-                await signOut(auth);
-                console.log("User signed out successfully from pos.html.");
-            } catch (error) {
-                console.error("Logout error from pos.html:", error.message);
-                showToast("حدث خطأ أثناء تسجيل الخروج.", "error");
-            }
-        });
 
-        // --- منطق اتصال ماسح الباركود بالهاتف (نسخ من تصميمك الموحد) ---
-        async function startListeningToSharedScannerSession() {
-            if (phoneSessionUnsubscribe) {
-                phoneSessionUnsubscribe();
-            }
+                function openPasswordModal(message) {
+                    passwordModal.style.display = 'flex';
+                    passwordInput.value = '';
+                    passwordErrorMessage.style.display = 'none';
+                    passwordModal.querySelector('h4').textContent = message;
 
-            const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
-            
-            // تحقق من وجود المستند، وإنشائه إذا لم يكن موجوداً
-            try {
-                const docSnap = await getDoc(sessionDocRef);
-                if (!docSnap.exists()) {
-                    await setDoc(sessionDocRef, {
-                        status: 'disconnected', createdAt: Timestamp.now(), lastAction: 'pos_initialized'
-                    });
-                } else {
-                    // إذا كان موجوداً، فقط حدث حالته للتأكيد على أنه نشط من جانب POS
-                    await updateDoc(sessionDocRef, {
-                        status: 'desktopReady', // حالة جديدة: سطح المكتب جاهز لاستقبال/إرسال
-                        lastAction: 'pos_reinitialized',
-                        updatedAt: Timestamp.now()
+                    return new Promise((resolve, reject) => {
+                        passwordForm.onsubmit = (e) => {
+                            e.preventDefault();
+                            resolve(passwordInput.value);
+                            closePasswordModal();
+                        };
+                        cancelPasswordBtn.onclick = () => { // زر الإلغاء في مودال كلمة السر
+                            reject("User cancelled password prompt.");
+                            closePasswordModal();
+                        };
+                        closePasswordModalBtn.onclick = () => { // زر الإغلاق (x)
+                            reject("User cancelled password prompt.");
+                            closePasswordModal();
+                        };
+                        passwordModal.onclick = (event) => { // النقر خارج المودال
+                            if (event.target === passwordModal) {
+                                reject("User cancelled password prompt.");
+                                closePasswordModal();
+                            }
+                        };
+                    }).catch((error) => {
+                        console.warn(error);
+                        // لا تظهر توست هنا، لأن الدالة التي استدعت openPasswordModal ستفعل ذلك
+                        return null;
                     });
                 }
-            } catch (e) {
-                console.error("Error checking/creating shared scanner session document:", e);
-                showToast("خطأ في إعداد جلسة الماسح. حاول تحديث الصفحة.", "error");
-                isPhoneScannerConnected = false;
-                return;
-            }
 
-            phoneSessionUnsubscribe = onSnapshot(sessionDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.status === 'phoneReady' || data.status === 'scanning' || data.status === 'scanRequested') {
-                        isPhoneScannerConnected = true;
-                        // لا نُظهر توست متكرر هنا
-                    } else if (data.status === 'scanned') {
-                        const scannedValue = data.scannedValue;
-                        const purposeFromSession = data.purpose;
-                        
-                        if (purposeFromSession === 'pos_scan') { // الغرض الخاص بنقطة البيع
-                            productSearchInput.value = scannedValue;
-                            searchProducts(scannedValue); // تشغيل البحث بالباركود الممسوح
-                            showToast(`تم مسح الباركود: ${scannedValue}`, "success");
-                        } else {
-                            showToast("تم مسح باركود لغرض آخر. تجاهل.", "info");
+                function closePasswordModal() {
+                    passwordModal.style.display = 'none';
+                    passwordForm.onsubmit = null;
+                    cancelPasswordBtn.onclick = null;
+                    closePasswordModalBtn.onclick = null;
+                    passwordModal.onclick = null;
+                }
+
+                managerAccessBtn.addEventListener('click', async () => {
+                    if (managerAccessEnabled) {
+                        managerAccessEnabled = false;
+                        setAccessButtonsState(false);
+                    } else {
+                        const password = await openPasswordModal("تفعيل صلاحيات المسؤول");
+                        if (password === MANAGER_PASSWORD) {
+                            managerAccessEnabled = true;
+                            setAccessButtonsState(true);
+                        } else if (password !== null) { // إذا لم يكن null (لم يلغ المستخدم)
+                            passwordErrorMessage.style.display = 'block';
+                            showToast("كلمة السر غير صحيحة.", "error");
                         }
-                        
-                        toggleScanningPulse(scanBarcodePosBtn, false); // إيقاف الوميض
-                        // إرسال إشارة للهاتف بأنه يمكنه المسح مرة أخرى
-                        updateDoc(sessionDocRef, {
-                            scannedValue: null, status: 'readyForNextScan', lastProcessedByDesktop: Timestamp.now()
-                        }).catch(e => console.error("Error resetting session doc after processing:", e));
-                        
-                    } else if (data.status === 'closedByPhone' || data.status === 'errorFromPhone' || data.status === 'disconnected') {
+                    }
+                });
+
+                // --- منطق المصادقة وتسجيل الخروج (نسخ من تصميمك الموحد) ---
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUserSpan.textContent = user.email;
+                        setAccessButtonsState(managerAccessEnabled); // تطبيق حالة المسؤول المحفوظة
+                        startListeningToSharedScannerSession(); // بدء الاستماع للماسح
+                        fetchAllProductsForSearch(); // جلب المنتجات للبحث
+                        console.log("User is logged in on pos.html:", user.email);
+                    } else {
+                        console.log("User is not logged in. Redirecting to login.html.");
+                        window.location.replace('login.html');
+                    }
+                });
+
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        // إرسال إشارة للهاتف بالانفصال قبل تسجيل الخروج
+                        if (phoneSessionUnsubscribe) {
+                            await updateDoc(doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID), {
+                                status: 'closedByDesktop',
+                                disconnectedAt: Timestamp.now()
+                            }, { merge: true }).catch(e => console.warn("Error signaling phone on logout:", e));
+                            phoneSessionUnsubscribe();
+                            phoneSessionUnsubscribe = null;
+                        }
+                        await signOut(auth);
+                        console.log("User signed out successfully from pos.html.");
+                    } catch (error) {
+                        console.error("Logout error from pos.html:", error.message);
+                        showToast("حدث خطأ أثناء تسجيل الخروج.", "error");
+                    }
+                });
+
+                // --- منطق اتصال ماسح الباركود بالهاتف (نسخ من تصميمك الموحد) ---
+                async function startListeningToSharedScannerSession() {
+                    if (phoneSessionUnsubscribe) {
+                        phoneSessionUnsubscribe();
+                    }
+
+                    const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
+                    
+                    // تحقق من وجود المستند، وإنشائه إذا لم يكن موجوداً
+                    try {
+                        const docSnap = await getDoc(sessionDocRef);
+                        if (!docSnap.exists()) {
+                            await setDoc(sessionDocRef, {
+                                status: 'disconnected', createdAt: Timestamp.now(), lastAction: 'pos_initialized'
+                            });
+                        } else {
+                            // إذا كان موجوداً، فقط حدث حالته للتأكيد على أنه نشط من جانب POS
+                            await updateDoc(sessionDocRef, {
+                                status: 'desktopReady', // حالة جديدة: سطح المكتب جاهز لاستقبال/إرسال
+                                lastAction: 'pos_reinitialized',
+                                updatedAt: Timestamp.now()
+                            });
+                        }
+                    } catch (e) {
+                        console.error("Error checking/creating shared scanner session document:", e);
+                        showToast("خطأ في إعداد جلسة الماسح. حاول تحديث الصفحة.", "error");
                         isPhoneScannerConnected = false;
-                        showToast("انقطع الاتصال بالماسح. يرجى التأكد من تشغيله.", "error");
+                        return;
+                    }
+
+                    phoneSessionUnsubscribe = onSnapshot(sessionDocRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if (data.status === 'phoneReady' || data.status === 'scanning' || data.status === 'scanRequested') {
+                                isPhoneScannerConnected = true;
+                                // لا نُظهر توست متكرر هنا
+                            } else if (data.status === 'scanned') {
+                                const scannedValue = data.scannedValue;
+                                const purposeFromSession = data.purpose;
+                                
+                                if (purposeFromSession === 'pos_scan') { // الغرض الخاص بنقطة البيع
+                                    productSearchInput.value = scannedValue;
+                                    searchProducts(scannedValue); // تشغيل البحث بالباركود الممسوح
+                                    showToast(`تم مسح الباركود: ${scannedValue}`, "success");
+                                } else {
+                                    showToast("تم مسح باركود لغرض آخر. تجاهل.", "info");
+                                }
+                                
+                                toggleScanningPulse(scanBarcodePosBtn, false); // إيقاف الوميض
+                                // إرسال إشارة للهاتف بأنه يمكنه المسح مرة أخرى
+                                updateDoc(sessionDocRef, {
+                                    scannedValue: null, status: 'readyForNextScan', lastProcessedByDesktop: Timestamp.now()
+                                }).catch(e => console.error("Error resetting session doc after processing:", e));
+                                
+                            } else if (data.status === 'closedByPhone' || data.status === 'errorFromPhone' || data.status === 'disconnected') {
+                                isPhoneScannerConnected = false;
+                                showToast("انقطع الاتصال بالماسح. يرجى التأكد من تشغيله.", "error");
+                                toggleScanningPulse(scanBarcodePosBtn, false);
+                            }
+                        } else {
+                            isPhoneScannerConnected = false;
+                            showToast("تم إنهاء جلسة الماسح من الجهاز الرئيسي.", "info");
+                            toggleScanningPulse(scanBarcodePosBtn, false);
+                            if (phoneSessionUnsubscribe) { phoneSessionUnsubscribe(); phoneSessionUnsubscribe = null; }
+                        }
+                    }, (error) => {
+                        console.error("Error listening to shared scanner session:", error);
+                        isPhoneScannerConnected = false;
+                        showToast("خطأ في الاتصال بالماسح. حاول تحديث الصفحة.", "error");
+                        toggleScanningPulse(scanBarcodePosBtn, false);
+                    });
+                }
+
+                async function requestScanFromPhone(purpose) {
+                    if (!isPhoneScannerConnected) {
+                        showToast("الهاتف غير متصل. يرجى التأكد من فتح صفحة الماسح على هاتفك.", "error");
+                        return;
+                    }
+
+                    try {
+                        const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
+                        const sessionDoc = await getDoc(sessionDocRef);
+
+                        if (!sessionDoc.exists() || sessionDoc.data().status === 'closedByPhone' || sessionDoc.data().status === 'errorFromPhone') {
+                            showToast("اتصال الهاتف غير صالح. يرجى التأكد من فتح صفحة الماسح على هاتفك.", "error");
+                            isPhoneScannerConnected = false;
+                            return;
+                        }
+
+                        toggleScanningPulse(scanBarcodePosBtn, true); // تفعيل الوميض
+
+                        await updateDoc(sessionDocRef, {
+                            purpose: purpose,
+                            scannedValue: null,
+                            status: 'scanRequested', // Signal phone to start scanning
+                            lastRequestedByDesktop: Timestamp.now()
+                        });
+                        showToast("تم إرسال طلب المسح إلى الهاتف. يرجى المسح الآن باستخدام الهاتف.", "info");
+
+                    } catch (e) {
+                        console.error("Error requesting scan from phone:", e);
+                        showToast("حدث خطأ أثناء طلب المسح من الهاتف: " + e.message, "error");
                         toggleScanningPulse(scanBarcodePosBtn, false);
                     }
-                } else {
-                    isPhoneScannerConnected = false;
-                    showToast("تم إنهاء جلسة الماسح من الجهاز الرئيسي.", "info");
-                    toggleScanningPulse(scanBarcodePosBtn, false);
-                    if (phoneSessionUnsubscribe) { phoneSessionUnsubscribe(); phoneSessionUnsubscribe = null; }
-                }
-            }, (error) => {
-                console.error("Error listening to shared scanner session:", error);
-                isPhoneScannerConnected = false;
-                showToast("خطأ في الاتصال بالماسح. حاول تحديث الصفحة.", "error");
-                toggleScanningPulse(scanBarcodePosBtn, false);
-            });
-        }
-
-        async function requestScanFromPhone(purpose) {
-            if (!isPhoneScannerConnected) {
-                showToast("الهاتف غير متصل. يرجى التأكد من فتح صفحة الماسح على هاتفك.", "error");
-                return;
-            }
-
-            try {
-                const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
-                const sessionDoc = await getDoc(sessionDocRef);
-
-                if (!sessionDoc.exists() || sessionDoc.data().status === 'closedByPhone' || sessionDoc.data().status === 'errorFromPhone') {
-                    showToast("اتصال الهاتف غير صالح. يرجى التأكد من فتح صفحة الماسح على هاتفك.", "error");
-                    isPhoneScannerConnected = false;
-                    return;
                 }
 
-                toggleScanningPulse(scanBarcodePosBtn, true); // تفعيل الوميض
+                // --- وظائف إدارة المنتجات والمخزون في نقطة البيع ---
 
-                await updateDoc(sessionDocRef, {
-                    purpose: purpose,
-                    scannedValue: null,
-                    status: 'scanRequested', // Signal phone to start scanning
-                    lastRequestedByDesktop: Timestamp.now()
-                });
-                showToast("تم إرسال طلب المسح إلى الهاتف. يرجى المسح الآن باستخدام الهاتف.", "info");
-
-            } catch (e) {
-                console.error("Error requesting scan from phone:", e);
-                showToast("حدث خطأ أثناء طلب المسح من الهاتف: " + e.message, "error");
-                toggleScanningPulse(scanBarcodePosBtn, false);
-            }
-        }
-
-        // --- وظائف إدارة المنتجات والمخزون في نقطة البيع ---
-
-        async function fetchAllProductsForSearch() {
-            try {
-                const productsCol = collection(db, 'products');
-                const productSnapshot = await getDocs(productsCol);
-                allProducts = []; // مسح المنتجات القديمة
-                productSnapshot.forEach(doc => {
-                    allProducts.push({ id: doc.id, ...doc.data() });
-                });
-                console.log("Products loaded for search:", allProducts.length);
-            } catch (error) {
-                console.error("Error fetching all products:", error);
-                showToast("خطأ في جلب المنتجات للبحث.", "error");
-            }
-        }
-
-        function searchProducts(searchTerm) {
-            searchTerm = searchTerm.toLowerCase();
-            productSearchResults.innerHTML = ''; // مسح النتائج السابقة
-
-            if (searchTerm.length < 2 && searchTerm !== '') { // ابدأ البحث بعد حرفين على الأقل
-                productSearchResults.innerHTML = '<p style="text-align: center; color: #555;">أدخل حرفين على الأقل للبحث.</p>';
-                return;
-            }
-            
-            const filteredProducts = allProducts.filter(p => 
-                p.name.toLowerCase().includes(searchTerm) || 
-                (p.barcode && p.barcode.toLowerCase().includes(searchTerm))
-            );
-
-            if (filteredProducts.length === 0) {
-                productSearchResults.innerHTML = '<p style="text-align: center; color: #555;">لا توجد منتجات مطابقة.</p>';
-                return;
-            }
-
-            filteredProducts.forEach(product => {
-                const productItemDiv = document.createElement('div');
-                productItemDiv.classList.add('product-item');
-                productItemDiv.innerHTML = `
-                    <div class="info">
-                        <h5>${product.name}</h5>
-                        <span>${(product.salePrice || 0).toFixed(2)} ج.م / ${product.unit} | باركود: ${product.barcode || 'N/A'} | الكمية: ${product.availableQuantity}</span>
-                    </div>
-                    <button class="add-btn" data-product-id="${product.id}" data-product-name="${product.name}" data-sale-price="${product.salePrice}" data-available-quantity="${product.availableQuantity}" data-unit="${product.unit}"><i class="fas fa-plus"></i></button>
-                `;
-                productSearchResults.appendChild(productItemDiv);
-            });
-        }
-
-        // --- وظائف سلة التسوق ---
-        function addToCart(productId, productName, salePrice, availableQuantity, unit) {
-            let item = cart.find(i => i.id === productId);
-            const isWeightUnit = ['كيلو جرام', 'جرام', 'لتر', 'مليلتر'].includes(unit);
-
-            if (item) {
-                if (isWeightUnit) {
-                    // لا نزيد تلقائيًا للوحدات الوزنية، بل نطلب من المستخدم التحديد
-                    showToast(`المنتج "${productName}" موجود بالفعل. يرجى تعديل الكمية في الفاتورة.`, 'info');
-                    return;
+                async function fetchAllProductsForSearch() {
+                    try {
+                        const productsCol = collection(db, 'products');
+                        const productSnapshot = await getDocs(productsCol);
+                        allProducts = []; // مسح المنتجات القديمة
+                        productSnapshot.forEach(doc => {
+                            allProducts.push({ id: doc.id, ...doc.data() });
+                        });
+                        console.log("Products loaded for search:", allProducts.length);
+                    } catch (error) {
+                        console.error("Error fetching all products:", error);
+                        showToast("خطأ في جلب المنتجات للبحث.", "error");
+                    }
                 }
-                // للوحدات العددية (قطعة، حبة، عبوة، إلخ)
-                if (item.quantity + 1 > availableQuantity) {
-                    showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity} ${unit}.`, 'error');
-                    return;
-                }
-                item.quantity++;
-            } else {
-                if (1 > availableQuantity && !isWeightUnit) { // للوحدات العددية
-                    showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity} ${unit}.`, 'error');
-                    return;
-                }
-                // إضافة المنتج لأول مرة
-                cart.push({ id: productId, name: productName, price: salePrice, quantity: isWeightUnit ? 0.01 : 1, maxQuantity: availableQuantity, unit: unit });
-                if (isWeightUnit) {
-                    showToast(`أضف "${productName}". يرجى تحديد الكمية بالجرامات/الكيلو في الفاتورة.`, 'info');
-                }
-            }
-            renderCart();
-            calculateTotals();
-        }
 
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            renderCart();
-            calculateTotals();
-        }
+                function searchProducts(searchTerm) {
+                    searchTerm = searchTerm.toLowerCase();
+                    productSearchResults.innerHTML = ''; // مسح النتائج السابقة
 
-        function updateCartQuantity(productId, newQuantity) {
-            let item = cart.find(i => i.id === productId);
-            if (item) {
-                // للوحدات الوزنية، الكمية يمكن أن تكون كسوراً
-                // للوحدات العددية، يجب أن تكون الكمية عدداً صحيحاً
-                if (!['كيلو جرام', 'جرام', 'لتر', 'مليلتر'].includes(item.unit) && newQuantity % 1 !== 0) {
-                    showToast(`كمية المنتج "${item.name}" يجب أن تكون عدداً صحيحاً.`, 'error');
-                    return;
-                }
-                
-                if (newQuantity <= 0) {
-                    removeFromCart(productId);
-                } else if (newQuantity > item.maxQuantity) {
-                    showToast(`الكمية القصوى المتاحة لـ ${item.name} هي ${item.maxQuantity} ${item.unit}.`, 'error');
-                    // يمكن إعادة تعيين الكمية إلى maxQuantity هنا إذا أردت
-                    item.quantity = item.maxQuantity;
-                } else {
-                    item.quantity = newQuantity;
-                }
-                renderCart(); // إعادة عرض سلة التسوق بعد التحديث
-            }
-            calculateTotals();
-        }
+                    if (searchTerm.length < 2 && searchTerm !== '') { // ابدأ البحث بعد حرفين على الأقل
+                        productSearchResults.innerHTML = '<p style="text-align: center; color: #555;">أدخل حرفين على الأقل للبحث.</p>';
+                        return;
+                    }
+                    
+                    const filteredProducts = allProducts.filter(p => 
+                        p.name.toLowerCase().includes(searchTerm) || 
+                        (p.barcode && p.barcode.toLowerCase().includes(searchTerm))
+                    );
 
-        function renderCart() {
-            cartItemsContainer.innerHTML = '';
-            if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p style="text-align: center; color: #555;">لا توجد منتجات في الفاتورة.</p>';
-                return;
-            }
+                    if (filteredProducts.length === 0) {
+                        productSearchResults.innerHTML = '<p style="text-align: center; color: #555;">لا توجد منتجات مطابقة.</p>';
+                        return;
+                    }
 
-            cart.forEach(item => {
-                const isWeightUnit = ['كيلو جرام', 'جرام', 'لتر', 'مليلتر'].includes(item.unit);
-                const quantityInputHtml = isWeightUnit ?
-                    `<input type="number" value="${item.quantity.toFixed(3)}" step="0.001" min="0.001" data-id="${item.id}" class="weight-quantity-input">` :
-                    `<button data-action="decrease" data-id="${item.id}"><i class="fas fa-minus"></i></button>
-                    <span>${item.quantity}</span>
-                    <button data-action="increase" data-id="${item.id}"><i class="fas fa-plus"></i></button>`;
-
-                const cartItemDiv = document.createElement('div');
-                cartItemDiv.classList.add('cart-item');
-                cartItemDiv.innerHTML = `
-                    <div class="details">
-                        <h5>${item.name}</h5>
-                        <span>${item.price.toFixed(2)} ج.م/${item.unit}</span>
-                    </div>
-                    <div class="quantity-controls">
-                        ${quantityInputHtml}
-                    </div>
-                    <button class="remove-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
-                `;
-                cartItemsContainer.appendChild(cartItemDiv);
-
-                // إضافة مستمعي الأحداث لأزرار الكمية والإزالة وحقل الإدخال الوزني
-                if (isWeightUnit) {
-                    cartItemDiv.querySelector('.weight-quantity-input').addEventListener('input', (e) => {
-                        const newVal = parseFloat(e.target.value);
-                        if (!isNaN(newVal)) {
-                            updateCartQuantity(item.id, newVal);
-                        }
+                    filteredProducts.forEach(product => {
+                        const productItemDiv = document.createElement('div');
+                        productItemDiv.classList.add('product-item');
+                        productItemDiv.innerHTML = `
+                            <div class="info">
+                                <h5>${product.name}</h5>
+                                <span>${(product.salePrice || 0).toFixed(2)} ج.م / ${product.unit} | باركود: ${product.barcode || 'N/A'} | الكمية: ${product.availableQuantity}</span>
+                            </div>
+                            <button class="add-btn" 
+                                data-product-id="${product.id}" 
+                                data-product-name="${product.name}" 
+                                data-sale-price="${product.salePrice}" 
+                                data-unit="${product.unit}"
+                                data-available-quantity="${product.availableQuantity}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        `;
+                        productSearchResults.appendChild(productItemDiv);
                     });
-                } else {
-                    cartItemDiv.querySelectorAll('.quantity-controls button').forEach(button => {
+                }
+
+                // --- وظائف سلة التسوق ---
+                // تم تعديل addToCart ليتعامل مع الوحدات المجزأة
+                function addToCart(productId, productName, salePrice, unit, availableQuantity) {
+                    // إذا كانت الوحدة كيلو أو لتر، اطلب الكمية المجزأة
+                    if (unit === 'كيلو جرام' || unit === 'لتر' || unit === 'جرام' || unit === 'مليلتر') {
+                        currentProductToAddFractional = { productId, productName, salePrice, unit, availableQuantity };
+                        openFractionalQuantityModal(productName, unit, salePrice);
+                        return;
+                    }
+
+                    // للوحدات غير المجزأة (قطعة، عبوة، إلخ)
+                    let item = cart.find(i => i.id === productId);
+
+                    if (item) {
+                        if (item.quantity + 1 > availableQuantity) {
+                            showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity} ${unit}.`, 'error');
+                            return;
+                        }
+                        item.quantity++;
+                    } else {
+                        if (1 > availableQuantity) {
+                            showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity} ${unit}.`, 'error');
+                            return;
+                        }
+                        cart.push({ id: productId, name: productName, price: salePrice, quantity: 1, unit: unit, maxQuantity: availableQuantity });
+                    }
+                    renderCart();
+                    calculateTotals();
+                }
+
+                function addFractionalProductToCart(quantity) {
+                    if (!currentProductToAddFractional) return;
+
+                    const { productId, productName, salePrice, unit, availableQuantity } = currentProductToAddFractional;
+
+                    // تحويل الكمية المدخلة إلى الوحدة الأساسية للمخزون (جرام -> كيلو، مليلتر -> لتر)
+                    let actualQuantityInBaseUnit = quantity; // Quantity entered by user
+                    let pricePerBaseUnit = parseFloat(salePrice); // Price is per KG or Liter
+
+                    // Determine the conversion factor and adjust the price
+                    let displayUnit = unit; // Unit to display in cart
+                    let convertedPrice = pricePerBaseUnit; // Price for the quantity entered
+
+                    if (unit === 'كيلو جرام' || unit === 'لتر') {
+                        // User enters grams/ml, price is per KG/Liter
+                        if (quantity > availableQuantity * 1000) { // Check against actual grams/ml
+                             showToast(`الكمية المتاحة لـ ${productName} هي ${(availableQuantity * 1000).toFixed(0)} ${unit === 'كيلو جرام' ? 'جرام' : 'مليلتر'}.`, 'error');
+                             return;
+                        }
+                        convertedPrice = (pricePerBaseUnit / 1000) * quantity; // Price for X grams/ml
+                        displayUnit = unit === 'كيلو جرام' ? 'جرام' : 'مليلتر'; // Display as grams/ml in cart
+                    } else if (unit === 'جرام' || unit === 'مليلتر') {
+                        // Product is stored/priced per gram/ml
+                        if (quantity > availableQuantity) {
+                            showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity} ${unit}.`, 'error');
+                            return;
+                        }
+                        convertedPrice = pricePerBaseUnit * quantity; // Price for X grams/ml
+                        displayUnit = unit; // Display as grams/ml in cart
+                    }
+
+                    let item = cart.find(i => i.id === productId);
+
+                    if (item) {
+                        // إذا كان المنتج موجوداً، قم بزيادة كميته
+                        const newTotalQuantity = item.actualQuantityInBaseUnit + actualQuantityInBaseUnit;
+                        if (newTotalQuantity > availableQuantity) { // التحقق من الكمية الكلية المضافة مقابل الكمية المتاحة الأصلية
+                            showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity} ${unit}. لا يمكن إضافة المزيد.`, 'error');
+                            return;
+                        }
+                        item.quantity += quantity; // الكمية في السلة تزيد بالكمية الجديدة
+                        item.actualQuantityInBaseUnit = newTotalQuantity; // تحديث الكمية الفعلية المجمعة
+                        item.price = (item.totalPrice / item.quantity); // إعادة حساب متوسط السعر لوحدة العرض
+                        item.totalPrice += convertedPrice; // تحديث الإجمالي الكلي لهذا الصنف
+                    } else {
+                        // أضف المنتج الجديد كصنف مجزأ
+                        cart.push({ 
+                            id: productId, 
+                            name: productName, 
+                            price: convertedPrice, // السعر للكمية المدخلة (e.g. 250g price)
+                            quantity: quantity, // الكمية المدخلة (e.g. 250)
+                            unit: displayUnit, // وحدة العرض (e.g. جرام)
+                            maxQuantity: availableQuantity, // الكمية القصوى المتاحة (بالوحدة الأصلية للكيلو/لتر)
+                            baseUnit: unit, // الوحدة الأساسية للمنتج (كيلو جرام/لتر)
+                            totalPrice: convertedPrice, // الإجمالي الكلي لهذا الصنف
+                            actualQuantityInBaseUnit: actualQuantityInBaseUnit // الكمية الفعلية المضافة بالوحدة المدخلة (للتتبع)
+                        });
+                    }
+
+                    renderCart();
+                    calculateTotals();
+                    closeFractionalQuantityModal();
+                    currentProductToAddFractional = null;
+                }
+
+
+                function openFractionalQuantityModal(productName, unit, salePrice) {
+                    fractionalModalTitle.textContent = `أدخل الكمية لـ ${productName}`;
+                    if (unit === 'كيلو جرام') {
+                        fractionalQuantityLabel.textContent = `الكمية (بالجرام، سعر الكيلو: ${salePrice.toFixed(2)} ج.م):`;
+                    } else if (unit === 'لتر') {
+                        fractionalQuantityLabel.textContent = `الكمية (بالمليلتر، سعر اللتر: ${salePrice.toFixed(2)} ج.م):`;
+                    } else {
+                        fractionalQuantityLabel.textContent = `الكمية (${unit}):`;
+                    }
+                    fractionalQuantityInput.value = '';
+                    fractionalQuantityModal.style.display = 'flex';
+                }
+
+                function closeFractionalQuantityModal() {
+                    fractionalQuantityModal.style.display = 'none';
+                    currentProductToAddFractional = null;
+                }
+
+
+                function removeFromCart(productId) {
+                    cart = cart.filter(item => item.id !== productId);
+                    renderCart();
+                    calculateTotals();
+                }
+
+                function updateCartQuantity(productId, change) {
+                    let item = cart.find(i => i.id === productId);
+                    if (item) {
+                        let newQuantity;
+                        let maxAllowedQuantity;
+
+                        // التعامل مع الوحدات المجزأة مقابل الوحدات العادية
+                        if (item.baseUnit === 'كيلو جرام' || item.baseUnit === 'لتر' || item.baseUnit === 'جرام' || item.baseUnit === 'مليلتر') {
+                            newQuantity = item.actualQuantityInBaseUnit + (change * (item.baseUnit === 'كيلو جرام' || item.baseUnit === 'لتر' ? 100 : 1)); // زيادة/نقصان بـ 100 جرام/مليلتر
+                            maxAllowedQuantity = item.maxQuantity * (item.baseUnit === 'كيلو جرام' || item.baseUnit === 'لتر' ? 1000 : 1); // تحويل المتاح إلى جرام/مليلتر
+                        } else {
+                            newQuantity = item.quantity + change;
+                            maxAllowedQuantity = item.maxQuantity;
+                        }
+
+                        if (newQuantity <= 0) {
+                            removeFromCart(productId);
+                        } else if (newQuantity > maxAllowedQuantity) {
+                            showToast(`الكمية القصوى المتاحة لـ ${item.name} هي ${maxAllowedQuantity} ${item.unit}.`, 'error');
+                        } else {
+                            if (item.baseUnit === 'كيلو جرام' || item.baseUnit === 'لتر' || item.baseUnit === 'جرام' || item.baseUnit === 'مليلتر') {
+                                item.actualQuantityInBaseUnit = newQuantity;
+                                item.quantity = newQuantity; // للعرض
+                                let pricePerBaseUnit = item.totalPrice / item.actualQuantityInBaseUnit; // سعر الوحدة الأصلية
+                                if (item.baseUnit === 'كيلو جرام' || item.baseUnit === 'لتر') {
+                                     item.totalPrice = (pricePerBaseUnit / 1000) * newQuantity;
+                                } else {
+                                    item.totalPrice = pricePerBaseUnit * newQuantity;
+                                }
+                                
+                            } else {
+                                item.quantity = newQuantity;
+                                item.totalPrice = item.price * newQuantity; // تحديث الإجمالي
+                            }
+                            renderCart();
+                        }
+                    }
+                    calculateTotals();
+                }
+
+
+                function renderCart() {
+                    cartItemsContainer.innerHTML = '';
+                    if (cart.length === 0) {
+                        cartItemsContainer.innerHTML = '<p style="text-align: center; color: #555;">لا توجد منتجات في الفاتورة.</p>';
+                        return;
+                    }
+
+                    cart.forEach(item => {
+                        const cartItemDiv = document.createElement('div');
+                        cartItemDiv.classList.add('cart-item');
+
+                        let displayPrice = item.price.toFixed(2);
+                        let displayQuantity = item.quantity;
+                        let displayUnit = item.unit;
+
+                        // إذا كان منتج مجزأ، نعرض السعر الإجمالي للصنف بدلاً من سعر الوحدة المفردة مضروبة في الكمية
+                        if (item.baseUnit === 'كيلو جرام' || item.baseUnit === 'لتر' || item.baseUnit === 'جرام' || item.baseUnit === 'مليلتر') {
+                            displayPrice = item.totalPrice.toFixed(2); // السعر الإجمالي لهذه الكمية المضافة
+                        }
+                        
+                        cartItemDiv.innerHTML = `
+                            <div class="details">
+                                <h5>${item.name}</h5>
+                                <span>${displayPrice} ج.م | ${displayQuantity} ${displayUnit}</span>
+                            </div>
+                            <div class="quantity-controls">
+                                <button data-action="decrease" data-id="${item.id}"><i class="fas fa-minus"></i></button>
+                                <span>${displayQuantity}</span>
+                                <button data-action="increase" data-id="${item.id}"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <button class="remove-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+                        `;
+                        cartItemsContainer.appendChild(cartItemDiv);
+                    });
+
+                    // إضافة مستمعي الأحداث لأزرار الكمية والإزالة
+                    cartItemsContainer.querySelectorAll('.quantity-controls button').forEach(button => {
                         button.addEventListener('click', (e) => {
                             const productId = e.currentTarget.dataset.id;
                             const action = e.currentTarget.dataset.action;
-                            updateCartQuantity(productId, item.quantity + (action === 'increase' ? 1 : -1));
+                            updateCartQuantity(productId, action === 'increase' ? 1 : -1);
+                        });
+                    });
+                    cartItemsContainer.querySelectorAll('.remove-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const productId = e.currentTarget.dataset.id;
+                            removeFromCart(productId);
                         });
                     });
                 }
-                cartItemDiv.querySelector('.remove-btn').addEventListener('click', (e) => {
-                    const productId = e.currentTarget.dataset.id;
-                    removeFromCart(productId);
-                });
-            });
-        }
 
+                function calculateTotals() {
+                    let subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0); // استخدم totalPrice
+                    let discountAmount = 0;
 
-        function calculateTotals() {
-            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            let discountAmount = 0;
+                    if (currentDiscount.type === 'percentage') {
+                        discountAmount = subtotal * (currentDiscount.value / 100);
+                    } else {
+                        discountAmount = currentDiscount.value;
+                    }
+                    
+                    // التأكد من أن الخصم لا يتجاوز الإجمالي الفرعي
+                    discountAmount = Math.min(discountAmount, subtotal);
 
-            if (currentDiscount.type === 'percentage') {
-                discountAmount = subtotal * (currentDiscount.value / 100);
-            } else {
-                discountAmount = currentDiscount.value;
-            }
-            
-            discountAmount = Math.min(discountAmount, subtotal); // التأكد من أن الخصم لا يتجاوز الإجمالي
+                    let total = subtotal - discountAmount;
 
-            let total = subtotal - discountAmount;
+                    subtotalDisplay.textContent = `${subtotal.toFixed(2)} ج.م`;
+                    discountDisplay.textContent = `${discountAmount.toFixed(2)} ج.م`;
+                    totalDisplay.textContent = `${total.toFixed(2)} ج.م`;
 
-            subtotalDisplay.textContent = `${subtotal.toFixed(2)} ج.م`;
-            discountDisplay.textContent = `${discountAmount.toFixed(2)} ج.م`;
-            totalDisplay.textContent = `${total.toFixed(2)} ج.م`;
-
-            // تحديث الباقي للعميل
-            const cashPaid = parseFloat(cashPaidInput.value) || 0;
-            const changeDue = cashPaid - total;
-            changeDueDisplay.textContent = `${changeDue.toFixed(2)} ج.م`;
-            changeDueDisplay.style.color = changeDue >= 0 ? '#4CAF50' : '#f44336';
-        }
-
-        function resetSale() {
-            cart = [];
-            currentDiscount = { type: 'fixed', value: 0 };
-            selectedCustomer = null;
-            productSearchInput.value = '';
-            productSearchResults.innerHTML = '<p style="text-align: center; color: #555;">ابحث عن منتج أو امسح باركود.</p>';
-            cashPaidInput.value = '0.00';
-            paymentMethodSelect.value = 'cash';
-            customerSearchInput.value = '';
-            customerSearchResults.innerHTML = '';
-            customerSelectGroup.style.display = 'none';
-            cashPaidGroup.style.display = 'block';
-            renderCart();
-            calculateTotals();
-            showToast("تم إلغاء البيع بنجاح.", "info");
-        }
-
-        // --- وظائف إدارة العملاء ---
-        async function searchCustomers(searchTerm) {
-            customerSearchResults.innerHTML = '';
-            if (searchTerm.length < 2) {
-                customerSearchResults.innerHTML = '<p style="text-align: center; color: #555;">أدخل حرفين على الأقل.</p>';
-                return;
-            }
-
-            try {
-                const customersRef = collection(db, 'customers');
-                const q = query(customersRef, where('name', '>=', searchTerm), where('name', '<=', searchTerm + '\uf8ff'));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    customerSearchResults.innerHTML = '<p style="text-align: center; color: #555;">لا يوجد عملاء بهذا الاسم.</p>';
-                    return;
+                    // تحديث الباقي للعميل
+                    const cashPaid = parseFloat(cashPaidInput.value) || 0;
+                    const changeDue = cashPaid - total;
+                    changeDueDisplay.textContent = `${changeDue.toFixed(2)} ج.م`;
+                    changeDueDisplay.style.color = changeDue >= 0 ? '#4CAF50' : '#f44336';
                 }
 
-                querySnapshot.forEach(doc => {
-                    const customer = doc.data();
-                    const div = document.createElement('div');
-                    div.classList.add('customer-item'); // إضافة كلاس للتصميم
-                    div.textContent = `${customer.name} (دين: ${customer.outstandingBalance || 0} ج.م)`;
-                    div.dataset.id = doc.id;
-                    div.dataset.name = customer.name;
-                    div.dataset.debt = customer.outstandingBalance || 0;
-                    div.addEventListener('click', () => {
-                        selectedCustomer = { id: doc.id, name: customer.name, outstandingBalance: customer.outstandingBalance || 0 };
-                        customerSearchInput.value = customer.name;
-                        customerSearchResults.innerHTML = ''; // إخفاء النتائج
-                        showToast(`تم اختيار العميل: ${customer.name}`, 'success');
-                        calculateTotals(); // إعادة حساب الإجمالي لتحديث الباقي/الدين
+                function resetSale() {
+                    cart = [];
+                    currentDiscount = { type: 'fixed', value: 0 };
+                    selectedCustomer = null;
+                    productSearchInput.value = '';
+                    productSearchResults.innerHTML = '<p style="text-align: center; color: #555;">ابحث عن منتج أو امسح باركود.</p>';
+                    cashPaidInput.value = '0.00';
+                    paymentMethodSelect.value = 'cash';
+                    customerSearchInput.value = '';
+                    customerSearchResults.innerHTML = '';
+                    customerSelectGroup.style.display = 'none';
+                    cashPaidGroup.style.display = 'block';
+                    renderCart();
+                    calculateTotals();
+                    showToast("تم إلغاء البيع بنجاح.", "info");
+                }
+
+                // --- وظائف إدارة العملاء (مبسطة) ---
+                async function searchCustomers(searchTerm) {
+                    customerSearchResults.innerHTML = ''; // مسح النتائج السابقة
+                    if (searchTerm.length < 2) {
+                        customerSearchResults.innerHTML = '<p style="text-align: center; color: #555;">أدخل حرفين على الأقل للبحث عن عميل.</p>';
+                        return;
+                    }
+
+                    try {
+                        const customersRef = collection(db, 'customers');
+                        const q = query(customersRef, where('name', '>=', searchTerm), where('name', '<=', searchTerm + '\uf8ff'));
+                        const querySnapshot = await getDocs(q);
+
+                        if (querySnapshot.empty) {
+                            customerSearchResults.innerHTML = '<p style="text-align: center; color: #555;">لا يوجد عملاء بهذا الاسم.</p>';
+                            return;
+                        }
+
+                        querySnapshot.forEach(doc => {
+                            const customer = doc.data();
+                            const div = document.createElement('div');
+                            div.style = "padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; text-align: right;";
+                            div.textContent = `${customer.name} (دين: ${customer.outstandingBalance || 0} ج.م)`;
+                            div.dataset.id = doc.id;
+                            div.dataset.name = customer.name;
+                            div.dataset.debt = customer.outstandingBalance || 0;
+                            div.addEventListener('click', () => {
+                                selectedCustomer = { id: doc.id, name: customer.name, outstandingBalance: customer.outstandingBalance || 0 };
+                                customerSearchInput.value = customer.name;
+                                customerSearchResults.innerHTML = ''; // إخفاء النتائج
+                                showToast(`تم اختيار العميل: ${customer.name}`, 'info');
+                                calculateTotals(); // إعادة حساب الإجمالي بعد اختيار العميل
+                            });
+                            customerSearchResults.appendChild(div);
+                        });
+
+                    } catch (error) {
+                        console.error("Error searching customers:", error);
+                        showToast("خطأ في البحث عن العملاء.", "error");
+                    }
+                }
+
+                async function addNewCustomer(name, phone) {
+                    if (!name.trim()) {
+                        showToast("اسم العميل لا يمكن أن يكون فارغاً.", "error");
+                        return;
+                    }
+                    try {
+                        const customersRef = collection(db, 'customers');
+                        const newCustomer = {
+                            name: name.trim(),
+                            phone: phone.trim(),
+                            outstandingBalance: 0,
+                            createdAt: Timestamp.now()
+                        };
+                        const docRef = await addDoc(customersRef, newCustomer);
+                        selectedCustomer = { id: docRef.id, name: newCustomer.name, outstandingBalance: 0 };
+                        customerSearchInput.value = newCustomer.name;
+                        closeAddCustomerModal();
+                        showToast(`تم إضافة العميل: ${newCustomer.name} بنجاح.`, 'success');
+                    } catch (error) {
+                        console.error("Error adding new customer:", error);
+                        showToast("خطأ في إضافة عميل جديد.", "error");
+                    }
+                }
+
+                function openAddCustomerModal() {
+                    addCustomerModal.style.display = 'flex';
+                    newCustomerNameInput.value = '';
+                    newCustomerPhoneInput.value = '';
+                }
+
+                function closeAddCustomerModal() {
+                    addCustomerModal.style.display = 'none';
+                }
+
+                // --- إتمام عملية البيع (الأكثر تعقيداً) ---
+                async function completeSale() {
+                    if (cart.length === 0) {
+                        showToast("لا توجد منتجات في الفاتورة.", "error");
+                        return;
+                    }
+
+                    const paymentMethod = paymentMethodSelect.value;
+                    let subtotal = 0;
+                    cart.forEach(item => {
+                        subtotal += item.totalPrice;
                     });
-                    customerSearchResults.appendChild(div);
-                });
+                    
+                    let discountAmount = 0;
+                    if (currentDiscount.type === 'percentage') {
+                        discountAmount = subtotal * (currentDiscount.value / 100);
+                    } else {
+                        discountAmount = currentDiscount.value;
+                    }
+                    discountAmount = Math.min(discountAmount, subtotal);
+                    const totalAmount = subtotal - discountAmount;
+                    const cashPaid = parseFloat(cashPaidInput.value) || 0;
+                    let outstandingBalanceChange = 0; // التغيير في دين العميل
 
-            } catch (error) {
-                console.error("Error searching customers:", error);
-                showToast("خطأ في البحث عن العملاء.", "error");
-            }
-        }
-
-        async function addNewCustomer(name, phone) {
-            if (!name.trim()) {
-                showToast("اسم العميل لا يمكن أن يكون فارغاً.", "error");
-                return;
-            }
-            try {
-                const customersRef = collection(db, 'customers');
-                const newCustomer = {
-                    name: name.trim(),
-                    phone: phone.trim(),
-                    outstandingBalance: 0,
-                    createdAt: Timestamp.now()
-                };
-                const docRef = await addDoc(customersRef, newCustomer);
-                selectedCustomer = { id: docRef.id, name: newCustomer.name, outstandingBalance: 0 };
-                customerSearchInput.value = newCustomer.name;
-                closeAddCustomerModal();
-                showToast(`تم إضافة العميل: ${newCustomer.name} بنجاح.`, 'success');
-                calculateTotals(); // إعادة حساب الإجمالي لتحديث الباقي/الدين
-            } catch (error) {
-                console.error("Error adding new customer:", error);
-                showToast("خطأ في إضافة عميل جديد.", "error");
-            }
-        }
-
-        // --- إتمام عملية البيع (الأكثر تعقيداً) ---
-        async function completeSale() {
-            if (cart.length === 0) {
-                showToast("لا توجد منتجات في الفاتورة.", "error");
-                return;
-            }
-
-            const paymentMethod = paymentMethodSelect.value;
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            let discountAmount = 0;
-            if (currentDiscount.type === 'percentage') {
-                discountAmount = subtotal * (currentDiscount.value / 100);
-            } else {
-                discountAmount = currentDiscount.value;
-            }
-            discountAmount = Math.min(discountAmount, subtotal);
-            const totalAmount = subtotal - discountAmount;
-            const cashPaid = parseFloat(cashPaidInput.value) || 0;
-            let outstandingBalanceChange = 0; // التغيير في دين العميل
-
-            if (paymentMethod === 'cash') {
-                if (cashPaid < totalAmount) {
-                    showToast("المبلغ النقدي المدفوع أقل من الإجمالي الكلي.", "error");
-                    return;
-                }
-            } else if (paymentMethod === 'debt' || paymentMethod === 'mixed') {
-                if (!selectedCustomer) {
-                    showToast("يرجى اختيار عميل لتسجيل الدين.", "error");
-                    return;
-                }
-                outstandingBalanceChange = totalAmount - cashPaid; // إذا دفع جزءاً، الباقي دين
-                if (paymentMethod === 'debt' && cashPaid > 0 && cashPaid < totalAmount) {
-                    // في وضع الدين، إذا دفع جزءاً، فلا يزال يعتبر دين
-                } else if (paymentMethod === 'debt' && cashPaid > totalAmount) {
-                    showToast("لا يمكن أن يكون هناك باقي للعميل في طريقة دفع 'آجل' فقط إذا كان المبلغ المدفوع أكبر من الإجمالي.", "error");
-                    return;
-                }
-            }
-            
-            // تأكيد مع صلاحيات المسؤول للخصم
-            if (currentDiscount.value > 0 && !managerAccessEnabled) {
-                const password = await openPasswordModal("تأكيد كلمة سر المسؤول لتطبيق الخصم");
-                if (password !== MANAGER_PASSWORD) {
-                    showToast("كلمة السر غير صحيحة. لا يمكن تطبيق الخصم.", "error");
-                    return;
-                }
-            }
-
-            try {
-                await runTransaction(db, async (transaction) => {
-                    // 1. تحديث كميات المنتجات في المخزون
-                    for (const item of cart) {
-                        const productRef = doc(db, 'products', item.id);
-                        const productDoc = await transaction.get(productRef);
-                        
-                        if (!productDoc.exists()) {
-                            throw "المنتج غير موجود في المخزون: " + item.name;
+                    if (paymentMethod === 'cash') {
+                        if (cashPaid < totalAmount) {
+                            showToast("المبلغ النقدي المدفوع أقل من الإجمالي الكلي.", "error");
+                            return;
                         }
-                        const currentQuantity = productDoc.data().availableQuantity;
-                        const newQuantity = currentQuantity - item.quantity;
-                        if (newQuantity < 0) {
-                            throw `كمية غير كافية من المنتج: ${item.name}. المتاح: ${currentQuantity} ${item.unit}, المطلوب: ${item.quantity} ${item.unit}`;
+                    } else if (paymentMethod === 'debt' || paymentMethod === 'mixed') {
+                        if (!selectedCustomer) {
+                            showToast("يرجى اختيار عميل لتسجيل الدين.", "error");
+                            return;
                         }
-                        transaction.update(productRef, { availableQuantity: newQuantity });
+                        outstandingBalanceChange = totalAmount - cashPaid; // إذا دفع جزءاً، الباقي دين
+                        if (outstandingBalanceChange < 0 && paymentMethod === 'debt') {
+                            showToast("لا يمكن أن يكون هناك باقي للعميل في طريقة دفع 'آجل' فقط.", "error");
+                            return;
+                        }
                     }
 
-                    // 2. تحديث دين العميل (إذا كان هناك دين)
-                    if (paymentMethod === 'debt' || paymentMethod === 'mixed') {
-                        const customerRef = doc(db, 'customers', selectedCustomer.id);
-                        const customerDoc = await transaction.get(customerRef);
-                        if (!customerDoc.exists()) {
-                            throw "العميل غير موجود: " + selectedCustomer.name;
-                        }
-                        const currentDebt = customerDoc.data().outstandingBalance || 0;
-                        const newDebt = currentDebt + outstandingBalanceChange;
-                        transaction.update(customerRef, { outstandingBalance: newDebt });
-                    }
+                    try {
+                        // استخدام Firestore Transaction لضمان تحديث المخزون والديون بشكل آمن
+                        await runTransaction(db, async (transaction) => {
+                            // 1. تحديث كميات المنتجات في المخزون
+                            for (const item of cart) {
+                                const productRef = doc(db, 'products', item.id);
+                                const productDoc = await transaction.get(productRef);
+                                
+                                if (!productDoc.exists()) {
+                                    throw "المنتج غير موجود في المخزون: " + item.name;
+                                }
+                                const currentQuantity = productDoc.data().availableQuantity;
+                                
+                                let quantityToDeduct = 0;
+                                if (item.baseUnit === 'كيلو جرام' || item.baseUnit === 'لتر') {
+                                    quantityToDeduct = item.actualQuantityInBaseUnit / 1000; // تحويل الجرام/مليلتر إلى كيلو/لتر للخصم
+                                } else if (item.baseUnit === 'جرام' || item.baseUnit === 'مليلتر') {
+                                    quantityToDeduct = item.actualQuantityInBaseUnit; // الخصم بنفس الوحدة
+                                } else {
+                                    quantityToDeduct = item.quantity; // الخصم بالقطعة
+                                }
 
-                    // 3. إضافة سجل البيع إلى مجموعة 'sales'
-                    const saleRecord = {
-                        timestamp: Timestamp.now(),
-                        items: cart.map(item => ({
-                            productId: item.id,
-                            productName: item.name,
-                            quantity: item.quantity,
-                            unitPrice: item.price,
-                            unit: item.unit
-                        })),
-                        subtotal: subtotal,
-                        discount: discountAmount,
-                        totalAmount: totalAmount,
-                        paymentMethod: paymentMethod,
-                        cashPaid: cashPaid,
-                        changeDue: cashPaid - totalAmount,
-                        customerId: selectedCustomer ? selectedCustomer.id : null,
-                        customerName: selectedCustomer ? selectedCustomer.name : null,
-                        outstandingBalanceChange: outstandingBalanceChange,
-                        soldBy: auth.currentUser ? auth.currentUser.email : 'Unknown' // تسجيل البائع
+                                const newQuantity = currentQuantity - quantityToDeduct;
+
+                                if (newQuantity < 0) {
+                                    throw `كمية غير كافية من المنتج: ${item.name}. المتاح: ${currentQuantity} ${item.baseUnit}, المطلوب: ${quantityToDeduct} ${item.baseUnit}`;
+                                }
+                                transaction.update(productRef, { availableQuantity: newQuantity });
+                            }
+
+                            // 2. تحديث دين العميل (إذا كان هناك دين)
+                            if (paymentMethod === 'debt' || paymentMethod === 'mixed') {
+                                const customerRef = doc(db, 'customers', selectedCustomer.id);
+                                const customerDoc = await transaction.get(customerRef);
+                                if (!customerDoc.exists()) {
+                                    throw "العميل غير موجود: " + selectedCustomer.name;
+                                }
+                                const currentDebt = customerDoc.data().outstandingBalance || 0;
+                                const newDebt = currentDebt + outstandingBalanceChange;
+                                transaction.update(customerRef, { outstandingBalance: newDebt });
+                            }
+
+                            // 3. إضافة سجل البيع إلى مجموعة 'sales'
+                            const saleRecord = {
+                                timestamp: Timestamp.now(),
+                                items: cart.map(item => ({
+                                    productId: item.id,
+                                    productName: item.name,
+                                    quantity: item.quantity, // الكمية التي تم إدخالها (مثلا 250 جرام)
+                                    unit: item.unit, // وحدة العرض (مثلا جرام)
+                                    originalPrice: item.price, // سعر الوحدة الأساسية (للكيلو)
+                                    itemTotalPrice: item.totalPrice, // السعر الإجمالي لهذا الصنف
+                                    baseUnitSoldQuantity: (item.baseUnit === 'كيلو جرام' || item.baseUnit === 'لتر') ? (item.actualQuantityInBaseUnit / 1000) : item.actualQuantityInBaseUnit // الكمية التي تم خصمها من المخزون بالوحدة الأساسية
+                                })),
+                                subtotal: subtotal,
+                                discount: discountAmount,
+                                totalAmount: totalAmount,
+                                paymentMethod: paymentMethod,
+                                cashPaid: cashPaid,
+                                changeDue: cashPaid - totalAmount,
+                                customerId: selectedCustomer ? selectedCustomer.id : null,
+                                customerName: selectedCustomer ? selectedCustomer.name : null,
+                                outstandingBalanceChange: outstandingBalanceChange,
+                                soldBy: auth.currentUser ? auth.currentUser.email : 'Unknown' // تسجيل البائع
+                            };
+                            transaction.set(doc(collection(db, 'sales')), saleRecord);
+                        });
+
+                        showToast("تم إتمام البيع بنجاح!", "success");
+                        resetSale(); // مسح الفاتورة بعد الإتمام
+
+                    } catch (error) {
+                        console.error("Error completing sale:", error);
+                        // يمكن تحسين رسائل الخطأ من خلال تحليل 'error.message'
+                        showToast(`فشل إتمام البيع: ${error.message || error}`, "error");
+                    }
+                }
+
+                // --- وظائف طباعة الإيصال (بسيطة) ---
+                async function printReceipt() {
+                    // هذا مثال بسيط جداً لطباعة إيصال. في تطبيق حقيقي، ستحتاج إلى مكتبة طباعة PDF أو طباعة حرارية.
+                    // لتبسيط، سنعرض تفاصيل الفاتورة في نافذة طباعة المتصفح.
+                    showToast("جاري تجهيز الإيصال للطباعة...", "info");
+                    toggleScanningPulse(printReceiptBtn, true); // تفعيل لودر الطباعة
+
+                    const saleDetails = {
+                        items: cart,
+                        subtotal: parseFloat(subtotalDisplay.textContent),
+                        discount: parseFloat(discountDisplay.textContent),
+                        total: parseFloat(totalDisplay.textContent),
+                        paymentMethod: paymentMethodSelect.value,
+                        cashPaid: parseFloat(cashPaidInput.value) || 0,
+                        changeDue: parseFloat(changeDueDisplay.textContent),
+                        customer: selectedCustomer ? selectedCustomer.name : 'نقدي'
                     };
-                    transaction.set(doc(collection(db, 'sales')), saleRecord);
+
+                    let receiptContent = `
+                        <div style="font-family: 'Cairo', sans-serif; text-align: right; direction: rtl; width: 300px; margin: auto; padding: 10px; border: 1px solid #ccc;">
+                            <h3 style="text-align: center; color: #3f51b5;">فاتورة - شيخ العرب</h3>
+                            <p style="text-align: center; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">تاريخ: ${new Date().toLocaleString()}</p>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 5px; border: 1px solid #ddd;">المنتج</th>
+                                        <th style="padding: 5px; border: 1px solid #ddd;">الكمية</th>
+                                        <th style="padding: 5px; border: 1px solid #ddd;">السعر</th>
+                                        <th style="padding: 5px; border: 1px solid #ddd;">الإجمالي</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${saleDetails.items.map(item => `
+                                        <tr>
+                                            <td style="padding: 5px; border: 1px solid #ddd;">${item.name}</td>
+                                            <td style="padding: 5px; border: 1px solid #ddd;">${item.quantity} ${item.unit}</td>
+                                            <td style="padding: 5px; border: 1px solid #ddd;">${item.price.toFixed(2)}</td>
+                                            <td style="padding: 5px; border: 1px solid #ddd;">${item.totalPrice.toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            <p style="margin-top: 10px;">الإجمالي الفرعي: ${saleDetails.subtotal.toFixed(2)} ج.م</p>
+                            <p>الخصم: ${saleDetails.discount.toFixed(2)} ج.م</p>
+                            <p style="font-weight: bold; font-size: 1.2em;">الإجمالي الكلي: ${saleDetails.total.toFixed(2)} ج.م</p>
+                            <p>طريقة الدفع: ${saleDetails.paymentMethod === 'cash' ? 'نقداً' : saleDetails.paymentMethod === 'debt' ? 'آجل' : 'مختلط'}</p>
+                            ${saleDetails.paymentMethod !== 'debt' ? `<p>المبلغ المدفوع: ${saleDetails.cashPaid.toFixed(2)} ج.م</p>` : ''}
+                            <p>الباقي للعميل: ${saleDetails.changeDue.toFixed(2)} ج.م</p>
+                            ${saleDetails.customer !== 'نقدي' ? `<p>العميل: ${saleDetails.customer}</p>` : ''}
+                            <p style="text-align: center; margin-top: 20px;">شكراً لزيارتكم!</p>
+                        </div>
+                    `;
+
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(receiptContent);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.close();
+
+                    toggleScanningPulse(printReceiptBtn, false); // إيقاف لودر الطباعة
+                    showToast("تم إرسال الإيصال للطباعة.", "success");
+                }
+
+                // --- مستمعي الأحداث ---
+                productSearchInput.addEventListener('input', (e) => searchProducts(e.target.value));
+                scanBarcodePosBtn.addEventListener('click', () => requestScanFromPhone('pos_scan'));
+
+                productSearchResults.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.add-btn'); // استخدام closest للعثور على الزر
+                    if (btn) { // تأكد من أننا ضغطنا على زر الإضافة
+                        const productId = btn.dataset.productId;
+                        const productName = btn.dataset.productName;
+                        const salePrice = parseFloat(btn.dataset.salePrice);
+                        const unit = btn.dataset.unit; // وحدة المنتج
+                        const availableQuantity = parseFloat(btn.dataset.availableQuantity);
+                        addToCart(productId, productName, salePrice, unit, availableQuantity);
+                    }
                 });
 
-                showToast("تم إتمام البيع بنجاح!", "success");
-                resetSale(); // مسح الفاتورة بعد الإتمام
+                paymentMethodSelect.addEventListener('change', (e) => {
+                    if (e.target.value === 'cash') {
+                        cashPaidGroup.style.display = 'block';
+                        customerSelectGroup.style.display = 'none';
+                        cashPaidInput.value = parseFloat(totalDisplay.textContent) || 0; // املأ المبلغ الإجمالي تلقائيا
+                    } else if (e.target.value === 'debt') {
+                        cashPaidGroup.style.display = 'none';
+                        cashPaidInput.value = '0.00';
+                        customerSelectGroup.style.display = 'block';
+                        selectedCustomer = null; // إعادة تعيين العميل عند التبديل
+                    } else if (e.target.value === 'mixed') {
+                        cashPaidGroup.style.display = 'block';
+                        customerSelectGroup.style.display = 'block';
+                        cashPaidInput.value = '0.00'; // ابدأ بمبلغ مدفوع صفر
+                        selectedCustomer = null; // إعادة تعيين العميل
+                    }
+                    calculateTotals();
+                });
 
-            } catch (error) {
-                console.error("Error completing sale:", error);
-                showToast(`فشل إتمام البيع: ${error}`, "error");
-            }
-        }
+                cashPaidInput.addEventListener('input', calculateTotals);
+                customerSearchInput.addEventListener('input', (e) => searchCustomers(e.target.value));
+                addNewCustomerBtn.addEventListener('click', openAddCustomerModal); // استخدام الدالة المخصصة
+                saveNewCustomerBtn.addEventListener('click', () => addNewCustomer(newCustomerNameInput.value, newCustomerPhoneInput.value));
+                cancelNewCustomerBtn.addEventListener('click', closeAddCustomerModal); // زر الإلغاء الجديد
+                closeAddCustomerModalBtn.addEventListener('click', closeAddCustomerModal);
+                addCustomerModal.addEventListener('click', (event) => { if (event.target === addCustomerModal) closeAddCustomerModal(); });
 
-        // --- وظائف طباعة الإيصال (بسيطة) ---
-        async function printReceipt() {
-            // هذا مثال بسيط جداً لطباعة إيصال. في تطبيق حقيقي، ستحتاج إلى مكتبة طباعة PDF أو طباعة حرارية.
-            // لتبسيط، سنعرض تفاصيل الفاتورة في نافذة طباعة المتصفح.
-            showToast("جاري تجهيز الإيصال للطباعة...", "info");
-            toggleScanningPulse(printReceiptBtn, true); // تفعيل لودر الطباعة
+                addDiscountBtn.addEventListener('click', () => {
+                    discountModal.style.display = 'flex';
+                    discountTypeSelect.value = currentDiscount.type;
+                    discountValueInput.value = currentDiscount.value;
+                });
+                applyDiscountBtn.addEventListener('click', () => {
+                    const type = discountTypeSelect.value;
+                    const value = parseFloat(discountValueInput.value);
+                    if (isNaN(value) || value < 0) {
+                        showToast("قيمة الخصم غير صالحة.", "error");
+                        return;
+                    }
+                    if (type === 'percentage' && value > 100) {
+                        showToast("النسبة المئوية للخصم لا يمكن أن تتجاوز 100%.", "error");
+                        return;
+                    }
+                    
+                    // اطلب كلمة السر للمسؤول لتطبيق الخصم
+                    if (!managerAccessEnabled) {
+                        showToast("صلاحيات المسؤول مطلوبة لتطبيق الخصم.", "error");
+                        openPasswordModal("تطبيق الخصم يتطلب صلاحيات المسؤول"); // فتح مودال كلمة السر
+                        return;
+                    }
 
-            const saleDetails = {
-                items: cart,
-                subtotal: parseFloat(subtotalDisplay.textContent),
-                discount: parseFloat(discountDisplay.textContent),
-                total: parseFloat(totalDisplay.textContent),
-                paymentMethod: paymentMethodSelect.value,
-                cashPaid: parseFloat(cashPaidInput.value) || 0,
-                changeDue: parseFloat(changeDueDisplay.textContent),
-                customer: selectedCustomer ? selectedCustomer.name : 'نقدي'
-            };
+                    currentDiscount = { type, value };
+                    calculateTotals();
+                    discountModal.style.display = 'none';
+                    showToast("تم تطبيق الخصم.", "success");
+                });
+                removeDiscountBtn.addEventListener('click', () => {
+                    if (!managerAccessEnabled) {
+                        showToast("صلاحيات المسؤول مطلوبة لإزالة الخصم.", "error");
+                        openPasswordModal("إزالة الخصم تتطلب صلاحيات المسؤول");
+                        return;
+                    }
+                    currentDiscount = { type: 'fixed', value: 0 };
+                    calculateTotals();
+                    discountModal.style.display = 'none';
+                    showToast("تم إزالة الخصم.", "info");
+                });
+                closeDiscountModalBtn.addEventListener('click', () => discountModal.style.display = 'none');
+                discountModal.addEventListener('click', (event) => { if (event.target === discountModal) discountModal.style.display = 'none'; });
 
-            let receiptContent = `
-                <div style="font-family: 'Cairo', sans-serif; text-align: right; direction: rtl; width: 300px; margin: auto; padding: 10px; border: 1px solid #ccc;">
-                    <h3 style="text-align: center; color: #3f51b5;">فاتورة - شيخ العرب</h3>
-                    <p style="text-align: center; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">تاريخ: ${new Date().toLocaleString()}</p>
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                        <thead>
-                            <tr style="background-color: #f0f0f0;">
-                                <th style="padding: 5px; border: 1px solid #ddd;">المنتج</th>
-                                <th style="padding: 5px; border: 1px solid #ddd;">الكمية</th>
-                                <th style="padding: 5px; border: 1px solid #ddd;">السعر</th>
-                                <th style="padding: 5px; border: 1px solid #ddd;">الإجمالي</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${saleDetails.items.map(item => `
-                                <tr>
-                                    <td style="padding: 5px; border: 1px solid #ddd;">${item.name}</td>
-                                    <td style="padding: 5px; border: 1px solid #ddd;">${item.quantity} ${item.unit}</td>
-                                    <td style="padding: 5px; border: 1px solid #ddd;">${item.price.toFixed(2)}</td>
-                                    <td style="padding: 5px; border: 1px solid #ddd;">${(item.quantity * item.price).toFixed(2)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    <p style="margin-top: 10px;">الإجمالي الفرعي: ${saleDetails.subtotal.toFixed(2)} ج.م</p>
-                    <p>الخصم: ${saleDetails.discount.toFixed(2)} ج.م</p>
-                    <p style="font-weight: bold; font-size: 1.2em;">الإجمالي الكلي: ${saleDetails.total.toFixed(2)} ج.م</p>
-                    <p>طريقة الدفع: ${saleDetails.paymentMethod === 'cash' ? 'نقداً' : saleDetails.paymentMethod === 'debt' ? 'آجل' : 'مختلط'}</p>
-                    ${saleDetails.paymentMethod !== 'debt' ? `<p>المبلغ المدفوع: ${saleDetails.cashPaid.toFixed(2)} ج.م</p>` : ''}
-                    <p>الباقي للعميل: ${saleDetails.changeDue.toFixed(2)} ج.م</p>
-                    ${saleDetails.customer !== 'نقدي' ? `<p>العميل: ${saleDetails.customer}</p>` : ''}
-                    <p style="text-align: center; margin-top: 20px;">شكراً لزيارتكم!</p>
-                </div>
-            `;
+                // مستمعات لأزرار المودال الجزئي (الجرامات/المليلترات)
+                addFractionalToCartBtn.addEventListener('click', () => {
+                    const quantity = parseFloat(fractionalQuantityInput.value);
+                    if (isNaN(quantity) || quantity <= 0) {
+                        showToast("الكمية غير صالحة. يجب أن تكون أكبر من صفر.", "error");
+                        return;
+                    }
+                    addFractionalProductToCart(quantity);
+                });
+                cancelFractionalAddBtn.addEventListener('click', closeFractionalQuantityModal);
+                closeFractionalQuantityModalBtn.addEventListener('click', closeFractionalQuantityModal);
+                fractionalQuantityModal.addEventListener('click', (event) => { if (event.target === fractionalQuantityModal) closeFractionalQuantityModal(); });
+                
+                // مستمع لزر الإلغاء في مودال كلمة السر
+                cancelPasswordBtn.addEventListener('click', closePasswordModal);
 
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(receiptContent);
-            printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
-            printWindow.close();
 
-            toggleScanningPulse(printReceiptBtn, false); // إيقاف لودر الطباعة
-            showToast("تم إرسال الإيصال للطباعة.", "success");
-        }
+                completeSaleBtn.addEventListener('click', completeSale);
+                cancelSaleBtn.addEventListener('click', resetSale);
+                printReceiptBtn.addEventListener('click', printReceipt);
 
-        // --- مستمعي الأحداث ---
-        productSearchInput.addEventListener('input', (e) => searchProducts(e.target.value));
-        scanBarcodePosBtn.addEventListener('click', () => requestScanFromPhone('pos_scan'));
-
-        productSearchResults.addEventListener('click', (e) => {
-            // حدث النقر على زر "إضافة" المنتج
-            const addBtn = e.target.closest('.add-btn');
-            if (addBtn) {
-                const productId = btn.dataset.productId;
-                const productName = btn.dataset.productName;
-                const salePrice = parseFloat(btn.dataset.salePrice);
-                const availableQuantity = parseFloat(btn.dataset.availableQuantity);
-                const unit = btn.dataset.unit; // الحصول على الوحدة
-                addToCart(productId, productName, salePrice, availableQuantity, unit); // تمرير الوحدة
-            }
-        });
-
-        paymentMethodSelect.addEventListener('change', (e) => {
-            if (e.target.value === 'cash') {
-                cashPaidGroup.style.display = 'block';
-                customerSelectGroup.style.display = 'none';
-                cashPaidInput.value = (parseFloat(totalDisplay.textContent) || 0).toFixed(2); // املأ المبلغ الإجمالي تلقائيا
-            } else if (e.target.value === 'debt') {
-                cashPaidGroup.style.display = 'none';
-                cashPaidInput.value = '0.00';
-                customerSelectGroup.style.display = 'block';
-                selectedCustomer = null; // إعادة تعيين العميل عند التبديل
-            } else if (e.target.value === 'mixed') {
-                cashPaidGroup.style.display = 'block';
-                customerSelectGroup.style.display = 'block';
-                cashPaidInput.value = '0.00'; // ابدأ بمبلغ مدفوع صفر
-                selectedCustomer = null; // إعادة تعيين العميل
-            }
-            calculateTotals();
-        });
-
-        cashPaidInput.addEventListener('input', calculateTotals);
-        customerSearchInput.addEventListener('input', (e) => searchCustomers(e.target.value));
-        addNewCustomerBtn.addEventListener('click', () => {
-            addCustomerModal.style.display = 'flex';
-            newCustomerNameInput.value = '';
-            newCustomerPhoneInput.value = '';
-        });
-        saveNewCustomerBtn.addEventListener('click', () => addNewCustomer(newCustomerNameInput.value, newCustomerPhoneInput.value));
-        closeAddCustomerModalBtn.addEventListener('click', () => addCustomerModal.style.display = 'none');
-        addCustomerModal.addEventListener('click', (event) => { if (event.target === addCustomerModal) addCustomerModal.style.display = 'none'; });
-
-        addDiscountBtn.addEventListener('click', async () => { // إضافة async هنا
-            if (!managerAccessEnabled) {
-                const password = await openPasswordModal("تأكيد كلمة سر المسؤول لتطبيق الخصم");
-                if (password !== MANAGER_PASSWORD) {
-                    showToast("كلمة السر غير صحيحة. لا يمكن تطبيق الخصم.", "error");
-                    return;
-                }
-            }
-            discountModal.style.display = 'flex';
-            discountTypeSelect.value = currentDiscount.type;
-            discountValueInput.value = currentDiscount.value;
-        });
-        applyDiscountBtn.addEventListener('click', () => {
-            const type = discountTypeSelect.value;
-            const value = parseFloat(discountValueInput.value);
-            if (isNaN(value) || value < 0) {
-                showToast("قيمة الخصم غير صالحة.", "error");
-                return;
-            }
-            currentDiscount = { type, value };
-            calculateTotals();
-            discountModal.style.display = 'none';
-            showToast("تم تطبيق الخصم.", "success");
-        });
-        removeDiscountBtn.addEventListener('click', () => {
-            currentDiscount = { type: 'fixed', value: 0 };
-            calculateTotals();
-            discountModal.style.display = 'none';
-            showToast("تم إزالة الخصم.", "info");
-        });
-        closeDiscountModalBtn.addEventListener('click', () => discountModal.style.display = 'none');
-        discountModal.addEventListener('click', (event) => { if (event.target === discountModal) discountModal.style.display = 'none'; });
-
-        completeSaleBtn.addEventListener('click', completeSale);
-        cancelSaleBtn.addEventListener('click', resetSale);
-        printReceiptBtn.addEventListener('click', printReceipt);
-
-        // --- التهيئة الأولية عند تحميل الصفحة ---
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCart();
-            calculateTotals();
-            setAccessButtonsState(managerAccessEnabled); // تطبيق حالة المسؤول المحفوظة
-            startListeningToSharedScannerSession(); // بدء الاستماع للماسح الضوئي
-            fetchAllProductsForSearch(); // جلب المنتجات للبحث
-        });
-    </script>
-</body>
-</html>
+                // --- التهيئة الأولية عند تحميل الصفحة ---
+                document.addEventListener('DOMContentLoaded', () => {
+                    renderCart();
+                    calculateTotals();
+                    setAccessButtonsState(managerAccessEnabled); // تطبيق حالة المسؤول المحفوظة
+                    startListeningToSharedScannerSession(); // بدء الاستماع للماسح الضوئي
+                    fetchAllProductsForSearch(); // جلب المنتجات للبحث
+                });
+            </script>
+        </body>
+        </html>
