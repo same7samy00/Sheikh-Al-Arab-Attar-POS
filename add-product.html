@@ -125,26 +125,7 @@
             position: relative;
         }
         .barcode-scan-buttons input {
-            padding-left: 35px; /* مسافة لـ Loader */
-        }
-
-        /* Loader داخل حقل الباركود في النموذج */
-        .barcode-scan-buttons .scan-loader-inside-button { /* تم تغيير الكلاس ليطابق Loader داخل الزر */
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3f51b5; /* لون الـ Loader ليتناسب مع theme */
-            border-radius: 50%;
-            width: 18px; /* حجم أكبر قليلاً */
-            height: 18px;
-            animation: spin 1s linear infinite;
-            display: none;
-            position: absolute; /* ليكون داخل الـ input */
-            left: 10px; /* موضع ثابت داخل الـ input */
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            padding-left: 12px; /* لا حاجة لمسافة لـ Loader بعد الآن */
         }
 
         /* --- توحيد تصميم الأزرار (Save, Scan, Back to Inventory) --- */
@@ -152,7 +133,7 @@
         .submit-btn, 
         .action-buttons-group button,
         .return-button-header, /* الزر في الرأس */
-        .action-icon-btn /* زر الأيقونة الجديد للمسح */ {
+        .action-icon-btn /* زر الأيقونة الجديد (مسح بالهاتف) */ {
             font-family: 'Cairo', sans-serif;
             padding: 12px 25px; /* بادينغ موحد */
             border: none;
@@ -165,6 +146,8 @@
             justify-content: center;
             gap: 8px; /* مسافة بين الأيقونة والنص */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* ظل خفيف موحد */
+            position: relative; /* لتمكين تأثير الوميض */
+            overflow: hidden; /* لضمان عدم خروج الوميض عن الزر */
         }
         .submit-btn:hover, 
         .action-buttons-group button:hover,
@@ -224,6 +207,7 @@
             height: 45px; /* ارتفاع ثابت */
             border-radius: 50%; /* لجعل الزر دائريًا */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            gap: 0; /* لا يوجد gap للأزرار الأيقونية */
         }
         .action-icon-btn i {
             margin: 0; /* إزالة هامش الأيقونة */
@@ -232,32 +216,19 @@
         .action-icon-btn:hover {
             background-color: #1976D2;
         }
-        /* سلوك Loader داخل الزر الأيقونة */
-     .action-icon-btn {
-    /* ... (احتفظ بباقي التنسيقات الموجودة هنا) ... */
-    position: relative; /* مهم جداً: ليكون العنصر الأب للـ Loader المطلق */
-    overflow: hidden; /* لإخفاء أي جزء من Loader قد يخرج عن الزر إذا كان أكبر */
-}
-.action-icon-btn .scan-loader-inside-button { /* سلوك Loader داخل الزر الأيقونة */
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #fff; /* لون أبيض ليتناسب مع الزر */
-    border-radius: 50%;
-    width: 15px;
-    height: 15px;
-    animation: spin 1s linear infinite;
-    display: none;
-    
-    /* التعديلات لجعله في المنتصف */
-    position: absolute; /* وضع مطلق داخل الزر */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* لتحريكه بدقة للمنتصف بناءً على حجمه */
-}
-        .action-icon-btn.loading i {
-            display: none;
+        /* --- تأثير الوميض (Pulse Effect) للأزرار أثناء المسح --- */
+        .action-icon-btn.scanning-pulse {
+            animation: scan-button-pulse 1s infinite alternate;
         }
-        .action-icon-btn.loading .scan-loader-inside-button {
-            display: block;
+        @keyframes scan-button-pulse {
+            0% { 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(33, 150, 243, 0.4); /* لون أزرق */
+                background-color: #2196F3; /* لون خلفية زر المسح بالهاتف */
+            }
+            100% { 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(33, 150, 243, 0);
+                background-color: #2196F3;
+            }
         }
 
 
@@ -476,8 +447,8 @@
         const productBarcodeInput = document.getElementById('product-barcode');
         const productDescriptionInput = document.getElementById('product-description');
         const scanBarcodeFormBtnProduct = document.getElementById('scan-barcode-form-btn-product');
-        //Loader هنا لم يعد عنصرًا منفصلاً خارج الزر، بل هو جزء داخلي من زر المسح نفسه
-        //const productBarcodeLoader = document.getElementById('product-barcode-loader'); 
+        // تم إزالة Loader كعنصر منفصل، سيتم التحكم في Loader داخل الزر
+
 
         const addAnotherProductBtn = document.getElementById('add-another-product-btn');
         // تم إزالة backToInventoryBtn من هنا
@@ -504,23 +475,24 @@
         }
 
         /**
-         * لإظهار أو إخفاء Loader المسح داخل الزر.
-         * @param {HTMLElement} buttonElement - زر المسح (scanBarcodeFormBtnProduct)
-         * @param {boolean} show - true لإظهار، false لإخفاء
+         * لتطبيق أو إزالة تأثير الوميض على الزر.
+         * @param {HTMLElement} buttonElement - زر المسح الذي سيومض (مثلاً scanBarcodeFormBtnProduct).
+         * @param {boolean} activate - true لتفعيل الوميض، false لإزالته.
          */
-        function toggleButtonLoader(buttonElement, show) {
-            const icon = buttonElement.querySelector('i');
+        function toggleScanningPulse(buttonElement, activate) {
             const loader = buttonElement.querySelector('.scan-loader-inside-button');
-            if (!icon || !loader) return;
+            const icon = buttonElement.querySelector('i');
 
-            if (show) {
-                icon.style.display = 'none';
-                loader.style.display = 'block';
-                buttonElement.classList.add('loading');
+            if (activate) {
+                // إظهار Loader وإخفاء الأيقونة عند بدء الوميض (التحميل)
+                if (loader) loader.style.display = 'block';
+                if (icon) icon.style.display = 'none';
+                buttonElement.classList.add('scanning-pulse');
             } else {
-                icon.style.display = 'block';
-                loader.style.display = 'none';
-                buttonElement.classList.remove('loading');
+                // إخفاء Loader وإظهار الأيقونة عند انتهاء الوميض
+                if (loader) loader.style.display = 'none';
+                if (icon) icon.style.display = 'block';
+                buttonElement.classList.remove('scanning-pulse');
             }
         }
 
@@ -562,7 +534,7 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    if (data.status === 'phoneReady' || data.status === 'connecting' || data.status === 'scanning' || data.status === 'scanRequested') {
+                    if (data.status === 'phoneReady' || data.status === 'connecting' || data.status === 'scanRequested') {
                         isPhoneScannerConnected = true;
                         // لا نُظهر توست متكرر هنا، فقط نُحدث الحالة الداخلية
                     } else if (data.status === 'scanned') { 
@@ -577,7 +549,7 @@
                             showToast('تم مسح باركود لغرض مختلف (ليس إضافة).', "info");
                         }
                         
-                        toggleButtonLoader(scanBarcodeFormBtnProduct, false); // إخفاء Loader
+                        toggleScanningPulse(scanBarcodeFormBtnProduct, false); // إيقاف الوميض
 
                         // إرسال إشارة للهاتف بأنه يمكنه المسح مرة أخرى
                         updateDoc(sessionDocRef, {
@@ -589,17 +561,21 @@
                     } else if (data.status === 'closedByPhone' || data.status === 'errorFromPhone' || data.status === 'disconnected') {
                         isPhoneScannerConnected = false;
                         showToast('انقطع الاتصال بالماسح. يرجى التأكد من تشغيله.', "error");
-                        toggleButtonLoader(scanBarcodeFormBtnProduct, false);
+                        toggleScanningPulse(scanBarcodeFormBtnProduct, false); // إيقاف الوميض
                     } else if (data.status === 'closedByDesktop') {
                         isPhoneScannerConnected = false;
                         showToast('تم إغلاق الماسح من الجهاز الرئيسي.', "info");
-                        toggleButtonLoader(scanBarcodeFormBtnProduct, false);
+                        toggleScanningPulse(scanBarcodeFormBtnProduct, false); // إيقاف الوميض
+                    } else if (data.status === 'scanning') { // الهاتف يقوم بالمسح الآن
+                        isPhoneScannerConnected = true; // تأكيد الاتصال
+                        showToast('الماسح يقوم بالمسح الآن...', 'info');
+                        // لا نُطبق الوميض هنا لأن الوميض يُطبق عند طلب المسح (scanRequested)
                     }
                 } else {
                     // المستند غير موجود، مما يعني أنه تم حذفه من الجهاز الرئيسي
                     isPhoneScannerConnected = false;
                     showToast('تم إنهاء جلسة الماسح من الجهاز الرئيسي.', "info");
-                    toggleButtonLoader(scanBarcodeFormBtnProduct, false);
+                    toggleScanningPulse(scanBarcodeFormBtnProduct, false); // إيقاف الوميض
                     if (phoneSessionUnsubscribe) {
                         phoneSessionUnsubscribe();
                         phoneSessionUnsubscribe = null;
@@ -609,7 +585,7 @@
                 console.error("Error listening to shared session document:", error);
                 isPhoneScannerConnected = false;
                 showToast('خطأ في الاتصال بالماسح. حاول تحديث الصفحة.', "error");
-                toggleButtonLoader(scanBarcodeFormBtnProduct, false);
+                toggleScanningPulse(scanBarcodeFormBtnProduct, false); // إيقاف الوميض
             });
         }
 
@@ -633,7 +609,7 @@
                     return;
                 }
 
-                toggleButtonLoader(scanBarcodeFormBtnProduct, true); // إظهار Loader
+                toggleScanningPulse(scanBarcodeFormBtnProduct, true); // تفعيل الوميض
 
                 await updateDoc(sessionDocRef, {
                     purpose: purpose,
@@ -646,7 +622,7 @@
             } catch (e) {
                 console.error("Error requesting scan from phone:", e);
                 showToast('حدث خطأ أثناء طلب المسح من الماسح: ' + e.message, "error");
-                toggleButtonLoader(scanBarcodeFormBtnProduct, false); // إخفاء Loader عند الخطأ
+                toggleScanningPulse(scanBarcodeFormBtnProduct, false); // إيقاف الوميض عند الخطأ
             }
         }
 
