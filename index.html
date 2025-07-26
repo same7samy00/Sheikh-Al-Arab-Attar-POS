@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة محل عطارة "شيخ العرب"</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Reem+Kufi+Ink&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <div class="logo">
+                <h1>شيخ العرب</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" data-section="dashboard" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
+                    <li><a href="#" data-section="inventory"><i class="fas fa-boxes"></i> إدارة المخزون</a></li>
+                    <li><a href="#" data-section="pos"><i class="fas fa-cash-register"></i> نقطة البيع</a></li>
+                    <li><a href="#" data-section="customers"><i class="fas fa-users"></i> العملاء والديون</a></li>
+                    <li><a href="#" data-section="reports"><i class="fas fa-chart-line"></i> التقارير</a></li>
+                    <li><a href="#" data-section="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
+                    <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main id="main-content">
+            <header>
+                <h2>لوحة التحكم</h2>
+                <div class="user-info">
+                    <span>مرحباً، <span id="current-user-name"></span></span>
+                </div>
+            </header>
+
+            <section id="dashboard" class="content-section active">
+                <h3>نظرة عامة على الأداء</h3>
+                <div class="summary-cards">
+                    <div class="card">
+                        <h4>إجمالي مبيعات اليوم</h4>
+                        <p id="daily-sales">--- ج.م</p> </div>
+                    <div class="card">
+                        <h4>إجمالي ديون العملاء</h4>
+                        <p id="total-debts">--- ج.م</p> </div>
+                    <div class="card">
+                        <h4>منتجات على وشك النفاذ</h4>
+                        <p id="low-stock-products">--- منتجات</p> </div>
+                </div>
+            </section>
+
+            <section id="inventory" class="content-section">
+                <h3>إدارة المخزون</h3>
+                <button class="add-new-btn"><i class="fas fa-plus"></i> إضافة منتج جديد</button>
+                <div class="products-list">
+                    </div>
+            </section>
+
+            <section id="pos" class="content-section">
+                <h3>نقطة البيع</h3>
+                </section>
+
+            <section id="customers" class="content-section">
+                <h3>العملاء والديون</h3>
+                </section>
+
+            <section id="reports" class="content-section">
+                <h3>التقارير</h3>
+                </section>
+
+            <section id="settings" class="content-section">
+                <h3>إعدادات النظام</h3>
+                </section>
+
+            <section id="auth-section" class="content-section">
+                <h3>تسجيل الدخول</h3>
+                <form id="login-form">
+                    <input type="email" id="login-email" placeholder="البريد الإلكتروني" required>
+                    <input type="password" id="login-password" placeholder="كلمة المرور" required>
+                    <button type="submit">تسجيل الدخول</button>
+                    <p id="auth-error" class="error-message"></p>
+                </form>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./script.js"></script>
+</body>
+</html>
