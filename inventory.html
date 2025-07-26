@@ -213,6 +213,10 @@
             font-size: 1.1em;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            width: 45px; /* لتحديد حجم الأيقونة كزر */
+            height: 45px;
+            justify-content: center;
+            align-items: center;
         }
         #phone-connect-btn:hover {
             background-color: #303f9f;
@@ -406,13 +410,14 @@
         }
 
         /* --- تنسيقات لمودال الاتصال بالهاتف (ملء الشاشة) --- */
+        /* هذا المودال أصبح للتحكم في حالة الهاتف وعرض QR فقط عند الحاجة */
         #phone-connection-modal .modal-content {
-            width: 100vw;
-            height: 100vh;
-            max-width: none; /* إزالة الحد الأقصى للعرض */
-            max-height: none; /* إزالة الحد الأقصى للارتفاع */
+            width: 95vw;
+            height: 95vh;
+            max-width: 500px; /* حجم معقول لعرض حالة الاتصال والـ QR */
+            max-height: 550px;
             padding: 20px;
-            border-radius: 0;
+            border-radius: 8px; /* استعادة الحواف المستديرة */
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -424,7 +429,7 @@
         }
 
         /* تنسيق حاوية الـ QR داخل مودال الاتصال */
-        #qr-container-desktop { /* تم تغيير ID ليكون أكثر وضوحاً */
+        #qr-container-desktop {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -432,13 +437,14 @@
             border: 1px dashed #ccc;
             border-radius: 8px;
             background-color: #f8f8f8;
-            width: 90%;
-            max-width: 400px;
+            width: 100%; /* ياخذ عرضاً أكبر داخل المودال */
+            max-width: 300px; /* أقصى عرض لـ QR Container */
             box-sizing: border-box;
+            margin-top: 15px;
         }
         #phone-connection-modal #qr-code-display {
-            width: 250px;
-            height: 250px;
+            width: 200px;
+            height: 200px;
             margin: 15px auto;
             border: 1px solid #ddd;
             padding: 5px;
@@ -730,7 +736,7 @@
                                     <option value="مجموعة">مجموعة</option>
                                     <option value="جرام">جرام</option>
                                     <option value="مليلتر">مليلتر</option>
-                                    <option value="ملعقة">ملعقة</option>
+                                    <option value="ملعقة">ملعقة</output>
                                     <option value="زجاجة">زجاجة</option>
                                     <option value="علبة">علبة</option>
                                     <option value="صندوق">صندوق</option>
@@ -756,7 +762,8 @@
                                 <label for="product-barcode">باركود/QR:</label>
                                 <div class="barcode-scan-buttons">
                                     <input type="text" id="product-barcode" style="flex-grow: 1;">
-                                    </div>
+                                    <button type="button" id="scan-barcode-form-btn-product" class="secondary-action-btn"><i class="fas fa-qrcode"></i> مسح بالهاتف</button>
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -775,7 +782,7 @@
                         <h4 id="phone-modal-title">ربط ماسح الباركود بالهاتف</h4>
                         <div id="qr-container-desktop">
                             <canvas id="qr-code-display"></canvas>
-                            <p class="instruction" id="qr-instruction">امسح هذا الرمز بهاتفك لربط الماسح. (يظهر لمرة واحدة فقط)</p>
+                            <p class="instruction" id="qr-instruction">امسح هذا الرمز بهاتفك لربط الماسح. (تظهر لمرة واحدة فقط)</p>
                             <div class="loader" id="phone-qr-loader"></div>
                             <p id="phone-connection-status-message" class="status-message"></p>
                             <button id="disconnect-phone-button" class="secondary-action-btn" style="margin-top: 20px; display: none;"><i class="fas fa-times"></i> قطع الاتصال بالهاتف</button>
@@ -809,7 +816,7 @@
         import { getFirestore, collection, getDocs, Timestamp, addDoc, updateDoc, deleteDoc, doc, getDoc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-        // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا)
+        // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكريرها هنا)
         const firebaseConfig = {
           apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
           authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
@@ -827,6 +834,9 @@
 
         // --- كلمة السر للمسؤول (Hardcoded - غير آمنة في الإنتاج!) ---
         const MANAGER_PASSWORD = "0000"; 
+        // --- معرف الجلسة المشترك (استخدم معرف فريد لمشروعك/متجرك) ---
+        // هذا معرف ثابت يستخدم للاتصال المباشر بدلاً من QR ديناميكي
+        const SHARED_SCANNER_SESSION_ID = "YOUR_STORE_UNIQUE_SCANNER_ID_12345"; // !!! قم بتغيير هذا ليكون معرفًا فريدًا لمتجرك !!!
 
         let managerAccessEnabled = false;
 
@@ -837,7 +847,7 @@
 
         const addProductBtn = document.getElementById('add-product-btn');
         const inventorySearchInput = document.getElementById('inventory-search');
-        const scanBarcodeInventorySearchBtn = document.getElementById('scan-barcode-inventory-search'); // تم تغيير ID
+        const scanBarcodeInventorySearchBtn = document.getElementById('scan-barcode-inventory-search');
         const productsTableBody = document.querySelector('#products-table tbody');
 
         const productModal = document.getElementById('product-modal');
@@ -853,7 +863,7 @@
         const productSalePriceInput = document.getElementById('product-sale-price');
         const productBarcodeInput = document.getElementById('product-barcode');
         const productDescriptionInput = document.getElementById('product-description');
-        // تم إزالة scanBarcodeFormBtn هنا لأنه لن يكون زرًا منفصلاً للنموذج
+        const scanBarcodeFormBtnProduct = document.getElementById('scan-barcode-form-btn-product'); // تم تغيير ID هنا
 
         const passwordModal = document.getElementById('password-modal');
         const closePasswordModalBtn = document.getElementById('close-password-modal-btn');
@@ -862,18 +872,16 @@
         const passwordErrorMessage = document.getElementById('password-error-message');
 
         // عناصر مودال الاتصال بالهاتف
-        const phoneConnectionModal = document.getElementById('phone-connection-modal'); // تم تغيير ID
-        const closePhoneConnectionModalBtn = document.getElementById('close-phone-connection-modal-btn'); // تم تغيير ID
-        const phoneModalTitle = document.getElementById('phone-modal-title'); // تم تغيير ID
-        const qrContainerDesktop = document.getElementById('qr-container-desktop'); // تم تغيير ID
+        const phoneConnectionModal = document.getElementById('phone-connection-modal');
+        const closePhoneConnectionModalBtn = document.getElementById('close-phone-connection-modal-btn');
+        const phoneModalTitle = document.getElementById('phone-modal-title');
+        const qrContainerDesktop = document.getElementById('qr-container-desktop');
         const qrCodeDisplayCanvas = document.getElementById('qr-code-display');
-        const qrInstruction = document.getElementById('qr-instruction'); // تم تغيير ID
+        const qrInstruction = document.getElementById('qr-instruction');
         const phoneQrLoader = document.getElementById('phone-qr-loader');
-        const phoneConnectionStatusMessage = document.getElementById('phone-connection-status-message'); // تم تغيير ID
-        const disconnectPhoneButton = document.getElementById('disconnect-phone-button'); // زر قطع الاتصال داخل المودال
+        const phoneConnectionStatusMessage = document.getElementById('phone-connection-status-message');
+        const disconnectPhoneButton = document.getElementById('disconnect-phone-button');
 
-
-        // زر أيقونة الهاتف الجديد
         const phoneConnectBtn = document.getElementById('phone-connect-btn');
 
 
@@ -882,9 +890,9 @@
 
         // --- متغيرات حالة المسح بالباركود ---
         let currentScanPurpose = null; // الغرض من المسح: 'addEdit' أو 'search'
-        let activePhoneScanSessionId = localStorage.getItem('activePhoneScanSessionId') || null; 
         let phoneSessionUnsubscribe = null;
         let qrCodeInstance = null;
+        let isPhoneScannerConnected = false; // حالة اتصال ماسح الهاتف
 
         // --- دالة لإظهار الإشعارات العائمة (Toasts) ---
         function showToast(message, type = 'info') {
@@ -913,18 +921,22 @@
                 case 'disconnected':
                     phoneConnectBtn.innerHTML = '<i class="fas fa-mobile-alt"></i>';
                     title = 'الهاتف: غير متصل (انقر للربط)';
+                    isPhoneScannerConnected = false;
                     break;
                 case 'connecting':
                     phoneConnectBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
                     title = 'الهاتف: جاري الاتصال...';
+                    isPhoneScannerConnected = false;
                     break;
                 case 'connected':
                     phoneConnectBtn.innerHTML = '<i class="fas fa-link"></i>';
                     title = 'الهاتف: متصل وجاهز';
+                    isPhoneScannerConnected = true;
                     break;
                 case 'error':
                     phoneConnectBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
                     title = 'الهاتف: خطأ في الاتصال';
+                    isPhoneScannerConnected = false;
                     break;
             }
             phoneConnectBtn.title = title;
@@ -988,36 +1000,8 @@
                 setAccessButtonsState(managerAccessEnabled);
                 console.log("User is logged in on inventory.html:", user.email);
 
-                // عند تحميل الصفحة، إذا كان هناك activePhoneScanSessionId من قبل،
-                // حاول إعادة الاتصال بالجلسة لضمان الاستمرارية
-                if (activePhoneScanSessionId) {
-                    try {
-                        const sessionDoc = await getDoc(doc(db, 'scannerSessions', activePhoneScanSessionId));
-                        if (sessionDoc.exists()) {
-                            // تحقق من أن الجلسة لم تُغلق من قبل الهاتف
-                            if (sessionDoc.data().status !== 'closedByPhone' && sessionDoc.data().status !== 'errorFromPhone') {
-                                listenToPhoneSession(activePhoneScanSessionId);
-                            } else {
-                                console.log("Stored session was previously closed by phone or had error. Resetting.");
-                                activePhoneScanSessionId = null;
-                                localStorage.removeItem('activePhoneScanSessionId');
-                                updatePhoneConnectionButtonStatus('disconnected');
-                            }
-                        } else {
-                            console.log("Stored session ID does not exist in Firestore. Resetting.");
-                            activePhoneScanSessionId = null;
-                            localStorage.removeItem('activePhoneScanSessionId');
-                            updatePhoneConnectionButtonStatus('disconnected');
-                        }
-                    } catch (e) {
-                        console.error("Error checking stored session ID:", e);
-                        activePhoneScanSessionId = null;
-                        localStorage.removeItem('activePhoneScanSessionId');
-                        updatePhoneConnectionButtonStatus('error');
-                    }
-                } else {
-                    updatePhoneConnectionButtonStatus('disconnected');
-                }
+                // حاول بدء الاستماع إلى جلسة الماسح المشتركة فورًا
+                startListeningToSharedSession();
 
             } else {
                 console.log("User is not logged in. Redirecting to login.html.");
@@ -1027,24 +1011,16 @@
 
         logoutBtn.addEventListener('click', async () => {
             try {
-                if (activePhoneScanSessionId) {
-                    if (phoneSessionUnsubscribe) {
-                        phoneSessionUnsubscribe();
-                        phoneSessionUnsubscribe = null;
-                    }
-                    await setDoc(doc(db, 'scannerSessions', activePhoneScanSessionId), {
-                        status: 'closedByDesktop',
-                        disconnectedAt: Timestamp.now()
-                    }, { merge: true }).catch(e => console.warn("Error signaling phone on logout:", e));
-
-                    localStorage.removeItem('activePhoneScanSessionId');
-                    const sessionIdToDelete = activePhoneScanSessionId;
-                    activePhoneScanSessionId = null; 
-                    setTimeout(async () => {
-                        await deleteDoc(doc(db, 'scannerSessions', sessionIdToDelete)).catch(e => console.error("Error deleting session doc after logout:", e));
-                        console.log("Session document deleted after logout:", sessionIdToDelete);
-                    }, 1000); 
+                if (phoneSessionUnsubscribe) {
+                    phoneSessionUnsubscribe();
+                    phoneSessionUnsubscribe = null;
                 }
+                // أرسل إشارة للهاتف بالانفصال قبل تسجيل الخروج
+                await setDoc(doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID), {
+                    status: 'closedByDesktop',
+                    disconnectedAt: Timestamp.now()
+                }, { merge: true }).catch(e => console.warn("Error signaling phone on logout:", e));
+
                 await signOut(auth);
                 console.log("User signed out successfully from inventory.html.");
                 window.location.replace('login.html'); 
@@ -1230,21 +1206,29 @@
             }
         }
 
-        function generateSessionId() {
-            return 'scan_' + Date.now() + Math.random().toString(36).substring(2, 9);
-        }
-
         /**
-         * وظيفة الاستماع المستمر لجلسة مسح الباركود عبر الهاتف (من جانب الكمبيوتر).
-         * @param {string} sessionIdToListen - معرف الجلسة الذي سيتم الاستماع إليه.
+         * وظيفة لبدء الاستماع إلى جلسة الماسح المشتركة.
          */
-        function listenToPhoneSession(sessionIdToListen) {
+        async function startListeningToSharedSession() {
             if (phoneSessionUnsubscribe) {
-                phoneSessionUnsubscribe();
+                phoneSessionUnsubscribe(); // Stop any previous listener
             }
 
-            const sessionDocRef = doc(db, 'scannerSessions', sessionIdToListen);
+            const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
             
+            // تحقق من وجود المستند، إذا لم يكن موجودًا، قم بإنشائه.
+            const docSnap = await getDoc(sessionDocRef);
+            if (!docSnap.exists()) {
+                console.log("Creating shared session document in Firestore.");
+                await setDoc(sessionDocRef, {
+                    status: 'disconnected', // Initial status
+                    createdAt: Timestamp.now(),
+                    lastAction: 'desktop_initialized'
+                });
+            } else {
+                console.log("Shared session document already exists.");
+            }
+
             phoneSessionUnsubscribe = onSnapshot(sessionDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -1255,14 +1239,16 @@
                         phoneConnectionStatusMessage.className = 'status-message success';
                         qrContainerDesktop.style.display = 'none'; // Hide QR code
                         phoneModalTitle.textContent = 'الهاتف متصل';
-                        qrInstruction.style.display = 'none'; // Hide instruction
-                        disconnectPhoneButton.style.display = 'block'; // Show disconnect button
+                        qrInstruction.style.display = 'none';
+                        disconnectPhoneButton.style.display = 'block';
+                        // Close modal after a short delay if it's open (for better UX)
+                        setTimeout(closePhoneConnectionModal, 1500);
                     } else if (data.status === 'connecting') {
                         updatePhoneConnectionButtonStatus('connecting');
                         phoneConnectionStatusMessage.textContent = 'الهاتف جاري الاتصال...';
                         phoneConnectionStatusMessage.className = 'status-message info';
-                        qrContainerDesktop.style.display = 'flex'; // Show QR if connecting
-                        qrInstruction.style.display = 'block';
+                        qrContainerDesktop.style.display = 'none'; // Hide QR during connection attempt
+                        qrInstruction.style.display = 'none';
                         disconnectPhoneButton.style.display = 'none';
                     } else if (data.status === 'scanned') { 
                         const scannedValue = data.scannedValue;
@@ -1273,6 +1259,9 @@
                         if (purposeFromSession === 'addEdit') {
                             productBarcodeInput.value = scannedValue;
                             showToast('تم مسح الباركود بنجاح في نموذج المنتج.', 'success');
+                            if (productModal.style.display === 'flex') { // Only close if product modal is open
+                                closeProductModal(); 
+                            }
                         } else if (purposeFromSession === 'search') {
                             inventorySearchInput.value = scannedValue;
                             const event = new Event('input', { bubbles: true });
@@ -1289,6 +1278,11 @@
                             status: 'readyForNextScan',
                             lastProcessedByDesktop: Timestamp.now()
                         }).catch(e => console.error("Error resetting session doc after processing:", e));
+
+                        // Close phone connection modal if it was open for scanning
+                        if(phoneConnectionModal.style.display === 'flex' && data.status !== 'phoneReady') {
+                            closePhoneConnectionModal();
+                        }
                         
                     } else if (data.status === 'closedByPhone' || data.status === 'errorFromPhone') {
                         console.log("Phone signaled disconnection or error.");
@@ -1298,134 +1292,81 @@
                             phoneSessionUnsubscribe();
                             phoneSessionUnsubscribe = null;
                         }
-                        activePhoneScanSessionId = null;
-                        localStorage.removeItem('activePhoneScanSessionId');
-                        closePhoneConnectionModal(); // Close modal on phone disconnect
-                    } else if (data.status === 'scanRequested') { // New status for phone to start scanning
+                        // Close phone connection modal if open
+                        closePhoneConnectionModal();
+                    } else if (data.status === 'scanRequested') {
                          showToast('الهاتف جاهز للمسح الآن.', 'info');
-                         // Desktop just requested scan, no need to update input yet
+                         // Phone just confirmed it's ready to scan
+                    } else if (data.status === 'scanning') {
+                         phoneConnectionStatusMessage.textContent = 'الهاتف يقوم بالمسح... انتظر.';
+                         phoneConnectionStatusMessage.className = 'status-message info';
+                         phoneQrLoader.style.display = 'block';
                     }
                 } else {
-                    console.log("Session document deleted from Firestore. Unsubscribing desktop listener.");
+                    console.log("Shared session document deleted from Firestore. Unsubscribing desktop listener.");
                     if (phoneSessionUnsubscribe) {
                         phoneSessionUnsubscribe();
                         phoneSessionUnsubscribe = null;
                     }
-                    activePhoneScanSessionId = null; 
-                    localStorage.removeItem('activePhoneScanSessionId');
                     showToast('تم إنهاء جلسة اتصال الهاتف.', 'info');
                     updatePhoneConnectionButtonStatus('disconnected');
-                    closePhoneConnectionModal(); // Close modal on session end
+                    closePhoneConnectionModal();
                 }
             }, (error) => {
-                console.error("Error listening to session document on desktop:", error);
-                showToast('خطأ في الاتصال بجلسة مسح الباركود بالهاتف.', "error");
+                console.error("Error listening to shared session document:", error);
+                showToast('خطأ في الاتصال بجلسة ماسح الباركود المشتركة.', "error");
                 updatePhoneConnectionButtonStatus('error');
                 if (phoneSessionUnsubscribe) {
                     phoneSessionUnsubscribe();
                     phoneSessionUnsubscribe = null;
                 }
-                activePhoneScanSessionId = null;
-                localStorage.removeItem('activePhoneScanSessionId');
-                closePhoneConnectionModal(); // Close modal on error
+                closePhoneConnectionModal();
             });
         }
 
         /**
          * دالة للتحكم في مودال الاتصال بالهاتف وعرض QR أو حالة الاتصال.
+         * تُستدعى عند النقر على أيقونة الهاتف.
          */
-        async function managePhoneConnection() {
-            if (activePhoneScanSessionId) {
-                try {
-                    const sessionDoc = await getDoc(doc(db, 'scannerSessions', activePhoneScanSessionId));
-                    if (sessionDoc.exists() && sessionDoc.data().status !== 'closedByPhone' && sessionDoc.data().status !== 'errorFromPhone') {
-                        // Session exists and is not closed/error from phone side, just show status
-                        phoneConnectionModal.style.display = 'flex';
-                        phoneModalTitle.textContent = 'حالة اتصال ماسح الهاتف';
-                        qrContainerDesktop.style.display = 'none'; // Hide QR if already connected
-                        qrInstruction.style.display = 'none';
-                        phoneQrLoader.style.display = 'none';
-                        phoneConnectionStatusMessage.textContent = 'الهاتف متصل وجاهز للمسح.';
-                        phoneConnectionStatusMessage.className = 'status-message success';
-                        disconnectPhoneButton.style.display = 'block'; // Show disconnect button
-                        listenToPhoneSession(activePhoneScanSessionId); // Ensure listener is active
-                        updatePhoneConnectionButtonStatus('connected');
-                        return;
-                    } else {
-                        // Session either doesn't exist or was closed/had error from phone side, so clean up
-                        activePhoneScanSessionId = null;
-                        localStorage.removeItem('activePhoneScanSessionId');
-                        if (phoneSessionUnsubscribe) {
-                            phoneSessionUnsubscribe();
-                            phoneSessionUnsubscribe = null;
-                        }
-                    }
-                } catch (e) {
-                    console.error("Error checking existing session:", e);
-                    showToast('حدث خطأ في الجلسة السابقة. جاري إعداد جلسة جديدة.', 'error');
-                    activePhoneScanSessionId = null;
-                    localStorage.removeItem('activePhoneScanSessionId');
-                    if (phoneSessionUnsubscribe) {
-                        phoneSessionUnsubscribe();
-                        phoneSessionUnsubscribe = null;
-                    }
-                }
-            }
+        async function togglePhoneConnectionModal() {
+            if (isPhoneScannerConnected) { // If already connected, show status and disconnect option
+                phoneConnectionModal.style.display = 'flex';
+                phoneModalTitle.textContent = 'حالة اتصال ماسح الهاتف';
+                qrContainerDesktop.style.display = 'none'; // Hide QR if already connected
+                qrInstruction.style.display = 'none';
+                phoneQrLoader.style.display = 'none';
+                phoneConnectionStatusMessage.textContent = 'الهاتف متصل وجاهز للمسح.';
+                phoneConnectionStatusMessage.className = 'status-message success';
+                disconnectPhoneButton.style.display = 'block'; // Show disconnect button
+            } else { // If not connected, show QR for initial connection
+                phoneConnectionModal.style.display = 'flex';
+                phoneModalTitle.textContent = 'ربط ماسح الباركود بالهاتف';
+                qrContainerDesktop.style.display = 'flex'; // Ensure QR container is visible
+                phoneQrLoader.style.display = 'block';
+                phoneConnectionStatusMessage.textContent = 'جاري إعداد جلسة الماسح...';
+                phoneConnectionStatusMessage.className = 'status-message info';
+                qrInstruction.style.display = 'block';
+                qrInstruction.textContent = 'الرجاء فتح صفحة الماسح على الهاتف: \n ' + `https://your-app-domain.web.app/mobile-scanner.html`; // تظهر الرابط ليتم نسخه أو الذهاب إليه مباشرة
+                disconnectPhoneButton.style.display = 'none';
 
-            // If we reached here, no active session was found or reuse failed, so initiate new session and show QR.
-            phoneConnectionModal.style.display = 'flex';
-            phoneModalTitle.textContent = 'ربط ماسح الباركود بالهاتف';
-            qrContainerDesktop.style.display = 'flex'; // Ensure QR container is visible
-            phoneQrLoader.style.display = 'block';
-            phoneConnectionStatusMessage.textContent = 'جاري إعداد جلسة الماسح...';
-            phoneConnectionStatusMessage.className = 'status-message info';
-            qrInstruction.style.display = 'block';
-            qrInstruction.textContent = 'امسح هذا الرمز بهاتفك لربط الماسح.';
-            disconnectPhoneButton.style.display = 'none'; // Hide disconnect button during connection setup
-
-            updatePhoneConnectionButtonStatus('connecting');
-            
-            const context = qrCodeDisplayCanvas.getContext('2d');
-            context.clearRect(0, 0, qrCodeDisplayCanvas.width, qrCodeDisplayCanvas.height);
-
-            activePhoneScanSessionId = generateSessionId();
-            localStorage.setItem('activePhoneScanSessionId', activePhoneScanSessionId);
-            console.log("New Session ID generated:", activePhoneScanSessionId);
-
-            try {
-                await setDoc(doc(db, 'scannerSessions', activePhoneScanSessionId), {
-                    status: 'connecting',
-                    createdAt: Timestamp.now(),
-                    scannedValue: null,
-                    purpose: null // No specific purpose yet for initial connection QR
-                });
-                console.log("Session document created in Firestore:", activePhoneScanSessionId);
-
-                // IMPORTANT: Replace 'https://your-app-domain.web.app/' with your actual deployed app URL
-                // The mobile scanner URL now points to the page itself without sessionId, as it will scan the QR
-                const mobileScannerUrl = `https://your-app-domain.web.app/mobile-scanner.html`; 
+                updatePhoneConnectionButtonStatus('connecting');
                 
+                const context = qrCodeDisplayCanvas.getContext('2d');
+                context.clearRect(0, 0, qrCodeDisplayCanvas.width, qrCodeDisplayCanvas.height);
+
+                // QR will contain the SHARED_SCANNER_SESSION_ID
                 qrCodeInstance = new QRious({
                     element: qrCodeDisplayCanvas,
-                    value: mobileScannerUrl,
-                    size: 250
+                    value: SHARED_SCANNER_SESSION_ID, // QR will contain the shared ID
+                    size: 200 
                 });
                 
                 phoneQrLoader.style.display = 'none';
                 phoneConnectionStatusMessage.textContent = 'امسح هذا الرمز بهاتفك لربط الماسح.';
                 phoneConnectionStatusMessage.className = 'status-message info';
 
-                listenToPhoneSession(activePhoneScanSessionId);
-
-            } catch (e) {
-                console.error("Error setting up new session and QR:", e);
-                showToast('خطأ في إعداد جلسة المسح: ' + e.message, "error");
-                phoneQrLoader.style.display = 'none';
-                phoneConnectionStatusMessage.textContent = 'فشل في إعداد الجلسة.';
-                phoneConnectionStatusMessage.className = 'status-message error';
-                updatePhoneConnectionButtonStatus('disconnected');
-                activePhoneScanSessionId = null;
-                localStorage.removeItem('activePhoneScanSessionId');
+                // We are already listening to the shared session from page load
+                // So no need to call listenToPhoneSession again here
             }
         }
 
@@ -1434,35 +1375,33 @@
          * @param {string} purpose - 'addEdit' or 'search'
          */
         async function requestScanFromPhone(purpose) {
-            if (!activePhoneScanSessionId) {
+            if (!isPhoneScannerConnected) {
                 showToast("الهاتف غير متصل. يرجى ربط ماسح الهاتف أولاً.", "error");
-                managePhoneConnection(); // Prompt user to connect
+                togglePhoneConnectionModal(); // Prompt user to connect
                 return;
             }
 
             try {
-                // Check current status of the session doc
-                const sessionDoc = await getDoc(doc(db, 'scannerSessions', activePhoneScanSessionId));
+                const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
+                const sessionDoc = await getDoc(sessionDocRef);
+
                 if (!sessionDoc.exists() || sessionDoc.data().status === 'closedByPhone' || sessionDoc.data().status === 'errorFromPhone') {
                     showToast("اتصال الهاتف غير صالح. يرجى إعادة ربط ماسح الهاتف.", "error");
-                    activePhoneScanSessionId = null;
-                    localStorage.removeItem('activePhoneScanSessionId');
                     updatePhoneConnectionButtonStatus('disconnected');
-                    managePhoneConnection(); // Prompt user to reconnect
+                    togglePhoneConnectionModal(); // Prompt user to reconnect
                     return;
                 }
 
-                // Update purpose and set status to 'scanRequested'
-                await updateDoc(doc(db, 'scannerSessions', activePhoneScanSessionId), {
+                await updateDoc(sessionDocRef, {
                     purpose: purpose,
-                    scannedValue: null, // Clear any old scanned value
+                    scannedValue: null,
                     status: 'scanRequested', // Signal phone to start scanning
                     lastRequestedByDesktop: Timestamp.now()
                 });
                 showToast('تم إرسال طلب المسح إلى الهاتف. يرجى المسح الآن باستخدام الهاتف.', 'info');
                 console.log(`Scan requested from phone for purpose: ${purpose}`);
 
-                // Open the modal to show scanning status (optional, but good UX)
+                // Show the modal to indicate scanning status
                 phoneConnectionModal.style.display = 'flex';
                 phoneModalTitle.textContent = 'جاري المسح بواسطة الهاتف';
                 qrContainerDesktop.style.display = 'none';
@@ -1482,6 +1421,13 @@
         // --- وظائف إغلاق المودالات ---
         function closePhoneConnectionModal() {
             phoneConnectionModal.style.display = 'none';
+            // Reset modal content when closed
+            phoneModalTitle.textContent = 'ربط ماسح الباركود بالهاتف';
+            qrInstruction.textContent = 'امسح هذا الرمز بهاتفك لربط الماسح.';
+            phoneConnectionStatusMessage.textContent = '';
+            qrContainerDesktop.style.display = 'none';
+            disconnectPhoneButton.style.display = 'none';
+            phoneQrLoader.style.display = 'none';
         }
 
 
@@ -1495,55 +1441,33 @@
             }
         });
 
-        // زر البحث بالباركود في شريط البحث العلوي
         scanBarcodeInventorySearchBtn.addEventListener('click', () => {
             requestScanFromPhone('search'); 
         });
 
-        // بما أن زر المسح في نموذج المنتج لم يعد موجودًا،
-        // يمكننا استخدام أيقونة الاتصال العامة للمسح في النموذج إذا كان هناك حقل باركود نشط
-        // أو يمكنك إضافة زر "مسح باركود بالهاتف" داخل النموذج مرة أخرى إذا أردت ذلك تحديداً
-        // لكن الفكرة هي أن الأيقونة العامة هي التي تدير الاتصال وبدء المسح
+        scanBarcodeFormBtnProduct.addEventListener('click', () => {
+            productBarcodeInput.focus();
+            requestScanFromPhone('addEdit');
+        });
         
-        // عند الحاجة لملء حقل الباركود في نموذج المنتج، يمكنك استدعاء requestScanFromPhone('addEdit')
-        // على سبيل المثال، إذا أضفت زر "مسح بالهاتف" داخل حقل الباركود بالنموذج
-        // For now, let's assume the user will use the general phone connect/scan method
-        // You might consider adding a dedicated "Scan Barcode" button next to the barcode input in product-modal
-        // and link it to requestScanFromPhone('addEdit');
-        const productBarcodeInputParent = document.querySelector('#product-modal .form-group .barcode-scan-buttons');
-        if (productBarcodeInputParent) {
-            const scanBtnForProductModal = document.createElement('button');
-            scanBtnForProductModal.type = 'button';
-            scanBtnForProductModal.className = 'secondary-action-btn';
-            scanBtnForProductModal.innerHTML = '<i class="fas fa-qrcode"></i> مسح بالهاتف';
-            scanBtnForProductModal.addEventListener('click', () => {
-                requestScanFromPhone('addEdit');
-            });
-            productBarcodeInputParent.appendChild(scanBtnForProductModal);
-        }
-
-
-        // زر أيقونة الهاتف (تظهر مودال الاتصال/الحالة)
-        phoneConnectBtn.addEventListener('click', managePhoneConnection);
+        // زر أيقونة الهاتف (لفتح مودال الاتصال/الحالة)
+        phoneConnectBtn.addEventListener('click', togglePhoneConnectionModal);
 
         // زر قطع الاتصال داخل المودال
         disconnectPhoneButton.addEventListener('click', async () => {
-            if (activePhoneScanSessionId) {
+            if (SHARED_SCANNER_SESSION_ID) {
                 try {
-                    await setDoc(doc(db, 'scannerSessions', activePhoneScanSessionId), {
+                    await setDoc(doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID), {
                         status: 'closedByDesktop',
                         disconnectedAt: Timestamp.now()
                     }, { merge: true });
                     showToast('تم قطع الاتصال بالهاتف بنجاح.', 'info');
                     closePhoneConnectionModal();
                     updatePhoneConnectionButtonStatus('disconnected');
-                    // Clean up local session info
                     if (phoneSessionUnsubscribe) {
                         phoneSessionUnsubscribe();
                         phoneSessionUnsubscribe = null;
                     }
-                    activePhoneScanSessionId = null;
-                    localStorage.removeItem('activePhoneScanSessionId');
                 } catch (e) {
                     console.error("Error sending disconnect signal:", e);
                     showToast('حدث خطأ أثناء قطع الاتصال: ' + e.message, 'error');
