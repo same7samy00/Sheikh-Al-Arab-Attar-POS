@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - شيخ العرب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Reem+Kufi+Ink&display=swap" rel="stylesheet">
+    <style>
+        /* الألوان: أزرق (#3f51b5), أبيض (#ffffff), أسود (#000000) */
+        /* درجات من الرمادي: #333, #555, #ddd, #f4f7f6 */
+        /* الحواف المستديرة: 8px */
+        /* الخطوط: Cairo بالكامل، بما في ذلك خانات الإدخال */
+
+        body {
+            font-family: 'Cairo', sans-serif; /* استخدام خط كايرو بالكامل */
+            direction: rtl; /* اتجاه النص من اليمين لليسار */
+            text-align: right;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #3f51b5, #5c6bc0); /* تدرج لوني للخلفية */
+            display: flex;
+            justify-content: center; /* توسيط أفقي للمحتوى */
+            align-items: center; /* توسيط عمودي للمحتوى */
+            min-height: 100vh;
+            color: #333; /* لون نص داكن */
+        }
+
+        .login-container {
+            background-color: #ffffff; /* خلفية بيضاء */
+            padding: 40px;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* ظل ناعم */
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-sizing: border-box; /* لضمان أن البادينغ لا يزيد العرض الكلي */
+        }
+
+        .login-header h1 {
+            font-family: 'Reem Kufi Ink', sans-serif; /* خط خاص للشعار */
+            color: #3f51b5; /* لون أزرق للشعار */
+            margin-bottom: 5px;
+            font-size: 2.5em;
+        }
+
+        .login-header p {
+            color: #607d8b; /* لون رمادي مزرق */
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        form h2 {
+            color: #3f51b5;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right; /* محاذاة عناصر النموذج لليمين */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            font-family: 'Cairo', sans-serif; /* خط كايرو لمدخلات النص */
+            width: calc(100% - 24px); /* عرض كامل مع بادينغ 12px من كل جانب */
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            font-size: 1em;
+            direction: rtl; /* لضمان صحة اتجاه الكتابة */
+            box-sizing: border-box; /* لضمان أن البادينغ لا يزيد العرض الكلي */
+        }
+
+        .login-btn {
+            font-family: 'Cairo', sans-serif; /* خط كايرو للزر */
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50; /* أخضر جذاب */
+            color: white;
+            border: none;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .login-btn:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: #f44336; /* أحمر لرسائل الخطأ */
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* التعديلات المتجاوبة (Responsive) للشاشات الصغيرة */
+        @media (max-width: 500px) {
+            .login-container {
+                margin: 20px;
+                padding: 25px;
+                max-width: unset; /* إلغاء الحد الأقصى للعرض للسماح بالتكيف مع الشاشة */
+            }
+            .login-header h1 {
+                font-size: 2em;
+            }
+            form h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>شيخ العرب</h1>
+            <p>نظام إدارة المحلات</p>
+        </div>
+        <form id="login-form">
+            <h2>تسجيل الدخول</h2>
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني:</label>
+                <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني" required>
+            </div>
+            <div class="form-group">
+                <label for="password">كلمة المرور:</label>
+                <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+            </div>
+            <button type="submit" class="login-btn">تسجيل الدخول</button>
+            <p id="auth-error" class="error-message"></p>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        // لا نحتاج Firestore هنا، فقط Authentication.
+
+        // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا)
+        const firebaseConfig = {
+          apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
+          authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
+          projectId: "pharmacy-inventory-bf04a",
+          storageBucket: "pharmacy-inventory-bf04a.firebasestorage.app",
+          messagingSenderId: "937788650384",
+          appId: "1:937788650384:web:6451225d00e648f3a0b915",
+          measurementId: "G-ZGC9EQ55SL"
+        };
+
+        // تهيئة Firebase Services
+        const app = initializeApp(firebaseConfig);
+        // const analytics = getAnalytics(app); // قد لا تحتاج للـ Analytics في هذه الصفحة
+        const auth = getAuth(app); // تهيئة Authentication
+
+        // عناصر DOM الخاصة بالصفحة
+        const loginForm = document.getElementById('login-form');
+        const authError = document.getElementById('auth-error');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        // مراقبة حالة المصادقة عند تحميل صفحة تسجيل الدخول
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // إذا كان المستخدم مسجل الدخول بالفعل، قم بتوجيهه إلى لوحة التحكم
+                window.location.replace('dashboard.html');
+            } else {
+                // إذا لم يكن مسجل الدخول، تأكد من عرض نموذج تسجيل الدخول (عادة يكون مرئياً افتراضياً)
+                console.log("User is not logged in on login.html. Displaying login form.");
+            }
+        });
+
+        // التعامل مع تقديم نموذج تسجيل الدخول
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // منع إعادة تحميل الصفحة
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                authError.textContent = ''; // مسح أي رسائل خطأ سابقة عند النجاح
+                console.log("Login successful! Redirecting to dashboard.html...");
+                // بمجرد تسجيل الدخول بنجاح، onAuthStateChanged سيكتشف ذلك ويقوم بإعادة التوجيه
+            } catch (error) {
+                let errorMessage = "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "صيغة البريد الإلكتروني غير صحيحة.";
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = "تم حظر الوصول مؤقتًا بسبب كثرة المحاولات الفاشلة. حاول لاحقًا.";
+                }
+                authError.textContent = errorMessage; // عرض رسالة الخطأ للمستخدم
+                console.error("Login error:", error.message);
+            }
+        });
+    </script>
+</body>
+</html>
