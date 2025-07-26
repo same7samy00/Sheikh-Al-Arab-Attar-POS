@@ -31,13 +31,16 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             margin-bottom: 20px;
-            overflow: hidden; /* لضمان عرض الفيديو داخل الحدود المستديرة */
+            overflow: hidden;
         }
         .status-message {
             margin-top: 10px;
             padding: 10px;
             border-radius: 8px;
             font-weight: bold;
+            width: 90%;
+            max-width: 400px;
+            box-sizing: border-box; /* Include padding in width */
         }
         .status-message.info {
             background-color: #e3f2fd;
@@ -60,6 +63,10 @@
             cursor: pointer;
             font-size: 1em;
             margin-top: 20px;
+            display: flex; /* For icon and text alignment */
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
         }
         .action-button:hover {
             background-color: #546e7a;
@@ -72,7 +79,7 @@
             height: 30px;
             animation: spin 1s linear infinite;
             margin: 10px auto;
-            display: none; /* مخفي افتراضياً */
+            display: none;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -94,13 +101,13 @@
 
         // Firebase Configuration (Replace with your actual config)
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
+            apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
+            authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
+            projectId: "pharmacy-inventory-bf04a",
+            storageBucket: "pharmacy-inventory-bf04a.firebasestorage.app",
+            messagingSenderId: "937788650384",
+            appId: "1:937788650384:web:6451225d00e648f3a0b915",
+            measurementId: "G-ZGC9EQ55SL"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -117,18 +124,14 @@
         let lastScanTime = 0;
         const SCAN_COOLDOWN_MS = 2000; // 2 ثانية كحد أدنى بين المسحات لنفس الباركود
         let sessionId = null;
-        let sessionUnsubscribe = null;
-        let scanPurpose = null;
+        let scanPurpose = null; // The purpose passed from desktop (addEdit/search)
+        let sessionUnsubscribe = null; // Firestore listener unsubscribe function
 
         // Function to update status messages
         function updateStatus(message, type = 'info') {
             statusMessageDiv.textContent = message;
             statusMessageDiv.className = 'status-message ' + type;
-            if (type === 'loading') {
-                loader.style.display = 'block';
-            } else {
-                loader.style.display = 'none';
-            }
+            loader.style.display = (type === 'loading') ? 'block' : 'none';
         }
 
         // Function to parse query parameter
@@ -137,8 +140,13 @@
             return urlParams.get(name);
         }
 
-        // Initialize scanner
+        // Start HTML5-QRCode scanner
         async function startScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                console.log("Scanner already running, no need to restart.");
+                return;
+            }
+
             updateStatus('جاري تهيئة الكاميرا...', 'loading');
             html5QrCode = new Html5Qrcode("reader-mobile");
             const qrCodeConfig = {
@@ -147,17 +155,16 @@
             };
 
             try {
-                // Request camera permission
                 await html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onScanSuccess, onScanError);
-                updateStatus('الكاميرا جاهزة للمسح.', 'info');
+                updateStatus('الكاميرا جاهزة للمسح.', 'success');
                 console.log("Mobile scanner started.");
 
-                // If session is already connected, signal ready
+                // If a session ID exists, signal desktop that phone is ready
                 if (sessionId) {
                     await updateDoc(doc(db, 'scannerSessions', sessionId), {
                         status: 'phoneReady',
                         connectedAt: Timestamp.now()
-                    });
+                    }).catch(e => console.error("Error updating phoneReady status:", e));
                     console.log("Signaled desktop that phone is ready.");
                 }
 
@@ -170,7 +177,7 @@
                         status: 'errorFromPhone',
                         errorMessage: err.message,
                         disconnectedAt: Timestamp.now()
-                    });
+                    }).catch(e => console.error("Error signaling errorFromPhone status:", e));
                 }
             }
         }
@@ -199,11 +206,14 @@
                     });
                     console.log("Sent scanned value to desktop via Firestore.");
                     updateStatus('تم إرسال الباركود إلى الجهاز.', 'info');
-                    // Wait for desktop to process (status will change to 'readyForNextScan' or 'closedByDesktop')
+                    // The desktop will change status to 'readyForNextScan' or 'closedByDesktop'
                 } catch (e) {
                     console.error("Error sending scanned value to Firestore:", e);
                     updateStatus('خطأ في إرسال الباركود: ' + e.message, 'error');
                 }
+            } else {
+                updateStatus('الجلسة غير متصلة. لا يمكن إرسال الباركود.', 'error');
+                console.warn("Session ID is null, cannot send scanned value.");
             }
         }
 
@@ -215,7 +225,7 @@
         // Disconnect from session and stop scanner
         async function disconnect() {
             if (html5QrCode && html5QrCode.isScanning) {
-                await html5QrCode.stop();
+                await html5QrCode.stop().catch(e => console.error("Error stopping scanner:", e));
                 console.log("Mobile scanner stopped.");
             }
             if (sessionUnsubscribe) {
@@ -227,17 +237,17 @@
                     await updateDoc(doc(db, 'scannerSessions', sessionId), {
                         status: 'closedByPhone',
                         disconnectedAt: Timestamp.now()
-                    });
+                    }).catch(e => console.error("Error signaling desktop on disconnect:", e));
                     console.log("Signaled desktop that phone disconnected.");
                 } catch (e) {
-                    console.error("Error signaling desktop on disconnect:", e);
+                    console.error("Error updating session status on disconnect:", e);
                 }
                 sessionId = null; // Clear local session ID
+                scanPurpose = null;
             }
             updateStatus('تم قطع الاتصال بنجاح.', 'info');
-            // Optionally redirect or show a message to the user
-            alert('تم قطع الاتصال. يمكنك إغلاق هذه الصفحة.');
-            window.close(); // Tries to close the window/tab
+            alert('تم قطع الاتصال. يمكنك الآن إغلاق هذه الصفحة بأمان.');
+            // window.close(); // Browser security policies often prevent window.close()
         }
 
         // Event listener for disconnect button
@@ -246,29 +256,27 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
             sessionId = getQueryParam('sessionId');
-            scanPurpose = getQueryParam('purpose');
+            scanPurpose = getQueryParam('purpose'); // Get the purpose from URL
 
             if (sessionId) {
                 updateStatus('جاري الاتصال بجلسة الماسح...', 'loading');
-                // Listen to session changes from desktop
                 const sessionDocRef = doc(db, 'scannerSessions', sessionId);
+                
+                // Set up the Firestore listener for the session document
                 sessionUnsubscribe = onSnapshot(sessionDocRef, async (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        // If desktop signals readiness for next scan
+                        
                         if (data.status === 'readyForNextScan') {
                             updateStatus('الهاتف جاهز للمسح. امسح الباركود.', 'info');
-                        }
-                        // If desktop signals close
-                        if (data.status === 'closedByDesktop') {
+                        } else if (data.status === 'closedByDesktop') {
                             updateStatus('تم قطع الاتصال بواسطة الجهاز الآخر.', 'info');
-                            await disconnect(); // Perform local cleanup
+                            await disconnect();
                             return;
                         }
                     } else {
-                        // Session document deleted by desktop
                         updateStatus('الجلسة انتهت أو تم حذفها من الجهاز الآخر.', 'info');
-                        await disconnect(); // Perform local cleanup
+                        await disconnect();
                         return;
                     }
                 }, (error) => {
@@ -277,10 +285,10 @@
                     disconnect();
                 });
 
+                // Start the camera after setting up the listener
                 startScanner();
             } else {
-                updateStatus('معرّف الجلسة غير موجود. يرجى مسح رمز QR من الجهاز الرئيسي.', 'error');
-                // Maybe provide a QR code to connect if no session ID is found?
+                updateStatus('معرّف الجلسة غير موجود. يرجى مسح رمز QR من الجهاز الرئيسي لربط الماسح.', 'error');
             }
         });
 
@@ -300,15 +308,12 @@
         // Optional: Warn user before closing the tab/window
         window.addEventListener('beforeunload', async (event) => {
             if (sessionId) {
-                // This might not always complete due to browser restrictions,
-                // but it's good practice to try.
                 await updateDoc(doc(db, 'scannerSessions', sessionId), {
                     status: 'closedByPhone',
                     disconnectedAt: Timestamp.now()
                 }).catch(e => console.warn("Could not update session on beforeunload:", e));
             }
         });
-
     </script>
 </body>
 </html>
