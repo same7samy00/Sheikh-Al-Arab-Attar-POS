@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مسح الباركود بالهاتف - شيخ العرب</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Reem+Kufi+Ink&display=swap" rel="stylesheet">
     <style>
         /* الألوان: أزرق (#3f51b5), أبيض (#ffffff), أسود (#000000) */
         /* حواف مستديرة: 8px */
@@ -36,6 +36,18 @@
             flex-direction: column;
             align-items: center;
             box-sizing: border-box;
+        }
+
+        .phone-header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .phone-header h1 {
+            font-family: 'Reem Kufi Ink', sans-serif; /* خط الشعار */
+            color: #3f51b5; /* لون الشعار */
+            font-size: 1.8em;
+            margin: 0;
         }
 
         h2 {
@@ -118,6 +130,9 @@
 </head>
 <body>
     <div class="scanner-container-phone">
+        <div class="phone-header">
+            <h1>شيخ العرب</h1>
+        </div>
         <h2>امسح الباركود بهاتفك</h2>
         <div id="reader-phone"></div> <p class="status-message" id="phone-scanner-status"></p>
         <div class="loader" id="phone-scanner-loader" style="display: none;"></div>
@@ -214,33 +229,26 @@
                         const sessionDocRef = doc(db, 'scannerSessions', sessionId);
                         await setDoc(sessionDocRef, {
                             scannedValue: decodedText,
-                            status: 'scanned',
+                            status: 'scanned', // للإشارة إلى أن المسح قد تم
                             scannedAt: new Date().toISOString() 
                         }, { merge: true });
                         
-                        phoneScannerStatus.textContent = 'تم الإرسال بنجاح! في انتظار أمر جديد...';
+                        phoneScannerStatus.textContent = 'تم الإرسال بنجاح! امسح باركود آخر.';
                         phoneScannerStatus.classList.add('success-message');
                         phoneScannerLoader.style.display = 'none';
                         // لا نوقف الماسح هنا، بل نتركه يعمل باستمرار
-                        // startScanner(); // لا نستدعيها هنا مباشرة، الكمبيوتر هو من سيعطي الإشارة
                     } catch (e) {
                         console.error("Error sending scanned value to Firestore:", e);
                         phoneScannerStatus.textContent = 'خطأ في إرسال البيانات: ' + e.message;
                         phoneScannerStatus.classList.add('error-message');
                         phoneScannerLoader.style.display = 'none';
-                        // في حالة الخطأ، أوقف الماسح وقد يحتاج المستخدم لإعادة تشغيله يدوياً
-                        // أو حاول بدء الماسح مرة أخرى بعد فترة
-                        stopScanner(); 
-                        setTimeout(startScanner, 3000); // حاول مرة أخرى بعد 3 ثوانٍ
+                        // في حالة الخطأ، لا نوقف الماسح، بل نحاول مرة أخرى بعد فترة
+                        setTimeout(startScanner, 2000); 
                     }
                 },
                 (errorMessage) => {
                     // عند حدوث خطأ في المسح (ليس بالضرورة خطأ، قد يكون عدم وجود باركود)
                     // console.warn(`QR Code Scan Error: ${errorMessage}`);
-                    // phoneScannerStatus.textContent = 'لم يتم العثور على باركود. حاول مجدداً.';
-                    // phoneScannerStatus.classList.remove('success-message');
-                    // phoneScannerStatus.classList.add('error-message');
-                    // phoneScannerLoader.style.display = 'none';
                     // لا نفعل شيئاً هنا عند الأخطاء المتكررة لتجنب إزعاج المستخدم
                 }
             ).catch(err => {
@@ -287,23 +295,24 @@
                         phoneScannerStatus.classList.remove('error-message', 'success-message');
                     } else if (data.status === 'closedByDesktop') {
                         // الكمبيوتر أغلق الجلسة
-                        console.log("Desktop closed session. Stopping scanner and closing page (optional).");
+                        console.log("Desktop closed session. Stopping scanner and notifying.");
                         stopScanner();
                         phoneScannerStatus.textContent = 'الجلسة انتهت من الكمبيوتر. يمكنك إغلاق هذه الصفحة.';
-                        phoneScannerStatus.classList.add('error-message'); // رسالة تنبيهية
+                        phoneScannerStatus.classList.add('error-message');
                         if (sessionUnsubscribePhone) {
                             sessionUnsubscribePhone();
                             sessionUnsubscribePhone = null;
                         }
-                    } else if (data.status === 'active' && !data.scannedValue && !html5QrCode) {
-                        // إذا كانت الجلسة نشطة والهاتف لم يبدأ المسح بعد (لأول مرة)
-                        startScanner();
+                    } else if (data.status === 'connecting' || data.status === 'active' || data.status === 'scanned') {
+                        // حالات الاتصال الأولية أو بعد المسح
+                        startScanner(); // تأكد من تشغيل الماسح إذا لم يكن
                         phoneScannerStatus.textContent = 'الكاميرا نشطة. امسح الباركود الآن.';
                         phoneScannerStatus.classList.remove('error-message', 'success-message');
                     }
+                    // أي حالات أخرى تُترك كما هي
                 } else {
                     // المستند لم يعد موجوداً، ربما حذفه الكمبيوتر
-                    console.log("Session document deleted from Firestore. Stopping scanner.");
+                    console.log("Session document deleted from Firestore. Stopping scanner and notifying.");
                     stopScanner();
                     phoneScannerStatus.textContent = 'الجلسة انتهت أو تم إغلاقها من الكمبيوتر.';
                     phoneScannerStatus.classList.add('error-message');
