@@ -12,7 +12,7 @@
             direction: rtl;
             text-align: center;
             margin: 0;
-            padding: 0; /* Remove body padding, modal will handle it */
+            padding: 0;
             background-color: #f4f7f6;
             display: flex;
             flex-direction: column;
@@ -167,7 +167,7 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, doc, updateDoc, onSnapshot, Timestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, updateDoc, onSnapshot, Timestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         // Firebase Configuration (Replace with your actual config)
         const firebaseConfig = {
@@ -183,6 +183,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // --- معرف الجلسة المشترك (استخدم معرف فريد لمشروعك/متجرك) ---
+        // هذا معرف ثابت يجب أن يتطابق مع المعرف في صفحة الكمبيوتر
+        const SHARED_SCANNER_SESSION_ID = "YOUR_STORE_UNIQUE_SCANNER_ID_12345"; // !!! يجب أن يتطابق مع الكمبيوتر !!!
+
         // DOM Elements
         const cameraModal = document.getElementById('camera-modal');
         const closeModalBtn = document.getElementById('close-camera-modal-btn');
@@ -197,8 +201,8 @@
         let lastScannedValue = null;
         let lastScanTime = 0;
         const SCAN_COOLDOWN_MS = 2000; // 2 ثانية كحد أدنى بين المسحات لنفس الباركود
-        let sessionId = null;
-        let scanPurpose = null; // The purpose passed from desktop (addEdit/search)
+        let sessionId = SHARED_SCANNER_SESSION_ID; // سنستخدم المعرف المشترك مباشرة
+        let scanPurpose = null; // The purpose received from desktop (addEdit/search)
         let sessionUnsubscribe = null; // Firestore listener unsubscribe function
         let isScannerActive = false; // Flag to track if the scanner is actively running
 
@@ -209,57 +213,8 @@
             loaderPhone.style.display = (type === 'loading') ? 'block' : 'none';
         }
 
-        // Function to parse query parameter (for initial sessionId)
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        // Start HTML5-QRCode scanner for CONNECTION QR
-        async function startConnectionScanner() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                await html5QrCode.stop().catch(e => console.error("Error stopping existing scanner:", e));
-            }
-            isScannerActive = false; // Reset scanner active state
-
-            modalTitlePhone.textContent = 'مسح رمز QR للاتصال';
-            readerContainer.style.display = 'block'; // Show camera feed
-            stopScanBtn.style.display = 'none'; // Hide stop scan button
-            updateStatusPhone('ضع رمز QR الاتصال أمام الكاميرا...', 'loading');
-
-            html5QrCode = new Html5Qrcode("reader-container");
-            const qrCodeConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-            try {
-                await html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onConnectionQrScanned, onScanError);
-                isScannerActive = true;
-                updateStatusPhone('الكاميرا جاهزة لمسح رمز الاتصال.', 'info');
-                console.log("Connection QR scanner started.");
-            } catch (err) {
-                console.error("Error starting connection QR scanner:", err);
-                updateStatusPhone('تعذر تشغيل الكاميرا. يرجى التأكد من الصلاحيات.', 'error');
-            }
-        }
-
-        // On successful scan of the CONNECTION QR
-        async function onConnectionQrScanned(decodedText, decodedResult) {
-            if (!isScannerActive) return; // Prevent double-processing
-            
-            updateStatusPhone(`تم مسح رمز الاتصال: ${decodedText}`, 'success');
-            console.log(`Connection QR Scan result: ${decodedText}`);
-
-            // The decodedText should now be the sessionId from the desktop
-            sessionId = decodedText; // Capture the sessionId
-            
-            // Stop the connection scanner
-            await stopScanner();
-
-            // Attempt to connect to Firestore session
-            await connectToSession(sessionId);
-        }
-
         // Start HTML5-QRCode scanner for PRODUCT BARCODES
-        async function startProductBarcodeScanner() {
+        async function startProductBarcodeScanner(purpose) {
             if (html5QrCode && html5QrCode.isScanning) {
                 console.log("Product barcode scanner already running.");
                 return;
@@ -280,12 +235,13 @@
                 updateStatusPhone('الكاميرا جاهزة لمسح باركود المنتج.', 'info');
                 console.log("Product barcode scanner started.");
 
-                // After starting, signal desktop that phone is ready for product scans
+                // After starting, signal desktop that phone is actively scanning
                 if (sessionId) {
                     await updateDoc(doc(db, 'scannerSessions', sessionId), {
-                        status: 'phoneReady', // This status indicates it's ready for product scans
+                        status: 'scanning', // Indicates active scanning
+                        purpose: purpose, // Store purpose in session
                         connectedAt: Timestamp.now()
-                    }).catch(e => console.error("Error updating phoneReady status after product scanner start:", e));
+                    }).catch(e => console.error("Error updating scanning status:", e));
                 }
 
             } catch (err) {
@@ -325,6 +281,7 @@
                     });
                     console.log("Sent scanned value to desktop via Firestore.");
                     updateStatusPhone('تم إرسال الباركود إلى الجهاز.', 'info');
+                    await stopScanner(); // Stop scanner immediately after sending data
                 } catch (e) {
                     console.error("Error sending scanned value to Firestore:", e);
                     updateStatusPhone('خطأ في إرسال الباركود: ' + e.message, 'error');
@@ -369,38 +326,50 @@
                 } catch (e) {
                     console.error("Error updating session status on disconnect:", e);
                 }
-                sessionId = null;
+                // sessionId = null; // Don't clear shared sessionId
                 scanPurpose = null;
             }
             updateStatusPhone('تم قطع الاتصال بنجاح.', 'info');
             modalTitlePhone.textContent = 'ماسح الباركود بالهاتف';
-            // Optionally: prompt user to scan a new QR code for a new session
-            startConnectionScanner(); // Allow new connection via QR after disconnect
+            // Phone will remain connected to the shared session, just not actively scanning
+            // and waiting for desktop commands
         }
 
-        // Function to establish or re-establish session with desktop
-        async function connectToSession(retrievedSessionId) {
-            sessionId = retrievedSessionId;
-            updateStatusPhone('جاري الاتصال بجلسة الماسح...', 'loading');
+        // Function to connect to the shared Firebase session
+        async function connectToSharedSession() {
+            updateStatusPhone('جاري الاتصال بجلسة الماسح المشتركة...', 'loading');
 
-            const sessionDocRef = doc(db, 'scannerSessions', sessionId);
+            const sessionDocRef = doc(db, 'scannerSessions', SHARED_SCANNER_SESSION_ID);
             
+            // Check if session document exists, if not, create it
+            const docSnap = await getDoc(sessionDocRef);
+            if (!docSnap.exists()) {
+                console.log("Shared session document not found, creating it.");
+                await setDoc(sessionDocRef, {
+                    status: 'connecting', // Initial status
+                    createdAt: Timestamp.now(),
+                    lastAction: 'phone_initialized'
+                });
+            } else {
+                console.log("Shared session document already exists.");
+            }
+
             // Set up the Firestore listener for the session document
             sessionUnsubscribe = onSnapshot(sessionDocRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
                     if (data.status === 'connecting') {
-                        updateStatusPhone('تم العثور على الجلسة. انتظر الجهاز الرئيسي.', 'info');
-                        // No need to start product scanner yet, wait for 'scanRequested'
+                        updateStatusPhone('تم العثور على الجلسة. انتظر الجهاز الرئيسي للاتصال.', 'info');
                     } else if (data.status === 'phoneReady') {
+                        // Desktop confirms phone is ready, but not scanning yet
                         updateStatusPhone('الهاتف متصل وجاهز. الجهاز الرئيسي في انتظار طلب المسح.', 'success');
                         await stopScanner(); // Ensure scanner is off if not requested
                     } else if (data.status === 'scanRequested') {
                         // Desktop requested a scan! Start product barcode scanner
                         scanPurpose = data.purpose; // Get the specific purpose for this scan
                         updateStatusPhone('تم تلقي طلب مسح! جاري تشغيل الكاميرا.', 'info');
-                        await startProductBarcodeScanner();
+                        await startProductBarcodeScanner(scanPurpose); // Pass purpose to scanner
                     } else if (data.status === 'closedByDesktop' || data.status === 'errorFromDesktop') { // Assuming errorFromDesktop status could exist
                         updateStatusPhone('تم قطع الاتصال بواسطة الجهاز الرئيسي.', 'info');
                         await disconnect();
@@ -426,19 +395,12 @@
 
             // Signal desktop that phone is attempting to connect to this session
             try {
-                // Ensure document exists before trying to update it, could be stale ID
-                const docCheck = await getDoc(sessionDocRef);
-                if (docCheck.exists()) {
-                    await updateDoc(sessionDocRef, {
-                        status: 'connecting',
-                        connectedAt: Timestamp.now()
-                    });
-                } else {
-                    updateStatusPhone('الجلسة غير موجودة على الجهاز الرئيسي. يرجى إنشاء جلسة جديدة.', 'error');
-                    await disconnect(); // Force disconnect if session doesn't exist
-                }
+                await updateDoc(sessionDocRef, {
+                    status: 'phoneReady', // Phone is ready to receive scan requests
+                    connectedAt: Timestamp.now()
+                });
             } catch (e) {
-                console.error("Error signaling connection attempt to desktop:", e);
+                console.error("Error signaling phoneReady status to desktop:", e);
                 updateStatusPhone('خطأ في الاتصال بالجهاز الرئيسي: ' + e.message, 'error');
                 disconnect();
             }
@@ -460,15 +422,8 @@
 
         // Initial setup on page load
         document.addEventListener('DOMContentLoaded', () => {
-            // Check if sessionId is provided in URL (e.g., if user bookmarks after connecting)
-            const initialSessionId = getQueryParam('sessionId');
-            if (initialSessionId) {
-                // If a sessionId is in the URL, try to directly connect to it
-                connectToSession(initialSessionId);
-            } else {
-                // Otherwise, start the scanner to read the connection QR
-                startConnectionScanner();
-            }
+            // Phone will immediately try to connect to the shared session
+            connectToSharedSession();
         });
 
         // Handle page visibility changes (optional, for battery saving)
@@ -478,16 +433,9 @@
                     html5QrCode.stop().then(() => console.log("Scanner paused due to tab switch.")).catch(e => console.error("Error pausing scanner:", e));
                 }
             } else {
-                // Only restart if a session is active and scanner was previously active
+                // When tab becomes active again, ensure connection is alive
                 if (sessionId) { 
-                    // No need to auto-start product scanner, wait for desktop request
-                    // If it was in connection mode, restart connection scanner
-                    if (modalTitlePhone.textContent === 'مسح رمز QR للاتصال' && !isScannerActive) {
-                        startConnectionScanner();
-                    } else if (isScannerActive) { // If it was actively scanning products before hiding
-                        // Re-signal desktop that phone is ready, or wait for new scanRequested
-                        updateStatusPhone('الهاتف استأنف الاتصال. في انتظار طلب مسح.', 'info');
-                    }
+                    connectToSharedSession(); // Re-establish listener and status
                 }
             }
         });
