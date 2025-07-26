@@ -12,7 +12,7 @@
             direction: rtl;
             text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 0; /* Remove body padding, modal will handle it */
             background-color: #f4f7f6;
             display: flex;
             flex-direction: column;
@@ -25,14 +25,76 @@
             color: #3f51b5;
             margin-bottom: 20px;
         }
-        #reader-mobile {
+        .modal {
+            display: flex; /* Always display modal when this page is open */
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
             width: 100%;
-            max-width: 400px; /* حجم معقول للعرض على الهاتف */
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            box-sizing: border-box;
+
+            width: 95vw;
+            height: 95vh;
+            max-width: 500px; /* Max width for content within the modal */
+            max-height: 600px; /* Max height for content within the modal */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .close-button {
+            color: #aaa;
+            float: left; /* Aligns to top-left in RTL */
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute; /* Position relative to modal-content */
+            top: 10px;
+            left: 10px;
+        }
+        .close-button:hover, .close-button:focus {
+            color: black;
+        }
+
+        #reader-container { /* Container for the camera feed */
+            width: 100%;
+            max-width: 400px; /* Max width for scanner */
+            height: 300px; /* Fixed height for scanner */
             border: 2px solid #ddd;
             border-radius: 8px;
+            overflow: hidden;
             margin-bottom: 20px;
-            overflow: hidden; /* لضمان عرض الفيديو داخل الحدود المستديرة */
+            display: none; /* Hidden by default until scan requested */
         }
+        #reader-container video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover; /* Ensure video fills container */
+        }
+
         .status-message {
             margin-top: 10px;
             padding: 10px;
@@ -40,7 +102,7 @@
             font-weight: bold;
             width: 90%;
             max-width: 400px;
-            box-sizing: border-box; /* Include padding in width */
+            box-sizing: border-box;
         }
         .status-message.info {
             background-color: #e3f2fd;
@@ -63,7 +125,7 @@
             cursor: pointer;
             font-size: 1em;
             margin-top: 20px;
-            display: flex; /* For icon and text alignment */
+            display: flex;
             align-items: center;
             gap: 8px;
             justify-content: center;
@@ -88,16 +150,24 @@
     </style>
 </head>
 <body>
-    <h1>ماسح الباركود بالهاتف</h1>
-    <div id="reader-mobile"></div>
-    <div class="status-message" id="status-message">جاري التحميل...</div>
-    <div class="loader" id="loader"></div>
-    <button class="action-button" id="disconnect-btn"><i class="fas fa-times"></i> قطع الاتصال</button>
+    <div id="camera-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-camera-modal-btn">&times;</span>
+            <h1 id="modal-title-phone">ماسح الباركود بالهاتف</h1>
+            
+            <div id="reader-container"></div>
+            
+            <div class="status-message" id="status-message-phone">جاري التحميل...</div>
+            <div class="loader" id="loader-phone"></div>
+            <button class="action-button" id="disconnect-btn-phone"><i class="fas fa-times"></i> قطع الاتصال</button>
+            <button class="action-button" id="stop-scan-btn" style="display: none; background-color: #f44336;"><i class="fas fa-stop"></i> إيقاف المسح</button>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc, onSnapshot, Timestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, updateDoc, onSnapshot, Timestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         // Firebase Configuration (Replace with your actual config)
         const firebaseConfig = {
@@ -114,10 +184,14 @@
         const db = getFirestore(app);
 
         // DOM Elements
-        const readerMobileContainer = document.getElementById('reader-mobile');
-        const statusMessageDiv = document.getElementById('status-message');
-        const loader = document.getElementById('loader');
-        const disconnectBtn = document.getElementById('disconnect-btn');
+        const cameraModal = document.getElementById('camera-modal');
+        const closeModalBtn = document.getElementById('close-camera-modal-btn');
+        const modalTitlePhone = document.getElementById('modal-title-phone');
+        const readerContainer = document.getElementById('reader-container');
+        const statusMessagePhone = document.getElementById('status-message-phone');
+        const loaderPhone = document.getElementById('loader-phone');
+        const disconnectBtnPhone = document.getElementById('disconnect-btn-phone');
+        const stopScanBtn = document.getElementById('stop-scan-btn'); // زر إيقاف المسح
 
         let html5QrCode = null;
         let lastScannedValue = null;
@@ -126,108 +200,161 @@
         let sessionId = null;
         let scanPurpose = null; // The purpose passed from desktop (addEdit/search)
         let sessionUnsubscribe = null; // Firestore listener unsubscribe function
+        let isScannerActive = false; // Flag to track if the scanner is actively running
 
-        // Function to update status messages
-        function updateStatus(message, type = 'info') {
-            statusMessageDiv.textContent = message;
-            statusMessageDiv.className = 'status-message ' + type;
-            loader.style.display = (type === 'loading') ? 'block' : 'none';
+        // Function to update status messages in phone modal
+        function updateStatusPhone(message, type = 'info') {
+            statusMessagePhone.textContent = message;
+            statusMessagePhone.className = 'status-message ' + type;
+            loaderPhone.style.display = (type === 'loading') ? 'block' : 'none';
         }
 
-        // Function to parse query parameter
+        // Function to parse query parameter (for initial sessionId)
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
         }
 
-        // Start HTML5-QRCode scanner
-        async function startScanner() {
+        // Start HTML5-QRCode scanner for CONNECTION QR
+        async function startConnectionScanner() {
             if (html5QrCode && html5QrCode.isScanning) {
-                console.log("Scanner already running, no need to restart.");
-                return;
+                await html5QrCode.stop().catch(e => console.error("Error stopping existing scanner:", e));
             }
+            isScannerActive = false; // Reset scanner active state
 
-            updateStatus('جاري تهيئة الكاميرا...', 'loading');
-            html5QrCode = new Html5Qrcode("reader-mobile");
-            const qrCodeConfig = {
-                fps: 10,
-                qrbox: { width: 250, height: 250 }
-            };
+            modalTitlePhone.textContent = 'مسح رمز QR للاتصال';
+            readerContainer.style.display = 'block'; // Show camera feed
+            stopScanBtn.style.display = 'none'; // Hide stop scan button
+            updateStatusPhone('ضع رمز QR الاتصال أمام الكاميرا...', 'loading');
+
+            html5QrCode = new Html5Qrcode("reader-container");
+            const qrCodeConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
 
             try {
-                await html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onScanSuccess, onScanError);
-                updateStatus('الكاميرا جاهزة للمسح.', 'success');
-                console.log("Mobile scanner started.");
+                await html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onConnectionQrScanned, onScanError);
+                isScannerActive = true;
+                updateStatusPhone('الكاميرا جاهزة لمسح رمز الاتصال.', 'info');
+                console.log("Connection QR scanner started.");
+            } catch (err) {
+                console.error("Error starting connection QR scanner:", err);
+                updateStatusPhone('تعذر تشغيل الكاميرا. يرجى التأكد من الصلاحيات.', 'error');
+            }
+        }
 
-                // If a session ID exists, signal desktop that phone is ready
+        // On successful scan of the CONNECTION QR
+        async function onConnectionQrScanned(decodedText, decodedResult) {
+            if (!isScannerActive) return; // Prevent double-processing
+            
+            updateStatusPhone(`تم مسح رمز الاتصال: ${decodedText}`, 'success');
+            console.log(`Connection QR Scan result: ${decodedText}`);
+
+            // The decodedText should now be the sessionId from the desktop
+            sessionId = decodedText; // Capture the sessionId
+            
+            // Stop the connection scanner
+            await stopScanner();
+
+            // Attempt to connect to Firestore session
+            await connectToSession(sessionId);
+        }
+
+        // Start HTML5-QRCode scanner for PRODUCT BARCODES
+        async function startProductBarcodeScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                console.log("Product barcode scanner already running.");
+                return;
+            }
+            isScannerActive = false; // Reset scanner active state
+
+            modalTitlePhone.textContent = 'مسح باركود المنتج';
+            readerContainer.style.display = 'block'; // Show camera feed
+            stopScanBtn.style.display = 'block'; // Show stop scan button
+            updateStatusPhone('ضع باركود المنتج أمام الكاميرا...', 'loading');
+
+            html5QrCode = new Html5Qrcode("reader-container");
+            const qrCodeConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            try {
+                await html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onProductBarcodeScanned, onScanError);
+                isScannerActive = true;
+                updateStatusPhone('الكاميرا جاهزة لمسح باركود المنتج.', 'info');
+                console.log("Product barcode scanner started.");
+
+                // After starting, signal desktop that phone is ready for product scans
                 if (sessionId) {
                     await updateDoc(doc(db, 'scannerSessions', sessionId), {
-                        status: 'phoneReady',
+                        status: 'phoneReady', // This status indicates it's ready for product scans
                         connectedAt: Timestamp.now()
-                    }).catch(e => console.error("Error updating phoneReady status:", e));
-                    console.log("Signaled desktop that phone is ready.");
+                    }).catch(e => console.error("Error updating phoneReady status after product scanner start:", e));
                 }
 
             } catch (err) {
-                console.error("Error starting mobile scanner:", err);
-                updateStatus('تعذر تشغيل الكاميرا. يرجى التأكد من الصلاحيات.', 'error');
-                // Signal desktop about the error if session is active
+                console.error("Error starting product barcode scanner:", err);
+                updateStatusPhone('تعذر تشغيل الكاميرا. يرجى التأكد من الصلاحيات.', 'error');
                 if (sessionId) {
                     await updateDoc(doc(db, 'scannerSessions', sessionId), {
                         status: 'errorFromPhone',
                         errorMessage: err.message,
                         disconnectedAt: Timestamp.now()
-                    }).catch(e => console.error("Error signaling errorFromPhone status:", e));
+                    }).catch(e => console.error("Error signaling errorFromPhone status from product scanner:", e));
                 }
             }
         }
 
-        // On successful scan
-        async function onScanSuccess(decodedText, decodedResult) {
+        // On successful scan of PRODUCT BARCODE
+        async function onProductBarcodeScanned(decodedText, decodedResult) {
+            if (!isScannerActive) return;
+
             const currentTime = Date.now();
-            // Prevent duplicate scans for the same barcode within a cooldown period
             if (decodedText === lastScannedValue && (currentTime - lastScanTime < SCAN_COOLDOWN_MS)) {
-                updateStatus('تم مسح نفس الباركود مؤخرًا. انتظر قليلًا أو حرّك الباركود.', 'info');
+                updateStatusPhone('تم مسح نفس الباركود مؤخرًا. انتظر قليلًا أو حرّك الباركود.', 'info');
                 return;
             }
 
             lastScannedValue = decodedText;
             lastScanTime = currentTime;
-            updateStatus(`تم مسح: ${decodedText}`, 'success');
-            console.log(`Scan result: ${decodedText}`);
+            updateStatusPhone(`تم مسح: ${decodedText}`, 'success');
+            console.log(`Product Barcode Scan result: ${decodedText}`);
 
-            // Send scanned value to Firestore
             if (sessionId) {
                 try {
                     await updateDoc(doc(db, 'scannerSessions', sessionId), {
                         scannedValue: decodedText,
-                        status: 'scanned',
+                        status: 'scanned', // Signal desktop that a value is available
                         scannedAt: Timestamp.now()
                     });
                     console.log("Sent scanned value to desktop via Firestore.");
-                    updateStatus('تم إرسال الباركود إلى الجهاز.', 'info');
-                    // The desktop will change status to 'readyForNextScan' or 'closedByDesktop'
+                    updateStatusPhone('تم إرسال الباركود إلى الجهاز.', 'info');
                 } catch (e) {
                     console.error("Error sending scanned value to Firestore:", e);
-                    updateStatus('خطأ في إرسال الباركود: ' + e.message, 'error');
+                    updateStatusPhone('خطأ في إرسال الباركود: ' + e.message, 'error');
                 }
             } else {
-                updateStatus('الجلسة غير متصلة. لا يمكن إرسال الباركود.', 'error');
+                updateStatusPhone('الجلسة غير متصلة. لا يمكن إرسال الباركود.', 'error');
                 console.warn("Session ID is null, cannot send scanned value.");
             }
         }
 
-        // On scan error
+        // On any scanner error (common handler)
         function onScanError(errorMessage) {
-            // console.warn(`Scan error: ${errorMessage}`); // Keep this for debugging, but don't show to user constantly
+            // console.warn(`Scan error: ${errorMessage}`);
+        }
+
+        // Stop any active scanner
+        async function stopScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                await html5QrCode.stop().catch(e => console.error("Error stopping scanner:", e));
+                console.log("Scanner stopped.");
+            }
+            isScannerActive = false; // Update flag
+            readerContainer.style.display = 'none'; // Hide camera feed
+            stopScanBtn.style.display = 'none'; // Hide stop scan button
         }
 
         // Disconnect from session and stop scanner
         async function disconnect() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                await html5QrCode.stop().catch(e => console.error("Error stopping scanner:", e));
-                console.log("Mobile scanner stopped.");
-            }
+            await stopScanner(); // Stop camera first
+
             if (sessionUnsubscribe) {
                 sessionUnsubscribe();
                 sessionUnsubscribe = null;
@@ -242,53 +369,105 @@
                 } catch (e) {
                     console.error("Error updating session status on disconnect:", e);
                 }
-                sessionId = null; // Clear local session ID
+                sessionId = null;
                 scanPurpose = null;
             }
-            updateStatus('تم قطع الاتصال بنجاح.', 'info');
-            alert('تم قطع الاتصال. يمكنك الآن إغلاق هذه الصفحة بأمان.');
-            // window.close(); // Browser security policies often prevent window.close()
+            updateStatusPhone('تم قطع الاتصال بنجاح.', 'info');
+            modalTitlePhone.textContent = 'ماسح الباركود بالهاتف';
+            // Optionally: prompt user to scan a new QR code for a new session
+            startConnectionScanner(); // Allow new connection via QR after disconnect
         }
 
-        // Event listener for disconnect button
-        disconnectBtn.addEventListener('click', disconnect);
+        // Function to establish or re-establish session with desktop
+        async function connectToSession(retrievedSessionId) {
+            sessionId = retrievedSessionId;
+            updateStatusPhone('جاري الاتصال بجلسة الماسح...', 'loading');
 
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            sessionId = getQueryParam('sessionId');
-            scanPurpose = getQueryParam('purpose'); // Get the purpose from URL
-
-            if (sessionId) {
-                updateStatus('جاري الاتصال بجلسة الماسح...', 'loading');
-                const sessionDocRef = doc(db, 'scannerSessions', sessionId);
-                
-                // Set up the Firestore listener for the session document
-                sessionUnsubscribe = onSnapshot(sessionDocRef, async (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        
-                        if (data.status === 'readyForNextScan') {
-                            updateStatus('الهاتف جاهز للمسح. امسح الباركود.', 'info');
-                        } else if (data.status === 'closedByDesktop') {
-                            updateStatus('تم قطع الاتصال بواسطة الجهاز الآخر.', 'info');
-                            await disconnect();
-                            return;
-                        }
-                    } else {
-                        updateStatus('الجلسة انتهت أو تم حذفها من الجهاز الآخر.', 'info');
+            const sessionDocRef = doc(db, 'scannerSessions', sessionId);
+            
+            // Set up the Firestore listener for the session document
+            sessionUnsubscribe = onSnapshot(sessionDocRef, async (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    if (data.status === 'connecting') {
+                        updateStatusPhone('تم العثور على الجلسة. انتظر الجهاز الرئيسي.', 'info');
+                        // No need to start product scanner yet, wait for 'scanRequested'
+                    } else if (data.status === 'phoneReady') {
+                        updateStatusPhone('الهاتف متصل وجاهز. الجهاز الرئيسي في انتظار طلب المسح.', 'success');
+                        await stopScanner(); // Ensure scanner is off if not requested
+                    } else if (data.status === 'scanRequested') {
+                        // Desktop requested a scan! Start product barcode scanner
+                        scanPurpose = data.purpose; // Get the specific purpose for this scan
+                        updateStatusPhone('تم تلقي طلب مسح! جاري تشغيل الكاميرا.', 'info');
+                        await startProductBarcodeScanner();
+                    } else if (data.status === 'closedByDesktop' || data.status === 'errorFromDesktop') { // Assuming errorFromDesktop status could exist
+                        updateStatusPhone('تم قطع الاتصال بواسطة الجهاز الرئيسي.', 'info');
                         await disconnect();
                         return;
+                    } else if (data.status === 'readyForNextScan') {
+                        // Desktop processed the scan, phone is ready for next request
+                        updateStatusPhone('تم إرسال الباركود بنجاح. في انتظار طلب مسح جديد.', 'info');
+                        await stopScanner(); // Stop scanner after successful scan and processing
+                    } else if (data.status === 'scanned') {
+                        // This means a value was just sent, but desktop hasn't reset status yet
+                        updateStatusPhone('تم المسح. الجهاز الرئيسي جاري المعالجة...', 'info');
                     }
-                }, (error) => {
-                    console.error("Error listening to session document on phone:", error);
-                    updateStatus('خطأ في الاتصال بالجهاز الآخر.', 'error');
-                    disconnect();
-                });
+                } else {
+                    updateStatusPhone('الجلسة انتهت أو تم حذفها من الجهاز الرئيسي.', 'info');
+                    await disconnect();
+                    return;
+                }
+            }, (error) => {
+                console.error("Error listening to session document on phone:", error);
+                updateStatusPhone('خطأ في الاتصال بالجهاز الرئيسي.', 'error');
+                disconnect();
+            });
 
-                // Start the camera after setting up the listener
-                startScanner();
+            // Signal desktop that phone is attempting to connect to this session
+            try {
+                // Ensure document exists before trying to update it, could be stale ID
+                const docCheck = await getDoc(sessionDocRef);
+                if (docCheck.exists()) {
+                    await updateDoc(sessionDocRef, {
+                        status: 'connecting',
+                        connectedAt: Timestamp.now()
+                    });
+                } else {
+                    updateStatusPhone('الجلسة غير موجودة على الجهاز الرئيسي. يرجى إنشاء جلسة جديدة.', 'error');
+                    await disconnect(); // Force disconnect if session doesn't exist
+                }
+            } catch (e) {
+                console.error("Error signaling connection attempt to desktop:", e);
+                updateStatusPhone('خطأ في الاتصال بالجهاز الرئيسي: ' + e.message, 'error');
+                disconnect();
+            }
+        }
+
+
+        // Event Listeners for Phone Page
+        disconnectBtnPhone.addEventListener('click', disconnect);
+        stopScanBtn.addEventListener('click', async () => {
+            await stopScanner(); // Stop the product barcode scanner
+            updateStatusPhone('تم إيقاف المسح. في انتظار طلب جديد.', 'info');
+            // Signal desktop that phone is now just ready, not actively scanning
+            if (sessionId) {
+                await updateDoc(doc(db, 'scannerSessions', sessionId), {
+                    status: 'phoneReady'
+                }).catch(e => console.error("Error updating status to phoneReady after stop scan:", e));
+            }
+        });
+
+        // Initial setup on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if sessionId is provided in URL (e.g., if user bookmarks after connecting)
+            const initialSessionId = getQueryParam('sessionId');
+            if (initialSessionId) {
+                // If a sessionId is in the URL, try to directly connect to it
+                connectToSession(initialSessionId);
             } else {
-                updateStatus('معرّف الجلسة غير موجود. يرجى مسح رمز QR من الجهاز الرئيسي لربط الماسح.', 'error');
+                // Otherwise, start the scanner to read the connection QR
+                startConnectionScanner();
             }
         });
 
@@ -299,8 +478,16 @@
                     html5QrCode.stop().then(() => console.log("Scanner paused due to tab switch.")).catch(e => console.error("Error pausing scanner:", e));
                 }
             } else {
-                if (sessionId) { // Only restart if a session is active
-                    startScanner(); // Restart scanner when tab becomes active
+                // Only restart if a session is active and scanner was previously active
+                if (sessionId) { 
+                    // No need to auto-start product scanner, wait for desktop request
+                    // If it was in connection mode, restart connection scanner
+                    if (modalTitlePhone.textContent === 'مسح رمز QR للاتصال' && !isScannerActive) {
+                        startConnectionScanner();
+                    } else if (isScannerActive) { // If it was actively scanning products before hiding
+                        // Re-signal desktop that phone is ready, or wait for new scanRequested
+                        updateStatusPhone('الهاتف استأنف الاتصال. في انتظار طلب مسح.', 'info');
+                    }
                 }
             }
         });
