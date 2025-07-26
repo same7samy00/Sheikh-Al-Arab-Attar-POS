@@ -137,54 +137,109 @@
             gap: 15px; /* مسافة بين العناصر */
         }
 
-        .main-action-btn, .secondary-action-btn, .submit-btn, .option-btn {
-            font-family: 'Cairo', sans-serif; /* خط كايرو للأزرار */
-            padding: 10px 20px;
+        /* --- توحيد تصميم الأزرار --- */
+        /* هذا النمط الأساسي يطبق على جميع الأزرار ذات الصلة */
+        .main-action-btn, 
+        .secondary-action-btn, 
+        .submit-btn, 
+        .return-button-header, /* الزر في الرأس */
+        .action-icon-btn /* زر الأيقونة الجديد (مسح بالهاتف) */ {
+            font-family: 'Cairo', sans-serif;
+            padding: 12px 25px; /* بادينغ موحد */
             border: none;
-            border-radius: 8px; /* حواف مستديرة 8px */
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease, opacity 0.3s ease;
+            font-size: 1.05em; /* حجم خط موحد */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
             justify-content: center;
+            gap: 8px; /* مسافة بين الأيقونة والنص */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* ظل خفيف موحد */
+        }
+        .main-action-btn:hover, 
+        .secondary-action-btn:hover, 
+        .submit-btn:hover, 
+        .return-button-header:hover,
+        .action-icon-btn:hover {
+            transform: translateY(-2px); /* تأثير رفع موحد */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* ظل أكبر عند التمرير */
+        }
+        .main-action-btn:active, 
+        .secondary-action-btn:active, 
+        .submit-btn:active, 
+        .return-button-header:active,
+        .action-icon-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
-        .main-action-btn:disabled, .secondary-action-btn:disabled,
-        #products-table .action-buttons button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .main-action-btn {
-            background-color: #4CAF50;
+        /* ألوان محددة لكل نوع من الأزرار */
+        .main-action-btn { /* إضافة منتج جديد */
+            background-color: #4CAF50; /* أخضر */
             color: white;
         }
-
-        .main-action-btn:hover:not(:disabled) {
+        .main-action-btn:hover {
             background-color: #45a049;
         }
 
-        .secondary-action-btn {
-            background-color: #607d8b;
+        .secondary-action-btn { /* مسح باركود (الذي بجوار شريط البحث) */
+            background-color: #607d8b; /* رمادي مزرق */
             color: white;
         }
-
-        .secondary-action-btn:hover:not(:disabled) {
+        .secondary-action-btn:hover {
             background-color: #546e7a;
         }
 
-        .submit-btn {
-            background-color: #2196F3;
+        .submit-btn { /* زر الحفظ (الذي سيكون في add-product.html) */
+            background-color: #2196F3; /* أزرق */
             color: white;
-            width: 100%;
-            margin-top: 20px;
         }
-
-        .submit-btn:hover:not(:disabled) {
+        .submit-btn:hover {
             background-color: #1976D2;
         }
+
+        .return-button-header { /* زر العودة للمخزون في الرأس (لصفحة add-product.html) */
+            background-color: #607d8b; /* رمادي مزرق */
+            color: white;
+            /* يمكن أن يكون له padding خاص ليتناسب مع الرأس */
+            padding: 10px 15px;
+            font-size: 0.9em;
+        }
+
+        .action-icon-btn { /* زر أيقونة الهاتف */
+            background-color: #3f51b5; /* أزرق داكن */
+            color: white;
+            padding: 10px; /* بادينغ متساوي للأيقونة */
+            width: 45px; /* عرض ثابت لجعله دائريًا تقريبًا */
+            height: 45px; /* ارتفاع ثابت */
+            border-radius: 50%; /* لجعل الزر دائريًا */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-icon-btn i {
+            margin: 0; /* إزالة هامش الأيقونة */
+            font-size: 1.2em; /* حجم الأيقونة */
+        }
+        .action-icon-btn:hover {
+            background-color: #303f9f;
+        }
+        .action-icon-btn.status-disconnected {
+            background-color: #f44336; /* أحمر عندما يكون غير متصل */
+        }
+        .action-icon-btn.status-disconnected:hover {
+            background-color: #d32f2f;
+        }
+        .action-icon-btn.status-connecting {
+            background-color: #FFA000; /* برتقالي عندما يكون جاري الاتصال */
+            animation: pulse 1s infinite alternate;
+        }
+        .action-icon-btn.status-connected {
+            background-color: #4CAF50; /* أخضر عندما يكون متصل */
+        }
+        .action-icon-btn.status-connected:hover {
+            background-color: #45a049;
+        }
+
 
         /* شريط البحث */
         .search-bar {
@@ -193,7 +248,6 @@
             flex-grow: 1;
             max-width: 400px;
             align-items: center; /* لمحاذاة زر الأيقونة */
-            position: relative; /* لتموضع Loader البحث */
         }
 
         .search-bar input {
@@ -202,82 +256,37 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            padding-left: 35px; /* مسافة لـ Loader */
+            padding-left: 10px; /* لا حاجة لمسافة للودر هنا، سنضع الودر في الزر نفسه */
+            padding-right: 10px; /* لضمان التناسق */
         }
-
-        /* Loader داخل حقل البحث (موقعه ثابت بجوار الحقل) */
-        .search-bar .scan-loader {
-            position: absolute;
-            left: 10px; /* Adjust based on RTL direction */
-            top: 50%;
-            transform: translateY(-50%);
+        /* Loader داخل الزر */
+        .secondary-action-btn .scan-loader-inside-button {
             border: 2px solid #f3f3f3;
-            border-top: 2px solid #3f51b5;
+            border-top: 2px solid #fff; /* لون أبيض ليتناسب مع الزر */
             border-radius: 50%;
             width: 15px;
             height: 15px;
             animation: spin 1s linear infinite;
             display: none; /* Hidden by default */
+            margin-right: 8px; /* مسافة بين الـ loader والنص */
         }
-        /* Loader داخل حقل الباركود في نموذج المنتج */
-        .form-group .barcode-scan-buttons .scan-loader {
-            position: absolute;
-            left: 10px; /* Adjust based on RTL direction */
-            top: 50%;
-            transform: translateY(-50%);
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3f51b5;
-            border-radius: 50%;
-            width: 15px;
-            height: 15px;
-            animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
+        /* إخفاء الأيقونة عند ظهور Loader */
+        .secondary-action-btn.loading i {
+            display: none;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* أيقونة زر الهاتف */
-        #phone-connect-btn {
-            background-color: #3f51b5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 12px; /* أصغر قليلاً من الأزرار العادية */
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 45px; /* لتحديد حجم الأيقونة كزر */
-            height: 45px;
-            justify-content: center;
-            align-items: center;
-        }
-        #phone-connect-btn:hover {
-            background-color: #303f9f;
-        }
-        #phone-connect-btn.status-disconnected {
-            background-color: #f44336; /* أحمر عندما يكون غير متصل */
-        }
-        #phone-connect-btn.status-disconnected:hover {
-            background-color: #d32f2f;
-        }
-        #phone-connect-btn.status-connecting {
-            background-color: #FFA000; /* برتقالي عندما يكون جاري الاتصال */
-            animation: pulse 1s infinite alternate;
-        }
-        #phone-connect-btn.status-connected {
-            background-color: #4CAF50; /* أخضر عندما يكون متصل */
-        }
-        #phone-connect-btn.status-connected:hover {
-            background-color: #45a049;
+        .secondary-action-btn.loading .scan-loader-inside-button {
+            display: block;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
             100% { transform: scale(1.1); opacity: 0.7; }
         }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
 
         /* جدول المنتجات */
         .table-responsive {
@@ -379,9 +388,6 @@
             cursor: pointer;
         }
 
-        /* --- تنسيقات مودال المنتج (شاشة كاملة ومنسقة) --- */
-        /* تم نقل هذه التنسيقات بشكل أساسي إلى add-product.html */
-        
         /* --- تنسيقات لمودال الاتصال بالهاتف (صغير الحجم) --- */
         #phone-connection-modal .modal-content {
             background-color: #fefefe;
@@ -648,8 +654,10 @@
                     <button id="add-product-btn" class="main-action-btn" disabled><i class="fas fa-plus"></i> إضافة منتج جديد</button>
                     <div class="search-bar">
                         <input type="text" id="inventory-search" placeholder="ابحث باسم المنتج أو الباركود...">
-                        <span class="scan-loader" id="inventory-search-loader"></span> <button id="scan-barcode-inventory-search" class="secondary-action-btn"><i class="fas fa-barcode"></i> مسح باركود</button>
-                        <button id="phone-connect-btn" class="secondary-action-btn">
+                        <button id="scan-barcode-inventory-search" class="secondary-action-btn">
+                            <span class="scan-loader-inside-button" id="inventory-search-loader"></span> <i class="fas fa-barcode"></i> مسح باركود
+                        </button>
+                        <button id="phone-connect-btn" class="action-icon-btn">
                             <i class="fas fa-mobile-alt"></i>
                         </button>
                     </div>
@@ -746,12 +754,6 @@
         const productsTableBody = document.querySelector('#products-table tbody');
         const inventorySearchLoader = document.getElementById('inventory-search-loader'); // Loader for search input
 
-        // هذه العناصر لم تعد موجودة في inventory.html، ولكنها كانت في المودال القديم الذي تم نقله
-        // const productModal = document.getElementById('product-modal'); 
-        // const productBarcodeInput = document.getElementById('product-barcode'); 
-        // const productBarcodeLoader = document.getElementById('product-barcode-loader'); 
-        // const scanBarcodeFormBtnProduct = document.getElementById('scan-barcode-form-btn-product'); 
-
 
         const passwordModal = document.getElementById('password-modal');
         const closePasswordModalBtn = document.getElementById('close-password-modal-btn');
@@ -763,7 +765,6 @@
         const phoneConnectionModal = document.getElementById('phone-connection-modal');
         const closePhoneConnectionModalBtn = document.getElementById('close-phone-connection-modal-btn');
         const phoneModalTitle = document.getElementById('phone-modal-title');
-        // تم إزالة qrContainerDesktop و qrCodeDisplayCanvas
         const qrInstruction = document.getElementById('qr-instruction'); 
         const mobileScannerUrlDisplay = document.getElementById('mobile-scanner-url-display'); // لعرض الرابط النصي
         const phoneQrLoader = document.getElementById('phone-qr-loader'); // سيستخدم كلودر للحالة
@@ -830,17 +831,23 @@
         }
 
         /**
-         * لإظهار أو إخفاء Loader المسح.
-         * @param {string} target - 'search' or 'productBarcode'
+         * لإظهار أو إخفاء Loader المسح داخل الزر.
+         * @param {HTMLElement} buttonElement - زر المسح (scanBarcodeInventorySearchBtn)
          * @param {boolean} show - true لإظهار، false لإخفاء
          */
-        function toggleScanLoader(target, show) {
-            if (target === 'search') {
-                inventorySearchLoader.style.display = show ? 'block' : 'none';
-            } else if (target === 'productBarcode') { // هذا لم يعد مستخدما هنا
-                // productBarcodeLoader.style.display = show ? 'block' : 'none';
-                // إذا كنت ستستخدم Loader في حقل الباركود في inventory.html للتعديل مباشرة
-                // فستحتاج إلى معرفة productBarcodeInput هنا أيضًا
+        function toggleButtonLoader(buttonElement, show) {
+            const icon = buttonElement.querySelector('i');
+            const loader = buttonElement.querySelector('.scan-loader-inside-button');
+            if (!icon || !loader) return;
+
+            if (show) {
+                icon.style.display = 'none';
+                loader.style.display = 'block';
+                buttonElement.classList.add('loading');
+            } else {
+                icon.style.display = 'block';
+                loader.style.display = 'none';
+                buttonElement.classList.remove('loading');
             }
         }
 
@@ -1022,9 +1029,6 @@
             window.location.href = 'add-product.html'; // الانتقال إلى صفحة إضافة المنتج
         });
 
-        // تم إزالة openProductModalForEdit و closeProductModal من هنا، لأنهما لم يعدا يُستخدمان بشكل مباشر في inventory.html
-
-
         async function deleteProduct(productId) {
             if (confirm('هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
                 try {
@@ -1112,7 +1116,7 @@
                         }
                         
                         // Stop loader after scan
-                        toggleScanLoader('search', false);
+                        toggleButtonLoader(scanBarcodeInventorySearchBtn, false);
 
                         // Signal phone to be ready for next scan
                         updateDoc(sessionDocRef, {
@@ -1223,7 +1227,7 @@
                 }
 
                 // Show loader while waiting for scan
-                toggleScanLoader(purpose === 'search' ? 'search' : 'productBarcode', true); // productBarcode هنا لا يُستخدم لأنه في صفحة add-product
+                toggleButtonLoader(scanBarcodeInventorySearchBtn, true);
 
                 await updateDoc(sessionDocRef, {
                     purpose: purpose,
@@ -1246,7 +1250,7 @@
             } catch (e) {
                 console.error("Error requesting scan from phone:", e);
                 showToast('حدث خطأ أثناء طلب المسح من الهاتف: ' + e.message, "error");
-                toggleScanLoader(purpose === 'search' ? 'search' : 'productBarcode', false); // Hide loader on error
+                toggleButtonLoader(scanBarcodeInventorySearchBtn, false); // Hide loader on error
             }
         }
 
@@ -1257,7 +1261,6 @@
             phoneModalTitle.textContent = 'ربط ماسح الباركود بالهاتف';
             // qrInstruction.textContent = 'الرجاء فتح صفحة الماسح على الهاتف:'; // هذا يتم توليده ديناميكيا
             phoneConnectionStatusMessage.textContent = '';
-            // لا يوجد qrContainerDesktop بعد الآن
             disconnectPhoneButton.style.display = 'none';
             phoneQrLoader.style.display = 'none';
         }
@@ -1268,16 +1271,9 @@
         // هذا الزر يوجه إلى صفحة add-product.html
         // addProductBtn.addEventListener('click', () => { ... });
 
-        // هذه المستمعات لمودال المنتج لم تعد تُستخدم هنا
-        // closeButtonProductModal.addEventListener('click', closeProductModal);
-        // window.addEventListener('click', (event) => { if (event.target == productModal) { closeProductModal(); } });
-
         scanBarcodeInventorySearchBtn.addEventListener('click', () => {
             requestScanFromPhone('search'); 
         });
-
-        // زر المسح في مودال المنتج (الموجود الآن في add-product.html)
-        // scanBarcodeFormBtnProduct.addEventListener('click', () => { ... });
         
         // زر أيقونة الهاتف (لفتح مودال الاتصال/الحالة)
         phoneConnectBtn.addEventListener('click', togglePhoneConnectionModal);
