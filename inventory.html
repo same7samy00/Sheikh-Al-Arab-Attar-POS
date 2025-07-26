@@ -202,9 +202,10 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
+            padding-left: 35px; /* مسافة لـ Loader */
         }
 
-        /* Loader داخل حقل البحث */
+        /* Loader داخل حقل البحث (موقعه ثابت بجوار الحقل) */
         .search-bar .scan-loader {
             position: absolute;
             left: 10px; /* Adjust based on RTL direction */
@@ -379,88 +380,8 @@
         }
 
         /* --- تنسيقات مودال المنتج (شاشة كاملة ومنسقة) --- */
-        #product-modal .modal-content {
-            background-color: #fefefe;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-            animation-name: animatetop;
-            animation-duration: 0.4s;
-            box-sizing: border-box;
-
-            width: 95vw; /* تقريبا ملء الشاشة */
-            height: 95vh; /* تقريبا ملء الشاشة */
-            max-width: 1000px; /* أقصى عرض على الشاشات الكبيرة جداً */
-            max-height: 700px; /* أقصى ارتفاع */
-            overflow-y: auto;
-        }
-
-        #product-modal .modal-content h4 {
-            text-align: center;
-            color: #3f51b5;
-            margin-bottom: 25px;
-            font-size: 1.5em;
-        }
+        /* تم نقل هذه التنسيقات بشكل أساسي إلى add-product.html */
         
-        #product-form {
-            display: flex;
-            flex-wrap: wrap; /* لجعل العناصر بجانب بعضها */
-            gap: 20px; /* مسافة بين الخانات */
-            justify-content: space-between; /* توزيع الخانات */
-        }
-        #product-form .form-group {
-            flex: 1 1 calc(50% - 10px); /* خانتان في الصف، مع مراعاة الفجوة */
-            margin-bottom: 0; /* إزالة الهامش السفلي لأن الفجوة هي من تتولى المسافات */
-        }
-        /* لجعل حقول الوصف والباركود تأخذ عرضاً كاملاً */
-        #product-form .form-group:nth-last-child(2), /* الباركود */
-        #product-form .form-group:last-child { /* الوصف */
-            flex: 1 1 100%;
-        }
-        #product-form .submit-btn {
-            flex: 1 1 100%; /* زر الحفظ يأخذ عرضاً كاملاً */
-            margin-top: 20px;
-        }
-
-        /* تنسيقات حقول النموذج داخل المودال */
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="number"],
-        .form-group select,
-        .form-group textarea {
-            font-family: 'Cairo', sans-serif;
-            width: 100%; /* عرض كامل داخل الـ form-group */
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            direction: rtl;
-            box-sizing: border-box;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-        }
-
-        /* تنسيق زر مسح الباركود داخل النموذج */
-        .form-group .barcode-scan-buttons {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: relative; /* لتموضع Loader المسح */
-        }
-        .form-group .barcode-scan-buttons input {
-            margin-bottom: 0;
-        }
-
-
         /* --- تنسيقات لمودال الاتصال بالهاتف (صغير الحجم) --- */
         #phone-connection-modal .modal-content {
             background-color: #fefefe;
@@ -486,42 +407,8 @@
             margin-bottom: 20px;
         }
 
-        /* تنسيق حاوية الـ QR داخل مودال الاتصال */
-        #qr-container-desktop {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px; /* بادينغ أقل قليلاً */
-            border: 1px dashed #ccc;
-            border-radius: 8px;
-            background-color: #f8f8f8;
-            width: 100%;
-            max-width: 280px; /* أصغر ليتناسب مع المودال الصغير */
-            box-sizing: border-box;
-            margin-top: 15px;
-        }
-        #phone-connection-modal #qr-code-display {
-            width: 180px; /* أصغر قليلاً */
-            height: 180px;
-            margin: 10px auto;
-            border: 1px solid #ddd;
-            padding: 5px;
-            border-radius: 8px;
-            display: block;
-        }
-        #phone-connection-modal .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3f51b5;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 10px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* العناصر داخل مودال الاتصال بالهاتف (بدون QR) */
+        /* أزلنا qr-container-desktop كعنصر HTML، لكن سنستخدم هذه التنسيقات لعناصر الحالة مباشرة داخل المودال */
         #phone-connection-modal p.instruction, #phone-connection-modal p.status-message {
             color: #555;
             font-size: 0.9em;
@@ -533,6 +420,17 @@
         #phone-connection-modal p.success-message {
             color: #4CAF50;
         }
+        #phone-connection-modal .loader { /* Loader for connection status */
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3f51b5;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+            display: none;
+        }
+
 
         /* --- تنسيقات مودال كلمة السر الاحترافي --- */
         #password-modal .modal-content {
@@ -681,7 +579,8 @@
                 font-size: 0.9em;
             }
             /* المودالات تملأ الشاشة بالكامل في الجوال */
-            #product-modal .modal-content, #password-modal .modal-content {
+            /* Product modal is now in add-product.html */
+            #password-modal .modal-content {
                 width: 100vw;
                 height: 100vh;
                 max-width: none;
@@ -711,9 +610,7 @@
                 width: 100%;
             }
             /* ترتيب الخانات في مودال المنتج على الجوال لخانة واحدة في الصف */
-            #product-form .form-group {
-                flex: 1 1 100%;
-            }
+            /* Product form layout is now in add-product.html */
         }
     </style>
 </head>
@@ -777,86 +674,6 @@
                     </table>
                 </div>
 
-                <div id="product-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-button" id="close-product-modal-btn">&times;</span>
-                        <h4 id="modal-title">إضافة منتج جديد</h4>
-                        <form id="product-form">
-                            <input type="hidden" id="product-id"> 
-                            <div class="form-group">
-                                <label for="product-name">اسم المنتج:</label>
-                                <input type="text" id="product-name" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-category">الفئة:</label>
-                                <select id="product-category" required>
-                                    <option value="">اختر فئة</option>
-                                    <option value="أعشاب">أعشاب</option>
-                                    <option value="توابل">توابل</option>
-                                    <option value="زيوت طبيعية">زيوت طبيعية</option>
-                                    <option value="مستحضرات تجميل">مستحضرات تجميل</option>
-                                    <option value="ألبان">ألبان</output>
-                                    <option value="حبوب وبقوليات">حبوب وبقوليات</option>
-                                    <option value="مكسرات">مكسرات</option>
-                                    <option value="عسل ومشتقاته">عسل ومشتقاته</option>
-                                    <option value="أخرى">أخرى</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-unit">الوحدة الأساسية:</label>
-                                <select id="product-unit" required>
-                                    <option value="">اختر وحدة</option>
-                                    <option value="كيلو جرام">كيلو جرام</output>
-                                    <option value="لتر">لتر</option>
-                                    <option value="قطعة">قطعة</option>
-                                    <option value="حبة">حبة</option>
-                                    <option value="عبوة">عبوة</option>
-                                    <option value="كيس">كيس</option>
-                                    <option value="مجموعة">مجموعة</option>
-                                    <option value="جرام">جرام</output>
-                                    <option value="مليلتر">مليلتر</option>
-                                    <option value="ملعقة">ملعقة</output>
-                                    <option value="زجاجة">زجاجة</option>
-                                    <option value="علبة">علبة</option>
-                                    <option value="صندوق">صندوق</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-quantity">الكمية المتاحة:</label>
-                                <input type="number" id="product-quantity" step="0.01" min="0" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-purchase-price">سعر الشراء (للوحدة الأساسية بالج.م):</label>
-                                <input type="number" id="product-purchase-price" step="0.01" min="0" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-sale-price">سعر البيع (للوحدة الأساسية بالج.م):</label>
-                                <input type="number" id="product-sale-price" step="0.01" min="0" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-barcode">باركود/QR:</label>
-                                <div class="barcode-scan-buttons">
-                                    <input type="text" id="product-barcode" style="flex-grow: 1;">
-                                    <span class="scan-loader" id="product-barcode-loader"></span> <button type="button" id="scan-barcode-form-btn-product" class="secondary-action-btn"><i class="fas fa-qrcode"></i> مسح بالهاتف</button>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-description">الوصف:</label>
-                                <textarea id="product-description" rows="3"></textarea>
-                            </div>
-
-                            <button type="submit" class="submit-btn"><i class="fas fa-save"></i> حفظ المنتج</button>
-                        </form>
-                    </div>
-                </div>
-
                 <div id="phone-connection-modal" class="modal">
                     <div class="modal-content">
                         <span class="close-button" id="close-phone-connection-modal-btn">&times;</span>
@@ -915,7 +732,8 @@
         // هذا معرف ثابت يستخدم للاتصال المباشر بدلاً من QR ديناميكي
         const SHARED_SCANNER_SESSION_ID = "YOUR_STORE_UNIQUE_SCANNER_ID_12345"; // !!! قم بتغيير هذا ليكون معرفًا فريدًا لمتجرك !!!
 
-        let managerAccessEnabled = false;
+        // حالة صلاحيات المسؤول (مستمرة عبر localStorage)
+        let managerAccessEnabled = localStorage.getItem('managerAccessEnabled') === 'true';
 
         // --- الحصول على عناصر واجهة المستخدم (DOM Elements) ---
         const currentUserSpan = document.getElementById('current-user-name');
@@ -928,21 +746,11 @@
         const productsTableBody = document.querySelector('#products-table tbody');
         const inventorySearchLoader = document.getElementById('inventory-search-loader'); // Loader for search input
 
-        const productModal = document.getElementById('product-modal');
-        const closeButtonProductModal = document.getElementById('close-product-modal-btn');
-        const modalTitle = document.getElementById('modal-title');
-        const productForm = document.getElementById('product-form');
-        const productIdInput = document.getElementById('product-id');
-        const productNameInput = document.getElementById('product-name');
-        const productCategorySelect = document.getElementById('product-category');
-        const productUnitSelect = document.getElementById('product-unit');
-        const productQuantityInput = document.getElementById('product-quantity');
-        const productPurchasePriceInput = document.getElementById('product-purchase-price');
-        const productSalePriceInput = document.getElementById('product-sale-price');
-        const productBarcodeInput = document.getElementById('product-barcode');
-        const productDescriptionInput = document.getElementById('product-description');
-        const scanBarcodeFormBtnProduct = document.getElementById('scan-barcode-form-btn-product');
-        const productBarcodeLoader = document.getElementById('product-barcode-loader'); // Loader for product barcode input
+        // هذه العناصر لم تعد موجودة في inventory.html، ولكنها كانت في المودال القديم الذي تم نقله
+        // const productModal = document.getElementById('product-modal'); 
+        // const productBarcodeInput = document.getElementById('product-barcode'); 
+        // const productBarcodeLoader = document.getElementById('product-barcode-loader'); 
+        // const scanBarcodeFormBtnProduct = document.getElementById('scan-barcode-form-btn-product'); 
 
 
         const passwordModal = document.getElementById('password-modal');
@@ -956,7 +764,7 @@
         const closePhoneConnectionModalBtn = document.getElementById('close-phone-connection-modal-btn');
         const phoneModalTitle = document.getElementById('phone-modal-title');
         // تم إزالة qrContainerDesktop و qrCodeDisplayCanvas
-        const qrInstruction = document.getElementById('qr-instruction'); // هذا سيعرض النص فقط
+        const qrInstruction = document.getElementById('qr-instruction'); 
         const mobileScannerUrlDisplay = document.getElementById('mobile-scanner-url-display'); // لعرض الرابط النصي
         const phoneQrLoader = document.getElementById('phone-qr-loader'); // سيستخدم كلودر للحالة
         const phoneConnectionStatusMessage = document.getElementById('phone-connection-status-message');
@@ -1029,8 +837,10 @@
         function toggleScanLoader(target, show) {
             if (target === 'search') {
                 inventorySearchLoader.style.display = show ? 'block' : 'none';
-            } else if (target === 'productBarcode') {
-                productBarcodeLoader.style.display = show ? 'block' : 'none';
+            } else if (target === 'productBarcode') { // هذا لم يعد مستخدما هنا
+                // productBarcodeLoader.style.display = show ? 'block' : 'none';
+                // إذا كنت ستستخدم Loader في حقل الباركود في inventory.html للتعديل مباشرة
+                // فستحتاج إلى معرفة productBarcodeInput هنا أيضًا
             }
         }
 
@@ -1047,6 +857,7 @@
                 managerAccessBtn.classList.remove('active-access');
                 showToast("تم إلغاء صلاحيات المسؤول", "info");
             }
+            localStorage.setItem('managerAccessEnabled', enabled); // حفظ الحالة في localStorage
         }
 
         function openPasswordModal(message) {
@@ -1089,7 +900,7 @@
             if (user) {
                 currentUserSpan.textContent = user.email;
                 fetchProducts(); 
-                setAccessButtonsState(managerAccessEnabled);
+                setAccessButtonsState(managerAccessEnabled); // تطبيق الحالة المحفوظة
                 console.log("User is logged in on inventory.html:", user.email);
 
                 // حاول بدء الاستماع إلى جلسة الماسح المشتركة فورًا
@@ -1122,11 +933,14 @@
             }
         });
 
+        // زر تفعيل/تعطيل صلاحيات المسؤول
         managerAccessBtn.addEventListener('click', async () => {
             if (managerAccessEnabled) {
+                // إذا كانت مفعلة، قم بتعطيلها مباشرة
                 managerAccessEnabled = false;
                 setAccessButtonsState(false);
             } else {
+                // إذا كانت غير مفعلة، اطلب كلمة السر
                 const password = await openPasswordModal("تفعيل صلاحيات المسؤول");
                 if (password === MANAGER_PASSWORD) {
                     managerAccessEnabled = true;
@@ -1175,7 +989,9 @@
                             showToast("يرجى تفعيل صلاحيات المسؤول أولاً.", "error");
                             return; 
                         }
-                        openProductModalForEdit(e.currentTarget.dataset.id);
+                        // openProductModalForEdit(e.currentTarget.dataset.id); // تم نقل التعديل إلى صفحة add-product
+                        // للتعديل، سنحتاج لفتح صفحة add-product.html وتمرير ID المنتج لها
+                        window.location.href = `add-product.html?productId=${e.currentTarget.dataset.id}`;
                     });
                 });
                 document.querySelectorAll('.delete-btn').forEach(button => {
@@ -1206,81 +1022,8 @@
             window.location.href = 'add-product.html'; // الانتقال إلى صفحة إضافة المنتج
         });
 
-        async function openProductModalForEdit(productId) {
-            modalTitle.textContent = 'تعديل المنتج';
-            productForm.reset(); 
-            productIdInput.value = productId; 
+        // تم إزالة openProductModalForEdit و closeProductModal من هنا، لأنهما لم يعدا يُستخدمان بشكل مباشر في inventory.html
 
-            try {
-                const productDocRef = doc(db, 'products', productId);
-                const productDocSnap = await getDoc(productDocRef); 
-                
-                if (productDocSnap.exists()) {
-                    const productData = productDocSnap.data();
-                    productNameInput.value = productData.name || '';
-                    productCategorySelect.value = productData.category || '';
-                    productUnitSelect.value = productData.unit || '';
-                    productQuantityInput.value = productData.availableQuantity || 0;
-                    productPurchasePriceInput.value = productData.purchasePrice || 0;
-                    productSalePriceInput.value = productData.salePrice || 0;
-                    productBarcodeInput.value = productData.barcode || '';
-                    productDescriptionInput.value = productData.description || '';
-                    
-                    productModal.style.display = 'flex'; 
-                } else {
-                    showToast('المنتج غير موجود أو تم حذفه!', "error");
-                    console.error('Product not found for ID:', productId);
-                }
-            } catch (error) {
-                console.error("Error fetching product for edit:", error);
-                showToast('حدث خطأ أثناء جلب بيانات المنتج للتعديل.', "error");
-            }
-        }
-
-        function closeProductModal() {
-            productModal.style.display = 'none'; 
-        }
-
-        productForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const productId = productIdInput.value; 
-            const productData = {
-                name: productNameInput.value,
-                category: productCategorySelect.value,
-                unit: productUnitSelect.value,
-                availableQuantity: parseFloat(productQuantityInput.value),
-                purchasePrice: parseFloat(productPurchasePriceInput.value),
-                salePrice: parseFloat(productSalePriceInput.value),
-                barcode: productBarcodeInput.value.trim() || null, 
-                description: productDescriptionInput.value.trim() || null,
-                lastUpdated: Timestamp.now() 
-            };
-
-            if (isNaN(productData.availableQuantity) || isNaN(productData.purchasePrice) || isNaN(productData.salePrice)) {
-                showToast("يرجى إدخال أرقام صحيحة للكمية المتاحة، سعر الشراء، وسعر البيع.", "error");
-                return;
-            }
-
-            try {
-                if (productId) {
-                    const productDocRef = doc(db, 'products', productId);
-                    await updateDoc(productDocRef, productData);
-                    showToast('تم تحديث المنتج بنجاح!', "success");
-                    console.log("Product updated:", productId);
-                } else {
-                    productData.createdAt = Timestamp.now(); 
-                    await addDoc(collection(db, 'products'), productData);
-                    showToast('تم إضافة المنتج بنجاح!', "success");
-                    console.log("New product added.");
-                }
-                closeProductModal(); 
-                fetchProducts(); 
-            } catch (error) {
-                console.error("Error saving product:", error);
-                showToast('حدث خطأ أثناء حفظ المنتج. يرجى المحاولة مرة أخرى.', "error");
-            }
-        });
 
         async function deleteProduct(productId) {
             if (confirm('هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
@@ -1340,10 +1083,8 @@
                         updatePhoneConnectionButtonStatus('connected');
                         phoneConnectionStatusMessage.textContent = 'الهاتف متصل وجاهز للمسح!';
                         phoneConnectionStatusMessage.className = 'status-message success';
-                        // لا يوجد QR بعد الآن
                         phoneModalTitle.textContent = 'الهاتف متصل';
                         qrInstruction.style.display = 'none'; // التعليمات النصية لإظهار الرابط
-                        // إخفاء اللودر الخاص بالـ QR في المودال
                         phoneQrLoader.style.display = 'none';
                         disconnectPhoneButton.style.display = 'block';
                         setTimeout(closePhoneConnectionModal, 1500); // إخفاء المودال بعد الاتصال
@@ -1351,7 +1092,6 @@
                         updatePhoneConnectionButtonStatus('connecting');
                         phoneConnectionStatusMessage.textContent = 'الهاتف جاري الاتصال...';
                         phoneConnectionStatusMessage.className = 'status-message info';
-                        // لا يوجد QR بعد الآن
                         qrInstruction.style.display = 'none';
                         disconnectPhoneButton.style.display = 'none';
                         phoneQrLoader.style.display = 'block'; // إظهار اللودر
@@ -1361,22 +1101,18 @@
                         
                         const purposeFromSession = data.purpose;
                         
-                        if (purposeFromSession === 'addEdit') {
-                            productBarcodeInput.value = scannedValue;
-                            showToast('تم مسح الباركود بنجاح في نموذج المنتج.', "success");
-                            // المودال لن يغلق تلقائياً هنا
-                        } else if (purposeFromSession === 'search') {
+                        if (purposeFromSession === 'search') {
                             inventorySearchInput.value = scannedValue;
                             const event = new Event('input', { bubbles: true });
                             inventorySearchInput.dispatchEvent(event);
                             showToast('تم مسح الباركود بنجاح والبحث عن المنتج.', "success");
                         } else {
-                            console.warn("Received scanned value but purpose is unclear or session is stale.");
-                            showToast('تم مسح الباركود، ولكن الغرض غير واضح.', "info");
+                            console.warn("Received scanned value but purpose is not 'search' in inventory.html. Ignoring.");
+                            showToast('تم مسح باركود لغرض مختلف.', "info");
                         }
                         
                         // Stop loader after scan
-                        toggleScanLoader(purposeFromSession === 'search' ? 'search' : 'productBarcode', false);
+                        toggleScanLoader('search', false);
 
                         // Signal phone to be ready for next scan
                         updateDoc(sessionDocRef, {
@@ -1454,7 +1190,7 @@
                 phoneQrLoader.style.display = 'block';
                 qrInstruction.style.display = 'block';
                 const currentOrigin = window.location.origin;
-                const scannerPageUrl = `${currentOrigin}/mobile-scanner.html`; // Adjust if mobile-scanner.html is in a subfolder
+                const scannerPageUrl = `${currentOrigin}/mobile-scanner/mobile-scanner.html`; // مسار صفحة الهاتف في المجلد
                 qrInstruction.innerHTML = `الرجاء فتح هذا الرابط في هاتفك: <br> <span id="mobile-scanner-url-display" style="direction: ltr; display: inline-block; font-size: 0.8em; word-break: break-all;">${scannerPageUrl}</span><br> ثم سيتصل تلقائيا.`;
                 disconnectPhoneButton.style.display = 'none';
                 updatePhoneConnectionButtonStatus('connecting'); // تحديث حالة الزر أثناء محاولة الاتصال
@@ -1487,7 +1223,7 @@
                 }
 
                 // Show loader while waiting for scan
-                toggleScanLoader(purpose === 'search' ? 'search' : 'productBarcode', true);
+                toggleScanLoader(purpose === 'search' ? 'search' : 'productBarcode', true); // productBarcode هنا لا يُستخدم لأنه في صفحة add-product
 
                 await updateDoc(sessionDocRef, {
                     purpose: purpose,
@@ -1519,7 +1255,7 @@
             phoneConnectionModal.style.display = 'none';
             // Reset modal content when closed
             phoneModalTitle.textContent = 'ربط ماسح الباركود بالهاتف';
-            qrInstruction.textContent = 'الرجاء فتح صفحة الماسح على الهاتف:'; // إعادة النص الأصلي
+            // qrInstruction.textContent = 'الرجاء فتح صفحة الماسح على الهاتف:'; // هذا يتم توليده ديناميكيا
             phoneConnectionStatusMessage.textContent = '';
             // لا يوجد qrContainerDesktop بعد الآن
             disconnectPhoneButton.style.display = 'none';
@@ -1529,24 +1265,19 @@
 
         // --- مستمعي الأحداث ---
 
-        // تم نقل هذا المستمع إلى الأعلى لتوجيه إلى add-product.html
-        // addProductBtn.addEventListener('click', openAddProductModal); 
+        // هذا الزر يوجه إلى صفحة add-product.html
+        // addProductBtn.addEventListener('click', () => { ... });
 
-        closeButtonProductModal.addEventListener('click', closeProductModal);
-        window.addEventListener('click', (event) => {
-            if (event.target == productModal) {
-                closeProductModal();
-            }
-        });
+        // هذه المستمعات لمودال المنتج لم تعد تُستخدم هنا
+        // closeButtonProductModal.addEventListener('click', closeProductModal);
+        // window.addEventListener('click', (event) => { if (event.target == productModal) { closeProductModal(); } });
 
         scanBarcodeInventorySearchBtn.addEventListener('click', () => {
             requestScanFromPhone('search'); 
         });
 
-        scanBarcodeFormBtnProduct.addEventListener('click', () => {
-            productBarcodeInput.focus();
-            requestScanFromPhone('addEdit');
-        });
+        // زر المسح في مودال المنتج (الموجود الآن في add-product.html)
+        // scanBarcodeFormBtnProduct.addEventListener('click', () => { ... });
         
         // زر أيقونة الهاتف (لفتح مودال الاتصال/الحالة)
         phoneConnectBtn.addEventListener('click', togglePhoneConnectionModal);
@@ -1627,7 +1358,7 @@
                 document.querySelectorAll('.edit-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         if (!managerAccessEnabled) return;
-                        openProductModalForEdit(e.currentTarget.dataset.id);
+                        window.location.href = `add-product.html?productId=${e.currentTarget.dataset.id}`;
                     });
                 });
                 document.querySelectorAll('.delete-btn').forEach(button => {
