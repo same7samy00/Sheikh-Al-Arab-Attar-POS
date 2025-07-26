@@ -3,92 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة محل عطارة "شيخ العرب"</title>
+    <title>جاري التحميل - شيخ العرب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* الألوان: أزرق (#3f51b5), أبيض (#ffffff), أسود (#000000) - مع درجات للرمادي */
+        /* الحواف المستديرة: 8px */
+        /* الخطوط: Cairo */
 
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Reem+Kufi+Ink&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+        body {
+            font-family: 'Cairo', sans-serif; /* استخدام خط كايرو بالكامل */
+            direction: rtl; /* اتجاه النص من اليمين لليسار */
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* خلفية رمادية فاتحة جداً (مائلة للأزرق الفاتح) */
+            display: flex;
+            justify-content: center; /* توسيط أفقي */
+            align-items: center; /* توسيط عمودي */
+            min-height: 100vh;
+            color: #3f51b5; /* لون نص أزرق */
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        /* لا توجد بطاقات هنا لأنها صفحة بسيطة للتحويل */
+    </style>
 </head>
 <body>
-    <div id="app">
-        <aside id="sidebar">
-            <div class="logo">
-                <h1>شيخ العرب</h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="#" data-section="dashboard" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
-                    <li><a href="#" data-section="inventory"><i class="fas fa-boxes"></i> إدارة المخزون</a></li>
-                    <li><a href="#" data-section="pos"><i class="fas fa-cash-register"></i> نقطة البيع</a></li>
-                    <li><a href="#" data-section="customers"><i class="fas fa-users"></i> العملاء والديون</a></li>
-                    <li><a href="#" data-section="reports"><i class="fas fa-chart-line"></i> التقارير</a></li>
-                    <li><a href="#" data-section="settings"><i class="fas fa-cog"></i> الإعدادات</a></li>
-                    <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
-                </ul>
-            </nav>
-        </aside>
+    <div>جاري التحقق من حالة تسجيل الدخول...</div>
 
-        <main id="main-content">
-            <header>
-                <h2>لوحة التحكم</h2>
-                <div class="user-info">
-                    <span>مرحباً، <span id="current-user-name"></span></span>
-                </div>
-            </header>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        // لا نحتاج Firestore هنا، فقط Authentication للتحقق من حالة الدخول.
 
-            <section id="dashboard" class="content-section active">
-                <h3>نظرة عامة على الأداء</h3>
-                <div class="summary-cards">
-                    <div class="card">
-                        <h4>إجمالي مبيعات اليوم</h4>
-                        <p id="daily-sales">--- ج.م</p> </div>
-                    <div class="card">
-                        <h4>إجمالي ديون العملاء</h4>
-                        <p id="total-debts">--- ج.م</p> </div>
-                    <div class="card">
-                        <h4>منتجات على وشك النفاذ</h4>
-                        <p id="low-stock-products">--- منتجات</p> </div>
-                </div>
-            </section>
+        // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا كما طلبت)
+        const firebaseConfig = {
+          apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
+          authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
+          projectId: "pharmacy-inventory-bf04a",
+          storageBucket: "pharmacy-inventory-bf04a.firebasestorage.app",
+          messagingSenderId: "937788650384",
+          appId: "1:937788650384:web:6451225d00e648f3a0b915",
+          measurementId: "G-ZGC9EQ55SL"
+        };
 
-            <section id="inventory" class="content-section">
-                <h3>إدارة المخزون</h3>
-                <button class="add-new-btn"><i class="fas fa-plus"></i> إضافة منتج جديد</button>
-                <div class="products-list">
-                    </div>
-            </section>
+        // تهيئة Firebase Services
+        const app = initializeApp(firebaseConfig);
+        // const analytics = getAnalytics(app); // قد لا تحتاج للـ Analytics في هذه الصفحة البسيطة
+        const auth = getAuth(app); // تهيئة Authentication
 
-            <section id="pos" class="content-section">
-                <h3>نقطة البيع</h3>
-                </section>
-
-            <section id="customers" class="content-section">
-                <h3>العملاء والديون</h3>
-                </section>
-
-            <section id="reports" class="content-section">
-                <h3>التقارير</h3>
-                </section>
-
-            <section id="settings" class="content-section">
-                <h3>إعدادات النظام</h3>
-                </section>
-
-            <section id="auth-section" class="content-section">
-                <h3>تسجيل الدخول</h3>
-                <form id="login-form">
-                    <input type="email" id="login-email" placeholder="البريد الإلكتروني" required>
-                    <input type="password" id="login-password" placeholder="كلمة المرور" required>
-                    <button type="submit">تسجيل الدخول</button>
-                    <p id="auth-error" class="error-message"></p>
-                </form>
-            </section>
-
-        </main>
-    </div>
-
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script type="module" src="./firebase-config.js"></script>
-    <script type="module" src="./script.js"></script>
+        // منطق التحقق من المصادقة والتوجيه
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // المستخدم مسجل الدخول، وجهه إلى لوحة التحكم
+                window.location.replace('dashboard.html');
+            } else {
+                // المستخدم غير مسجل الدخول، وجهه إلى صفحة تسجيل الدخول
+                window.location.replace('login.html');
+            }
+        });
+    </script>
 </body>
 </html>
