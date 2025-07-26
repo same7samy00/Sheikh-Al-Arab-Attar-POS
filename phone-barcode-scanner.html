@@ -12,7 +12,7 @@
             direction: rtl;
             text-align: center;
             margin: 0;
-            padding: 0;
+            padding: 20px; /* Adjust padding to give space around content */
             background-color: #f4f7f6;
             display: flex;
             flex-direction: column;
@@ -25,67 +25,12 @@
             color: #3f51b5;
             margin-bottom: 20px;
         }
-        .modal {
-            display: flex; /* Always display modal when this page is open */
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-            animation-name: animatetop;
-            animation-duration: 0.4s;
-            box-sizing: border-box;
-
-            width: 95vw;
-            height: 95vh;
-            max-width: 500px; /* Max width for content within the modal */
-            max-height: 600px; /* Max height for content within the modal */
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        @keyframes animatetop {
-            from {top: -300px; opacity: 0}
-            to {top: 0; opacity: 1}
-        }
-
-        .close-button {
-            color: #aaa;
-            float: left; /* Aligns to top-left in RTL */
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            position: absolute; /* Position relative to modal-content */
-            top: 10px;
-            left: 10px;
-        }
-        .close-button:hover, .close-button:focus {
-            color: black;
-        }
-
         #reader-container { /* Container for the camera feed */
             width: 100%;
             max-width: 400px; /* Max width for scanner */
             height: 300px; /* Fixed height for scanner */
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
+            /* Remove borders/shadows to avoid "card" look */
+            overflow: hidden; /* Ensure video fills container */
             margin-bottom: 20px;
             display: none; /* Hidden by default until scan requested */
         }
@@ -98,6 +43,7 @@
         .status-message {
             margin-top: 10px;
             padding: 10px;
+            /* Remove borders/shadows to avoid "card" look */
             border-radius: 8px;
             font-weight: bold;
             width: 90%;
@@ -150,19 +96,14 @@
     </style>
 </head>
 <body>
-    <div id="camera-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="close-camera-modal-btn">&times;</span>
-            <h1 id="modal-title-phone">ماسح الباركود بالهاتف</h1>
-            
-            <div id="reader-container"></div>
-            
-            <div class="status-message" id="status-message-phone">جاري التحميل...</div>
-            <div class="loader" id="loader-phone"></div>
-            <button class="action-button" id="disconnect-btn-phone"><i class="fas fa-times"></i> قطع الاتصال</button>
-            <button class="action-button" id="stop-scan-btn" style="display: none; background-color: #f44336;"><i class="fas fa-stop"></i> إيقاف المسح</button>
-        </div>
-    </div>
+    <h1 id="page-title-phone">ماسح الباركود بالهاتف</h1>
+    
+    <div id="reader-container"></div>
+    
+    <div class="status-message" id="status-message-phone">جاري التحميل...</div>
+    <div class="loader" id="loader-phone"></div>
+    <button class="action-button" id="disconnect-btn-phone"><i class="fas fa-times"></i> قطع الاتصال</button>
+    <button class="action-button" id="stop-scan-btn" style="display: none; background-color: #f44336;"><i class="fas fa-stop"></i> إيقاف المسح</button>
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script type="module">
@@ -188,9 +129,7 @@
         const SHARED_SCANNER_SESSION_ID = "YOUR_STORE_UNIQUE_SCANNER_ID_12345"; // !!! يجب أن يتطابق مع الكمبيوتر !!!
 
         // DOM Elements
-        const cameraModal = document.getElementById('camera-modal');
-        const closeModalBtn = document.getElementById('close-camera-modal-btn');
-        const modalTitlePhone = document.getElementById('modal-title-phone');
+        const pageTitlePhone = document.getElementById('page-title-phone'); // Page title
         const readerContainer = document.getElementById('reader-container');
         const statusMessagePhone = document.getElementById('status-message-phone');
         const loaderPhone = document.getElementById('loader-phone');
@@ -206,7 +145,7 @@
         let sessionUnsubscribe = null; // Firestore listener unsubscribe function
         let isScannerActive = false; // Flag to track if the scanner is actively running
 
-        // Function to update status messages in phone modal
+        // Function to update status messages directly on the page
         function updateStatusPhone(message, type = 'info') {
             statusMessagePhone.textContent = message;
             statusMessagePhone.className = 'status-message ' + type;
@@ -221,7 +160,7 @@
             }
             isScannerActive = false; // Reset scanner active state
 
-            modalTitlePhone.textContent = 'مسح باركود المنتج';
+            pageTitlePhone.textContent = 'مسح باركود المنتج';
             readerContainer.style.display = 'block'; // Show camera feed
             stopScanBtn.style.display = 'block'; // Show stop scan button
             updateStatusPhone('ضع باركود المنتج أمام الكاميرا...', 'loading');
@@ -326,11 +265,10 @@
                 } catch (e) {
                     console.error("Error updating session status on disconnect:", e);
                 }
-                // sessionId = null; // Don't clear shared sessionId
                 scanPurpose = null;
             }
             updateStatusPhone('تم قطع الاتصال بنجاح.', 'info');
-            modalTitlePhone.textContent = 'ماسح الباركود بالهاتف';
+            pageTitlePhone.textContent = 'ماسح الباركود بالهاتف';
             // Phone will remain connected to the shared session, just not actively scanning
             // and waiting for desktop commands
         }
