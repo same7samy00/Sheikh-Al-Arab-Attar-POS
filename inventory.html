@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المخزون - شيخ العرب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Reem+Kufi+Ink&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* الألوان: أزرق (#3f51b5), أبيض (#ffffff), أسود (#000000) */
+        /* درجات من الرمادي: #333, #555, #ddd, #f4f7f6, #e0e0e0, #f9f9f9 */
+        /* أخضر: #4CAF50, #45a049, #e8f5e9 */
+        /* أحمر: #f44336, #d32f2f */
+        /* الحواف المستديرة: 8px */
+        /* الخطوط: Cairo بالكامل، Reem Kufi Ink للشعار */
+
+        /* --- تنسيقات عامة للتطبيق (مكررة في كل صفحة) --- */
+        body {
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            text-align: right;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* لون خلفية خفيف */
+            display: flex; /* لتمكين التخطيط المرن (Flexbox) للشريط الجانبي والمحتوى */
+            min-height: 100vh;
+            color: #333; /* لون نص داكن افتراضي */
+        }
+
+        /* الحاوية الرئيسية للتطبيق */
+        #app {
+            display: flex;
+            width: 100%;
+        }
+
+        /* الشريط الجانبي للتنقل */
+        #sidebar {
+            width: 250px;
+            background-color: #3f51b5; /* لون أزرق داكن جذاب */
+            color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* ظل خفيف على الجانب الأيمن */
+            display: flex;
+            flex-direction: column; /* ترتيب العناصر عمودياً */
+            flex-shrink: 0; /* منع الشريط الجانبي من الانكماش */
+        }
+
+        .logo h1 {
+            font-family: 'Reem Kufi Ink', sans-serif; /* خط خاص للشعار */
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 2.2em;
+        }
+
+        #sidebar nav ul {
+            list-style: none; /* إزالة نقاط القائمة */
+            padding: 0;
+            margin: 0;
+        }
+
+        #sidebar nav ul li {
+            margin-bottom: 10px; /* مسافة بين عناصر القائمة */
+        }
+
+        #sidebar nav ul li a {
+            font-family: 'Cairo', sans-serif; /* تطبيق خط كايرو على روابط التنقل */
+            color: #fff;
+            text-decoration: none; /* إزالة خط تحت الروابط */
+            padding: 10px 15px;
+            display: block; /* لجعل الرابط يأخذ كامل المساحة القابلة للنقر */
+            border-radius: 8px; /* حواف مستديرة 8px */
+            transition: background-color 0.3s ease; /* تأثير انتقال سلس عند التمرير */
+        }
+
+        #sidebar nav ul li a:hover,
+        #sidebar nav ul li a.active {
+            background-color: #5c6bc0; /* لون أزرق أفتح عند التحديد أو التمرير */
+        }
+
+        #sidebar nav ul li a i {
+            margin-left: 10px; /* مسافة بين الأيقونة والنص */
+        }
+
+        /* المحتوى الرئيسي للصفحات */
+        #main-content {
+            flex-grow: 1; /* للسماح للمحتوى الرئيسي بأخذ المساحة المتبقية */
+            padding: 20px;
+        }
+
+        /* رأس المحتوى الرئيسي (Header) */
+        header {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between; /* توزيع العناصر على الأطراف */
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* الأقسام الداخلية للمحتوى */
+        .content-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        /* --- تنسيقات خاصة بإدارة المخزون (Inventory) --- */
+        .inventory-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* للسماح بالعناصر بالنزول لسطر جديد في الشاشات الصغيرة */
+            gap: 15px; /* مسافة بين العناصر */
+        }
+
+        .main-action-btn, .secondary-action-btn, .submit-btn {
+            font-family: 'Cairo', sans-serif; /* خط كايرو للأزرار */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            display: flex; /* لترتيب الأيقونة والنص */
+            align-items: center;
+            gap: 8px; /* مسافة بين الأيقونة والنص */
+        }
+
+        .main-action-btn {
+            background-color: #4CAF50; /* أخضر */
+            color: white;
+        }
+
+        .main-action-btn:hover {
+            background-color: #45a049;
+        }
+
+        .secondary-action-btn {
+            background-color: #607d8b; /* رمادي مزرق */
+            color: white;
+        }
+
+        .secondary-action-btn:hover {
+            background-color: #546e7a;
+        }
+
+        .submit-btn {
+            background-color: #2196F3; /* أزرق */
+            color: white;
+            width: 100%; /* زر الحفظ يأخذ عرضاً كاملاً في النموذج */
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background-color: #1976D2;
+        }
+
+        /* شريط البحث */
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            flex-grow: 1; /* للسماح لشريط البحث بأخذ المساحة المتبقية */
+            max-width: 400px; /* تحديد أقصى عرض لشريط البحث */
+        }
+
+        .search-bar input {
+            font-family: 'Cairo', sans-serif; /* خط كايرو لحقل البحث */
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px; /* حواف مستديرة 8px */
+        }
+
+        /* جدول المنتجات */
+        .table-responsive {
+            overflow-x: auto; /* لجعل الجدول قابلاً للتمرير أفقياً في الشاشات الصغيرة */
+            margin-top: 20px;
+        }
+
+        #products-table {
+            width: 100%;
+            border-collapse: collapse; /* إزالة الحدود المزدوجة */
+            margin-top: 15px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 8px; /* حواف مستديرة 8px */
+            overflow: hidden; /* لضمان أن الحدود والظلال تطبق بشكل صحيح على الزوايا المستديرة */
+        }
+
+        #products-table thead {
+            background-color: #e0e0e0; /* لون رأس الجدول */
+            color: #333;
+        }
+
+        #products-table th, #products-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+
+        #products-table th {
+            font-weight: bold;
+        }
+
+        #products-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9; /* لون الصفوف الزوجية لتسهيل القراءة */
+        }
+
+        #products-table tbody tr:hover {
+            background-color: #f1f1f1; /* تأثير عند التمرير على الصفوف */
+        }
+
+        /* أزرار الإجراءات داخل الجدول */
+        #products-table .action-buttons button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-left: 10px;
+            transition: color 0.3s ease;
+        }
+
+        #products-table .action-buttons .edit-btn {
+            color: #2196F3; /* أزرق للتعديل */
+        }
+
+        #products-table .action-buttons .edit-btn:hover {
+            color: #1976D2;
+        }
+
+        #products-table .action-buttons .delete-btn {
+            color: #f44336; /* أحمر للحذف */
+        }
+
+        #products-table .action-buttons .delete-btn:hover {
+            color: #d32f2f;
+        }
+
+        /* تنسيقات النموذج المنبثق (Modal) */
+        .modal {
+            display: none; /* إخفاؤه افتراضياً */
+            position: fixed; /* يبقى في مكانه حتى عند التمرير */
+            z-index: 1001; /* فوق كل العناصر الأخرى */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* تمكين التمرير إذا كان المحتوى كبيراً */
+            background-color: rgba(0,0,0,0.4); /* خلفية داكنة شفافة */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto; /* لتوسيطه */
+            padding: 30px;
+            border: 1px solid #888;
+            width: 90%; /* عرض مرن */
+            max-width: 600px; /* أقصى عرض */
+            border-radius: 8px; /* حواف مستديرة 8px */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+
+        /* حركة ظهور المودال */
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .close-button {
+            color: #aaa;
+            float: left; /* لجعله في الزاوية العلوية اليسرى (بسبب dir="rtl") */
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h4 {
+            text-align: center;
+            color: #3f51b5;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+        }
+
+        /* تنسيقات حقول النموذج داخل المودال */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            font-family: 'Cairo', sans-serif; /* خط كايرو لمدخلات النموذج */
+            width: calc(100% - 24px); /* عرض كامل مع بادينغ 12px من كل جانب */
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            font-size: 1em;
+            direction: rtl; /* لضمان صحة اتجاه الكتابة */
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical; /* السماح بتغيير حجم النص عمودياً */
+        }
+
+        /* تنسيق زر مسح الباركود داخل النموذج */
+        #scan-barcode-form-btn {
+            margin-top: 5px;
+            display: inline-flex; /* لجعله بجانب حقل الباركود إذا كانت المساحة كافية */
+            width: auto;
+        }
+
+        /* تنسيق حاوية الماسح الضوئي */
+        #barcode-scanner-container {
+            border: 1px dashed #ccc;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px;
+            background-color: #f8f8f8;
+        }
+
+
+        /* --- التعديلات المتجاوبة (Responsive) العامة والمحددة لصفحة المخزون --- */
+        @media (max-width: 768px) {
+            #app {
+                flex-direction: column; /* جعل الشريط الجانبي والمحتوى فوق بعضهما */
+            }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                padding: 10px;
+                flex-direction: row; /* جعل عناصر التنقل أفقية في الجوال */
+                justify-content: space-around;
+                box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* ظل علوي عند الأسفل */
+                position: fixed; /* تثبيت الشريط السفلي في الجوال */
+                bottom: 0;
+                left: 0;
+                z-index: 1000;
+            }
+            #sidebar nav ul {
+                display: flex;
+                width: 100%;
+                justify-content: space-around;
+            }
+            #sidebar nav ul li {
+                margin-bottom: 0;
+            }
+            #sidebar nav ul li a {
+                padding: 8px 10px;
+                font-size: 0.8em;
+            }
+            #sidebar .logo {
+                display: none; /* إخفاء الشعار في شاشات الجوال الصغيرة */
+            }
+            #main-content {
+                padding-bottom: 80px; /* لترك مساحة للشريط السفلي الثابت */
+            }
+            .inventory-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-bar {
+                width: 100%;
+                max-width: unset;
+            }
+            .main-action-btn, .secondary-action-btn {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+            #products-table th, #products-table td {
+                padding: 8px; /* تقليل البادينغ في الجوال */
+                font-size: 0.9em;
+            }
+            .modal-content {
+                width: 95%; /* عرض أكبر للمودال في الشاشات الصغيرة */
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <div class="logo">
+                <h1>شيخ العرب</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> الرئيسية</a></li>
+                    <li><a href="inventory.html" class="active"><i class="fas fa-boxes"></i> إدارة المخزون</a></li>
+                    <li><a href="pos.html"><i class="fas fa-cash-register"></i> نقطة البيع</a></li>
+                    <li><a href="customers.html"><i class="fas fa-users"></i> العملاء والديون</a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> الإعدادات</a></li>
+                    <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main id="main-content">
+            <header>
+                <h2>إدارة المخزون</h2>
+                <div class="user-info">
+                    <span>مرحباً، <span id="current-user-name"></span></span>
+                </div>
+            </header>
+
+            <section id="inventory-content" class="content-section">
+                <h3>قائمة المنتجات</h3>
+                <div class="inventory-controls">
+                    <button id="add-product-btn" class="main-action-btn"><i class="fas fa-plus"></i> إضافة منتج جديد</button>
+                    <div class="search-bar">
+                        <input type="text" id="inventory-search" placeholder="ابحث باسم المنتج أو الباركود...">
+                        <button id="scan-barcode-inventory" class="secondary-action-btn"><i class="fas fa-barcode"></i> مسح باركود</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="products-table">
+                        <thead>
+                            <tr>
+                                <th>الباركود</th>
+                                <th>اسم المنتج</th>
+                                <th>الفئة</th>
+                                <th>الكمية المتاحة</th>
+                                <th>الوحدة</th>
+                                <th>سعر الشراء</th>
+                                <th>سعر البيع</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+
+                <div id="product-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button">&times;</span>
+                        <h4 id="modal-title">إضافة منتج جديد</h4>
+                        <form id="product-form">
+                            <input type="hidden" id="product-id"> <div class="form-group">
+                                <label for="product-name">اسم المنتج:</label>
+                                <input type="text" id="product-name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-category">الفئة:</label>
+                                <select id="product-category" required>
+                                    <option value="">اختر فئة</option>
+                                    <option value="أعشاب">أعشاب</option>
+                                    <option value="توابل">توابل</option>
+                                    <option value="زيوت طبيعية">زيوت طبيعية</option>
+                                    <option value="مستحضرات تجميل">مستحضرات تجميل</option>
+                                    <option value="ألبان">ألبان</option>
+                                    <option value="حبوب وبقوليات">حبوب وبقوليات</option>
+                                    <option value="مكسرات">مكسرات</option>
+                                    <option value="عسل ومشتقاته">عسل ومشتقاته</option>
+                                    <option value="أخرى">أخرى</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-unit">الوحدة الأساسية:</label>
+                                <select id="product-unit" required>
+                                    <option value="">اختر وحدة</option>
+                                    <option value="كيلو جرام">كيلو جرام</option>
+                                    <option value="لتر">لتر</option>
+                                    <option value="قطعة">قطعة</option>
+                                    <option value="حبة">حبة</option>
+                                    <option value="عبوة">عبوة</option>
+                                    <option value="كيس">كيس</option>
+                                    <option value="مجموعة">مجموعة</option>
+                                    <option value="جرام">جرام</option>
+                                    <option value="مليلتر">مليلتر</option>
+                                    <option value="ملعقة">ملعقة</option>
+                                    <option value="زجاجة">زجاجة</option>
+                                    <option value="علبة">علبة</option>
+                                    <option value="صندوق">صندوق</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-quantity">الكمية المتاحة:</label>
+                                <input type="number" id="product-quantity" step="0.01" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-purchase-price">سعر الشراء (للوحدة الأساسية):</label>
+                                <input type="number" id="product-purchase-price" step="0.01" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-sale-price">سعر البيع (للوحدة الأساسية):</label>
+                                <input type="number" id="product-sale-price" step="0.01" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-barcode">باركود/QR:</label>
+                                <input type="text" id="product-barcode">
+                                <button type="button" id="scan-barcode-form-btn" class="secondary-action-btn"><i class="fas fa-qrcode"></i> مسح باركود</button>
+                                <div id="barcode-scanner-container" style="width: 100%; max-width: 300px; margin: 10px auto; display: none;"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-description">الوصف:</label>
+                                <textarea id="product-description" rows="3"></textarea>
+                            </div>
+
+                            <button type="submit" class="submit-btn">حفظ المنتج</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+        import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+        // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا)
+        const firebaseConfig = {
+          apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
+          authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
+          projectId: "pharmacy-inventory-bf04a",
+          storageBucket: "pharmacy-inventory-bf04a.firebasestorage.app",
+          messagingSenderId: "937788650384",
+          appId: "1:937788650384:web:6451225d00e648f3a0b915",
+          measurementId: "G-ZGC9EQ55SL"
+        };
+
+        // تهيئة Firebase Services
+        const app = initializeApp(firebaseConfig);
+        // const analytics = getAnalytics(app); // قد لا تحتاج للـ Analytics في هذه الصفحة
+        const db = getFirestore(app);   // تهيئة Firestore
+        const auth = getAuth(app);     // تهيئة Authentication
+
+        // --- الحصول على عناصر واجهة المستخدم (DOM Elements) ---
+        const currentUserSpan = document.getElementById('current-user-name');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // عناصر واجهة المستخدم لصفحة إدارة المخزون
+        const addProductBtn = document.getElementById('add-product-btn');
+        const inventorySearchInput = document.getElementById('inventory-search');
+        const scanBarcodeInventoryBtn = document.getElementById('scan-barcode-inventory');
+        const productsTableBody = document.querySelector('#products-table tbody'); // جسم الجدول لعرض المنتجات
+
+        // عناصر واجهة المستخدم للنموذج المنبثق (Modal)
+        const productModal = document.getElementById('product-modal');
+        const closeButton = productModal.querySelector('.close-button');
+        const modalTitle = document.getElementById('modal-title');
+        const productForm = document.getElementById('product-form');
+        const productIdInput = document.getElementById('product-id');
+        const productNameInput = document.getElementById('product-name');
+        const productCategorySelect = document.getElementById('product-category');
+        const productUnitSelect = document.getElementById('product-unit');
+        const productQuantityInput = document.getElementById('product-quantity');
+        const productPurchasePriceInput = document.getElementById('product-purchase-price');
+        const productSalePriceInput = document.getElementById('product-sale-price');
+        const productBarcodeInput = document.getElementById('product-barcode');
+        const productDescriptionInput = document.getElementById('product-description');
+        const scanBarcodeFormBtn = document.getElementById('scan-barcode-form-btn');
+        const barcodeScannerContainer = document.getElementById('barcode-scanner-container');
+
+        // متغير لحالة ماسح الباركود
+        let html5QrCode = null;
+
+        // --- منطق المصادقة والتحويل لهذه الصفحة ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // المستخدم مسجل الدخول، عرض اسمه وتحميل المنتجات
+                currentUserSpan.textContent = user.email;
+                fetchProducts(); // جلب المنتجات عند تحميل الصفحة
+                console.log("User is logged in on inventory.html:", user.email);
+            } else {
+                // المستخدم غير مسجل الدخول، قم بتوجيهه إلى صفحة تسجيل الدخول
+                console.log("User is not logged in. Redirecting to login.html.");
+                window.location.replace('login.html');
+            }
+        });
+
+        // --- التعامل مع زر تسجيل الخروج ---
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                console.log("User signed out successfully from inventory.html.");
+                window.location.replace('login.html'); // إعادة التوجيه لصفحة الدخول بعد الخروج
+            } catch (error) {
+                console.error("Logout error from inventory.html:", error.message);
+                alert("حدث خطأ أثناء تسجيل الخروج. يرجى المحاولة مرة أخرى.");
+            }
+        });
+
+        // --- وظائف إدارة المنتجات (Inventory Management) ---
+
+        /**
+         * وظيفة لجلب وعرض المنتجات في جدول إدارة المخزون.
+         */
+        async function fetchProducts() {
+            productsTableBody.innerHTML = ''; // مسح أي صفوف موجودة قبل الجلب
+            try {
+                const productsCol = collection(db, 'products');
+                const productSnapshot = await getDocs(productsCol);
+
+                if (productSnapshot.empty) {
+                    productsTableBody.innerHTML = '<tr><td colspan="8">لا توجد منتجات حالياً.</td></tr>';
+                    return;
+                }
+
+                productSnapshot.forEach(doc => {
+                    const product = doc.data();
+                    const row = productsTableBody.insertRow();
+                    row.dataset.id = doc.id; // تخزين ID المستند في الصف لسهولة الوصول إليه
+
+                    row.innerHTML = `
+                        <td>${product.barcode || 'N/A'}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${product.availableQuantity}</td>
+                        <td>${product.unit}</td>
+                        <td>${(product.purchasePrice || 0).toFixed(2)} ج.م</td>
+                        <td>${(product.salePrice || 0).toFixed(2)} ج.م</td>
+                        <td class="action-buttons">
+                            <button class="edit-btn" data-id="${doc.id}"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                });
+
+                // إضافة مستمعي الأحداث لأزرار التعديل والحذف بعد تحميل المنتجات
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (e) => openProductModalForEdit(e.currentTarget.dataset.id));
+                });
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (e) => deleteProduct(e.currentTarget.dataset.id));
+                });
+
+            } catch (error) {
+                console.error("Error fetching products:", error);
+                productsTableBody.innerHTML = '<tr><td colspan="8">حدث خطأ أثناء جلب المنتجات.</td></tr>';
+            }
+        }
+
+        /**
+         * لفتح النموذج المنبثق لإضافة منتج جديد.
+         */
+        function openAddProductModal() {
+            modalTitle.textContent = 'إضافة منتج جديد';
+            productForm.reset(); // مسح أي بيانات سابقة من النموذج
+            productIdInput.value = ''; // التأكد من أن الـ ID فارغ (لعملية الإضافة)
+            productModal.style.display = 'flex'; // إظهار المودال باستخدام Flexbox للتوسيط
+            stopBarcodeScanner(); // إيقاف أي ماسح باركود سابق للتأكد
+            barcodeScannerContainer.style.display = 'none'; // إخفاء حاوية الماسح في البداية
+        }
+
+        /**
+         * لفتح النموذج المنبثق لتعديل منتج موجود.
+         * @param {string} productId - ID المستند للمنتج المراد تعديله.
+         */
+        async function openProductModalForEdit(productId) {
+            modalTitle.textContent = 'تعديل المنتج';
+            productForm.reset(); // مسح النموذج أولاً
+            productIdInput.value = productId; // تخزين ID المنتج للتعديل
+
+            try {
+                const productDocRef = doc(db, 'products', productId);
+                const productDocSnap = await getDoc(productDocRef); // جلب مستند واحد
+
+                if (productDocSnap.exists()) {
+                    const productData = productDocSnap.data();
+                    // ملء النموذج ببيانات المنتج
+                    productNameInput.value = productData.name || '';
+                    productCategorySelect.value = productData.category || '';
+                    productUnitSelect.value = productData.unit || '';
+                    productQuantityInput.value = productData.availableQuantity || 0;
+                    productPurchasePriceInput.value = productData.purchasePrice || 0;
+                    productSalePriceInput.value = productData.salePrice || 0;
+                    productBarcodeInput.value = productData.barcode || '';
+                    productDescriptionInput.value = productData.description || '';
+
+                    productModal.style.display = 'flex'; // إظهار المودال
+                    stopBarcodeScanner(); // إيقاف أي ماسح باركود سابق
+                    barcodeScannerContainer.style.display = 'none'; // إخفاء حاوية الماسح
+                } else {
+                    alert('المنتج غير موجود أو تم حذفه!');
+                    console.error('Product not found for ID:', productId);
+                }
+            } catch (error) {
+                console.error("Error fetching product for edit:", error);
+                alert('حدث خطأ أثناء جلب بيانات المنتج للتعديل.');
+            }
+        }
+
+        /**
+         * لغلق النموذج المنبثق.
+         */
+        function closeProductModal() {
+            productModal.style.display = 'none'; // إخفاء المودال
+            stopBarcodeScanner(); // إيقاف الماسح عند إغلاق المودال
+        }
+
+        /**
+         * وظيفة للتعامل مع إضافة أو تعديل المنتج بعد تقديم النموذج.
+         */
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const productId = productIdInput.value; // إذا كان موجوداً، فهذه عملية تعديل
+            const productData = {
+                name: productNameInput.value,
+                category: productCategorySelect.value,
+                unit: productUnitSelect.value,
+                availableQuantity: parseFloat(productQuantityInput.value),
+                purchasePrice: parseFloat(productPurchasePriceInput.value),
+                salePrice: parseFloat(productSalePriceInput.value),
+                barcode: productBarcodeInput.value.trim() || null, // حفظ كـ null إذا كان فارغاً بعد إزالة المسافات
+                description: productDescriptionInput.value.trim() || null,
+                lastUpdated: Timestamp.now() // تحديث تاريخ آخر تعديل
+            };
+
+            try {
+                if (productId) {
+                    // تحديث منتج موجود
+                    const productDocRef = doc(db, 'products', productId);
+                    await updateDoc(productDocRef, productData);
+                    alert('تم تحديث المنتج بنجاح!');
+                    console.log("Product updated:", productId);
+                } else {
+                    // إضافة منتج جديد
+                    productData.createdAt = Timestamp.now(); // إضافة تاريخ الإنشاء لأول مرة
+                    await addDoc(collection(db, 'products'), productData);
+                    alert('تم إضافة المنتج بنجاح!');
+                    console.log("New product added.");
+                }
+                closeProductModal(); // إغلاق المودال بعد الحفظ
+                fetchProducts(); // إعادة جلب وعرض المنتجات لتحديث الجدول
+            } catch (error) {
+                console.error("Error saving product:", error);
+                alert('حدث خطأ أثناء حفظ المنتج. يرجى المحاولة مرة أخرى.');
+            }
+        });
+
+        /**
+         * وظيفة لحذف منتج.
+         * @param {string} productId - ID المستند للمنتج المراد حذفه.
+         */
+        async function deleteProduct(productId) {
+            if (confirm('هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                try {
+                    await deleteDoc(doc(db, 'products', productId));
+                    alert('تم حذف المنتج بنجاح!');
+                    console.log("Product deleted:", productId);
+                    fetchProducts(); // إعادة جلب وعرض المنتجات لتحديث الجدول
+                } catch (error) {
+                    console.error("Error deleting product:", error);
+                    alert('حدث خطأ أثناء حذف المنتج. يرجى المحاولة مرة أخرى.');
+                }
+            }
+        }
+
+        // --- وظائف مسح الباركود/QR Code (باستخدام html5-qrcode) ---
+
+        /**
+         * بدء ماسح الباركود باستخدام html5-qrcode.
+         * @param {string} containerId - الـ ID الخاص بالعنصر الذي سيعرض الكاميرا (مثلاً 'barcode-scanner-container').
+         * @param {function} onScanSuccess - دالة يتم استدعاؤها عند المسح الناجح.
+         * @param {function} onScanError - دالة يتم استدعاؤها عند وجود خطأ في المسح (ليس بالضرورة خطأ، قد يكون عدم وجود باركود).
+         */
+        function startBarcodeScanner(containerId, onScanSuccess, onScanError) {
+            stopBarcodeScanner(); // التأكد من إيقاف أي ماسح يعمل مسبقاً
+
+            // تهيئة Html5Qrcode مع ID العنصر الذي سيعرض الكاميرا
+            html5QrCode = new Html5Qrcode(containerId);
+
+            const qrCodeConfig = { 
+                fps: 10, // عدد الإطارات في الثانية للكاميرا
+                qrbox: { width: 250, height: 250 } // حجم مربع المسح
+            };
+
+            html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onScanSuccess, onScanError)
+                .catch(err => {
+                    console.error(`Unable to start scanning: ${err}`);
+                    alert('تعذر تشغيل الكاميرا. تأكد من إعطاء الصلاحيات اللازمة للمتصفح.');
+                });
+        }
+
+        /**
+         * إيقاف ماسح الباركود.
+         */
+        function stopBarcodeScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    console.log("QR Code scanner stopped.");
+                    barcodeScannerContainer.innerHTML = ''; // إزالة محتوى الكاميرا من الحاوية
+                }).catch(err => {
+                    console.error("Error stopping QR Code scanner:", err);
+                });
+            }
+        }
+
+
+        // --- مستمعي الأحداث لعناصر واجهة المستخدم ---
+
+        // زر "إضافة منتج جديد"
+        addProductBtn.addEventListener('click', openAddProductModal);
+
+        // زر إغلاق النموذج المنبثق
+        closeButton.addEventListener('click', closeProductModal);
+
+        // إغلاق النموذج عند النقر خارج المحتوى (على الخلفية الشفافة للمودال)
+        window.addEventListener('click', (event) => {
+            if (event.target == productModal) {
+                closeProductModal();
+            }
+        });
+
+        // مسح الباركود من صفحة المخزون الرئيسية (يمكن تحسينها لاحقاً لفتح مودال بحث)
+        scanBarcodeInventoryBtn.addEventListener('click', () => {
+            alert('هذه الميزة غير مفعلة بعد للبحث المباشر. يرجى استخدام زر "مسح باركود" داخل نموذج "إضافة/تعديل منتج".');
+            // مستقبلاً: يمكن هنا فتح مودال بحث عن منتج بالباركود
+        });
+
+
+        // مسح الباركود داخل نموذج إضافة/تعديل المنتج
+        scanBarcodeFormBtn.addEventListener('click', () => {
+            barcodeScannerContainer.style.display = 'block'; // إظهار حاوية الماسح
+            startBarcodeScanner("barcode-scanner-container", // استخدام ID الحاوية
+                (decodedText, decodedResult) => {
+                    // عند نجاح المسح
+                    productBarcodeInput.value = decodedText; // وضع الباركود الممسوح في حقل الإدخال
+                    stopBarcodeScanner(); // إيقاف الماسح بعد المسح الناجح
+                    barcodeScannerContainer.style.display = 'none'; // إخفاء حاوية الماسح
+                    console.log(`QR Code detected: ${decodedText}`);
+                    // هنا يمكنك إضافة منطق للبحث عن المنتج بالباركود تلقائياً
+                    // إذا كان الباركود موجوداً، يمكنك جلب بيانات المنتج وملء النموذج
+                    // إذا لم يكن موجوداً، يبقى الحقل مملوءاً بالباركود الجديد
+                },
+                (errorMessage) => {
+                    // عند حدوث خطأ في المسح (مثل عدم وجود باركود في مجال الرؤية)
+                    console.warn(`QR Code Scan Error: ${errorMessage}`);
+                }
+            );
+        });
+
+        // البحث عن المنتجات
+        inventorySearchInput.addEventListener('input', async (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            productsTableBody.innerHTML = ''; // مسح الجدول للنتائج الجديدة
+
+            try {
+                const productsRef = collection(db, 'products');
+                const q = query(productsRef); // جلب كل المنتجات
+                const productSnapshot = await getDocs(q);
+
+                const filteredProducts = [];
+                productSnapshot.forEach(doc => {
+                    const product = doc.data();
+                    // التحقق من المطابقة بالاسم أو الباركود
+                    const matchesName = (product.name || '').toLowerCase().includes(searchTerm);
+                    const matchesBarcode = (product.barcode || '').toLowerCase().includes(searchTerm);
+
+                    if (matchesName || matchesBarcode) {
+                        filteredProducts.push({ id: doc.id, ...product });
+                    }
+                });
+
+                if (filteredProducts.length === 0) {
+                    productsTableBody.innerHTML = '<tr><td colspan="8">لا توجد منتجات مطابقة لعملية البحث.</td></tr>';
+                    return;
+                }
+
+                filteredProducts.forEach(product => {
+                    const row = productsTableBody.insertRow();
+                    row.dataset.id = product.id; 
+
+                    row.innerHTML = `
+                        <td>${product.barcode || 'N/A'}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${product.availableQuantity}</td>
+                        <td>${product.unit}</td>
+                        <td>${(product.purchasePrice || 0).toFixed(2)} ج.م</td>
+                        <td>${(product.salePrice || 0).toFixed(2)} ج.م</td>
+                        <td class="action-buttons">
+                            <button class="edit-btn" data-id="${product.id}"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${product.id}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                });
+
+                // إعادة ربط مستمعي الأحداث لأزرار التعديل والحذف لنتائج البحث
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (e) => openProductModalForEdit(e.currentTarget.dataset.id));
+                });
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (e) => deleteProduct(e.currentTarget.dataset.id));
+                });
+
+            } catch (error) {
+                console.error("Error searching products:", error);
+                productsTableBody.innerHTML = '<tr><td colspan="8">حدث خطأ أثناء البحث عن المنتجات.</td></tr>';
+            }
+        });
+
+        // استدعاء جلب المنتجات عند تحميل الصفحة لأول مرة (بعد التحقق من المصادقة)
+        // هذا يحدث تلقائياً عبر onAuthStateChanged
+    </script>
+</body>
+</html>
