@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - شيخ العرب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Reem+Kufi+Ink&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* الألوان: أزرق (#3f51b5), أبيض (#ffffff), أسود (#000000) */
+        /* درجات من الرمادي: #333, #555, #ddd, #f4f7f6, #e0e0e0 */
+        /* الحواف المستديرة: 8px */
+        /* الخطوط: Cairo بالكامل */
+
+        /* --- تنسيقات عامة للتطبيق (سيتم تكرارها في كل صفحة) --- */
+        body {
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            text-align: right;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* لون خلفية خفيف */
+            display: flex; /* لتمكين التخطيط المرن (Flexbox) للشريط الجانبي والمحتوى */
+            min-height: 100vh;
+            color: #333; /* لون نص داكن افتراضي */
+        }
+
+        /* الحاوية الرئيسية للتطبيق */
+        #app {
+            display: flex;
+            width: 100%;
+        }
+
+        /* الشريط الجانبي للتنقل */
+        #sidebar {
+            width: 250px;
+            background-color: #3f51b5; /* لون أزرق داكن جذاب */
+            color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* ظل خفيف على الجانب الأيمن */
+            display: flex;
+            flex-direction: column; /* ترتيب العناصر عمودياً */
+            flex-shrink: 0; /* منع الشريط الجانبي من الانكماش */
+        }
+
+        .logo h1 {
+            font-family: 'Reem Kufi Ink', sans-serif; /* خط خاص للشعار */
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 2.2em;
+        }
+
+        #sidebar nav ul {
+            list-style: none; /* إزالة نقاط القائمة */
+            padding: 0;
+            margin: 0;
+        }
+
+        #sidebar nav ul li {
+            margin-bottom: 10px; /* مسافة بين عناصر القائمة */
+        }
+
+        #sidebar nav ul li a {
+            font-family: 'Cairo', sans-serif; /* تطبيق خط كايرو على روابط التنقل */
+            color: #fff;
+            text-decoration: none; /* إزالة خط تحت الروابط */
+            padding: 10px 15px;
+            display: block; /* لجعل الرابط يأخذ كامل المساحة القابلة للنقر */
+            border-radius: 8px; /* حواف مستديرة 8px */
+            transition: background-color 0.3s ease; /* تأثير انتقال سلس عند التمرير */
+        }
+
+        #sidebar nav ul li a:hover,
+        #sidebar nav ul li a.active {
+            background-color: #5c6bc0; /* لون أزرق أفتح عند التحديد أو التمرير */
+        }
+
+        #sidebar nav ul li a i {
+            margin-left: 10px; /* مسافة بين الأيقونة والنص */
+        }
+
+        /* المحتوى الرئيسي للصفحات */
+        #main-content {
+            flex-grow: 1; /* للسماح للمحتوى الرئيسي بأخذ المساحة المتبقية */
+            padding: 20px;
+        }
+
+        /* رأس المحتوى الرئيسي (Header) */
+        header {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between; /* توزيع العناصر على الأطراف */
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* الأقسام الداخلية للمحتوى */
+        .content-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        /* --- تنسيقات خاصة بلوحة التحكم (Dashboard) --- */
+        .summary-cards {
+            display: flex;
+            gap: 20px; /* مسافة بين البطاقات */
+            flex-wrap: wrap; /* للسماح للبطاقات بالنزول لسطر جديد في الشاشات الصغيرة */
+        }
+
+        .summary-cards .card {
+            flex: 1; /* لجعل البطاقات تتوسع لتأخذ المساحة المتاحة */
+            min-width: 250px; /* الحد الأدنى لعرض البطاقة */
+            background-color: #e8f5e9; /* لون خلفية خفيف للبطاقات (أخضر فاتح جداً) */
+            padding: 20px;
+            border-radius: 8px; /* حواف مستديرة 8px */
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .summary-cards .card h4 {
+            margin-top: 0;
+            color: #3f51b5; /* لون عنوان البطاقة (أزرق داكن) */
+        }
+
+        .summary-cards .card p {
+            font-size: 1.8em; /* حجم خط كبير للأرقام */
+            font-weight: bold;
+            color: #4CAF50; /* لون الأرقام (أخضر زاهي) */
+            margin: 0;
+        }
+
+        /* --- التعديلات المتجاوبة (Responsive) --- */
+        @media (max-width: 768px) {
+            #app {
+                flex-direction: column; /* جعل الشريط الجانبي والمحتوى فوق بعضهما */
+            }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                padding: 10px;
+                flex-direction: row; /* جعل عناصر التنقل أفقية في الجوال */
+                justify-content: space-around;
+                box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* ظل علوي عند الأسفل */
+                position: fixed; /* تثبيت الشريط السفلي في الجوال */
+                bottom: 0;
+                left: 0;
+                z-index: 1000;
+            }
+            #sidebar nav ul {
+                display: flex;
+                width: 100%;
+                justify-content: space-around;
+            }
+            #sidebar nav ul li {
+                margin-bottom: 0;
+            }
+            #sidebar nav ul li a {
+                padding: 8px 10px;
+                font-size: 0.8em;
+            }
+            #sidebar .logo {
+                display: none; /* إخفاء الشعار في شاشات الجوال الصغيرة */
+            }
+            #main-content {
+                padding-bottom: 80px; /* لترك مساحة للشريط السفلي الثابت */
+            }
+            .summary-cards {
+                flex-direction: column; /* جعل البطاقات تظهر عمودياً في الجوال */
+            }
+            .summary-cards .card {
+                min-width: unset; /* إلغاء الحد الأدنى للعرض للسماح بالمرونة */
+                width: 100%; /* جعل البطاقات تأخذ عرضاً كاملاً في الشاشات الصغيرة */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <div class="logo">
+                <h1>شيخ العرب</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
+                    <li><a href="inventory.html"><i class="fas fa-boxes"></i> إدارة المخزون</a></li>
+                    <li><a href="pos.html"><i class="fas fa-cash-register"></i> نقطة البيع</a></li>
+                    <li><a href="customers.html"><i class="fas fa-users"></i> العملاء والديون</a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> الإعدادات</a></li>
+                    <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main id="main-content">
+            <header>
+                <h2>لوحة التحكم</h2>
+                <div class="user-info">
+                    <span>مرحباً، <span id="current-user-name"></span></span>
+                </div>
+            </header>
+
+            <section id="dashboard-content" class="content-section">
+                <h3>نظرة عامة على الأداء</h3>
+                <div class="summary-cards">
+                    <div class="card">
+                        <h4>إجمالي مبيعات اليوم</h4>
+                        <p id="daily-sales">--- ج.م</p> </div>
+                    <div class="card">
+                        <h4>إجمالي ديون العملاء</h4>
+                        <p id="total-debts">--- ج.م</p> </div>
+                    <div class="card">
+                        <h4>منتجات على وشك النفاذ</h4>
+                        <p id="low-stock-products">--- منتجات</p> </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+        import { getFirestore, collection, getDocs, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+        // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا)
+        const firebaseConfig = {
+          apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
+          authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
+          projectId: "pharmacy-inventory-bf04a",
+          storageBucket: "pharmacy-inventory-bf04a.firebasestorage.app",
+          messagingSenderId: "937788650384",
+          appId: "1:937788650384:web:6451225d00e648f3a0b915",
+          measurementId: "G-ZGC9EQ55SL"
+        };
+
+        // تهيئة Firebase Services
+        const app = initializeApp(firebaseConfig);
+        // const analytics = getAnalytics(app); // قد لا تحتاج للـ Analytics في هذه الصفحة
+        const db = getFirestore(app);   // تهيئة Firestore
+        const auth = getAuth(app);     // تهيئة Authentication
+
+        // --- الحصول على عناصر واجهة المستخدم (DOM Elements) ---
+        const currentUserSpan = document.getElementById('current-user-name');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // عناصر لوحة التحكم لعرض البيانات
+        const dailySalesEl = document.getElementById('daily-sales');
+        const totalDebtsEl = document.getElementById('total-debts');
+        const lowStockProductsEl = document.getElementById('low-stock-products');
+
+        // --- منطق المصادقة والتحويل لهذه الصفحة ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // المستخدم مسجل الدخول، عرض اسمه وتحديث البيانات
+                currentUserSpan.textContent = user.email;
+                fetchDashboardData(); // جلب بيانات لوحة التحكم
+                console.log("User is logged in on dashboard.html:", user.email);
+            } else {
+                // المستخدم غير مسجل الدخول، قم بتوجيهه إلى صفحة تسجيل الدخول
+                console.log("User is not logged in. Redirecting to login.html.");
+                window.location.replace('login.html');
+            }
+        });
+
+        // --- التعامل مع زر تسجيل الخروج ---
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                console.log("User signed out successfully from dashboard.html.");
+                // onAuthStateChanged سيكتشف الخروج وسيقوم بإعادة التوجيه إلى login.html
+            } catch (error) {
+                console.error("Logout error from dashboard.html:", error.message);
+                alert("حدث خطأ أثناء تسجيل الخروج. يرجى المحاولة مرة أخرى.");
+            }
+        });
+
+        // --- جلب وتحديث بيانات لوحة التحكم من Firebase Firestore ---
+
+        /**
+         * وظيفة لجلب بيانات لوحة التحكم (المبيعات اليومية، الديون، المنتجات المعرضة للنفاذ) من Firestore.
+         */
+        async function fetchDashboardData() {
+            console.log("Fetching dashboard data...");
+
+            // 1. حساب إجمالي مبيعات اليوم
+            try {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // ضبط الوقت إلى بداية اليوم (منتصف الليل)
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1); // بداية اليوم التالي
+
+                const salesRef = collection(db, 'sales'); // الإشارة إلى مجموعة 'sales' في Firestore
+                // إنشاء استعلام لجلب المبيعات التي حدثت في اليوم الحالي
+                const q = query(
+                    salesRef,
+                    where('timestamp', '>=', Timestamp.fromDate(today)), // المبيعات من بداية اليوم
+                    where('timestamp', '<', Timestamp.fromDate(tomorrow)) // إلى ما قبل بداية اليوم التالي
+                );
+                const salesSnapshot = await getDocs(q); // تنفيذ الاستعلام
+                let totalDailySales = 0;
+                salesSnapshot.forEach(doc => {
+                    const sale = doc.data();
+                    totalDailySales += (sale.totalAmount || 0); // جمع إجمالي المبالغ المدفوعة لكل عملية بيع
+                });
+                dailySalesEl.textContent = `${totalDailySales.toLocaleString()} ج.م`; // عرض القيمة المحدثة
+            } catch (error) {
+                console.error("Error fetching daily sales:", error);
+                dailySalesEl.textContent = "خطأ!"; // عرض رسالة خطأ في حال الفشل
+            }
+
+            // 2. حساب إجمالي ديون العملاء
+            try {
+                const customersRef = collection(db, 'customers'); // الإشارة إلى مجموعة 'customers'
+                const customerSnapshot = await getDocs(customersRef); // جلب جميع العملاء
+                let totalCustomerDebts = 0;
+                customerSnapshot.forEach(doc => {
+                    const customer = doc.data();
+                    // جمع قيمة حقل 'outstandingBalance' لكل عميل (أو 0 إذا لم يكن موجوداً)
+                    totalCustomerDebts += (customer.outstandingBalance || 0);
+                });
+                totalDebtsEl.textContent = `${totalCustomerDebts.toLocaleString()} ج.م`; // عرض القيمة المحدثة
+            } catch (error) {
+                console.error("Error fetching total customer debts:", error);
+                totalDebtsEl.textContent = "خطأ!";
+            }
+
+            // 3. حساب عدد المنتجات على وشك النفاذ
+            try {
+                const productsRef = collection(db, 'products'); // الإشارة إلى مجموعة 'products'
+                const LOW_STOCK_THRESHOLD = 10; // تحديد حد معين للمنتجات المعرضة للنفاذ
+                // إنشاء استعلام لجلب المنتجات التي كميتها المتاحة أقل من أو تساوي الحد
+                const q = query(
+                    productsRef,
+                    where('availableQuantity', '<=', LOW_STOCK_THRESHOLD)
+                );
+                const lowStockSnapshot = await getDocs(q); // تنفيذ الاستعلام
+                const lowStockCount = lowStockSnapshot.size; // عدد المستندات التي تطابق الشرط
+                lowStockProductsEl.textContent = `${lowStockCount} منتجات`; // عرض العدد المحدث
+            } catch (error) {
+                console.error("Error fetching low stock products:", error);
+                lowStockProductsEl.textContent = "خطأ!";
+            }
+        }
+    </script>
+</body>
+</html>
