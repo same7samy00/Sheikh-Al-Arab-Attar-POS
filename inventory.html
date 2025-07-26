@@ -102,6 +102,20 @@
             margin-bottom: 20px;
         }
 
+        /* أيقونة المسؤول */
+        .manager-icon {
+            font-size: 1.5em;
+            color: #3f51b5;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .manager-icon:hover {
+            color: #5c6bc0;
+        }
+        .manager-icon.active-access {
+            color: #4CAF50; /* أخضر عند تفعيل صلاحية المسؤول */
+        }
+
         /* الأقسام الداخلية للمحتوى */
         .content-section {
             background-color: #fff;
@@ -122,17 +136,23 @@
             gap: 15px; /* مسافة بين العناصر */
         }
 
-        .main-action-btn, .secondary-action-btn, .submit-btn {
+        .main-action-btn, .secondary-action-btn, .submit-btn, .option-btn { /* أضفنا option-btn هنا */
             font-family: 'Cairo', sans-serif; /* خط كايرو للأزرار */
             padding: 10px 20px;
             border: none;
             border-radius: 8px; /* حواف مستديرة 8px */
             cursor: pointer;
             font-size: 1em;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, opacity 0.3s ease; /* إضافة انتقال للأوباسيتي */
             display: flex; /* لترتيب الأيقونة والنص */
             align-items: center;
             gap: 8px; /* مسافة بين الأيقونة والنص */
+        }
+
+        .main-action-btn:disabled, .secondary-action-btn:disabled,
+        #products-table .action-buttons button:disabled {
+            opacity: 0.5; /* جعل الأزرار المعطلة باهتة */
+            cursor: not-allowed;
         }
 
         .main-action-btn {
@@ -140,7 +160,7 @@
             color: white;
         }
 
-        .main-action-btn:hover {
+        .main-action-btn:hover:not(:disabled) { /* لا تتغير عند التعطيل */
             background-color: #45a049;
         }
 
@@ -149,7 +169,7 @@
             color: white;
         }
 
-        .secondary-action-btn:hover {
+        .secondary-action-btn:hover:not(:disabled) {
             background-color: #546e7a;
         }
 
@@ -160,7 +180,7 @@
             margin-top: 20px;
         }
 
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             background-color: #1976D2;
         }
 
@@ -234,7 +254,7 @@
             color: #2196F3; /* أزرق للتعديل */
         }
 
-        #products-table .action-buttons .edit-btn:hover {
+        #products-table .action-buttons .edit-btn:hover:not(:disabled) {
             color: #1976D2;
         }
 
@@ -242,11 +262,11 @@
             color: #f44336; /* أحمر للحذف */
         }
 
-        #products-table .action-buttons .delete-btn:hover {
+        #products-table .action-buttons .delete-btn:hover:not(:disabled) {
             color: #d32f2f;
         }
 
-        /* تنسيقات النموذج المنبثق (Modal) */
+        /* --- تنسيقات النوافذ المنبثقة (Modals) الكبيرة (لتعبئة/تعديل المنتج ومسح الباركود للبحث) --- */
         .modal {
             display: none; /* إخفاؤه افتراضياً */
             position: fixed; /* يبقى في مكانه حتى عند التمرير */
@@ -256,24 +276,28 @@
             width: 100%;
             height: 100%;
             overflow: auto; /* تمكين التمرير إذا كان المحتوى كبيراً */
-            background-color: rgba(0,0,0,0.4); /* خلفية داكنة شفافة */
+            background-color: rgba(0,0,0,0.6); /* خلفية داكنة شفافة أكثر */
             justify-content: center; /* توسيط محتوى المودال أفقياً */
             align-items: center; /* توسيط محتوى المودال عمودياً */
         }
 
+        /* تنسيق المحتوى داخل المودال ليصبح بملء الشاشة تقريباً */
         .modal-content {
             background-color: #fefefe;
-            margin: auto; /* لتوسيطه */
             padding: 30px;
-            border: 1px solid #888;
-            width: 90%; /* عرض مرن */
-            max-width: 600px; /* أقصى عرض */
             border-radius: 8px; /* حواف مستديرة 8px */
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             position: relative;
             animation-name: animatetop;
             animation-duration: 0.4s;
             box-sizing: border-box; /* لضمان أن البادينغ لا يزيد العرض الكلي */
+
+            /* لجعله يظهر كصفحة كاملة عائمة */
+            width: 95%; /* ياخذ 95% من عرض الشاشة */
+            height: 95%; /* ياخذ 95% من ارتفاع الشاشة */
+            max-width: 1200px; /* يمكن تحديد أقصى عرض على الشاشات الكبيرة جداً */
+            max-height: 800px; /* يمكن تحديد أقصى ارتفاع */
+            overflow-y: auto; /* تمكين التمرير العمودي للمحتوى إذا زاد */
         }
 
         /* حركة ظهور المودال */
@@ -341,8 +365,8 @@
             width: auto;
         }
 
-        /* تنسيق حاوية الماسح الضوئي */
-        #barcode-scanner-container {
+        /* --- تنسيقات حاويات الماسح الضوئي (مشتركة بين المودالات) --- */
+        .barcode-scanner-common-container { /* هذا اسم عام للحاويات */
             border: 1px dashed #ccc;
             padding: 10px;
             display: flex; /* ليتوسط محتواه */
@@ -351,14 +375,16 @@
             min-height: 150px;
             background-color: #f8f8f8;
             border-radius: 8px; /* حواف مستديرة 8px */
+            margin-bottom: 15px; /* مسافة عن العناصر الأخرى */
+            position: relative; /* لتحديد موقع عنصر التحميل */
         }
         /* لتنسيق لوحة تحكم الماسح الداخلية (html5-qrcode) */
-        #barcode-scanner-container__dashboard_section_csr {
+        .barcode-scanner-common-container__dashboard_section_csr {
             border-top: 1px solid #ddd !important; /* لضبط تنسيق لوحة التحكم الخاصة بالماسح */
             padding-top: 10px !important;
             background-color: #f8f8f8;
         }
-        #barcode-scanner-container__dashboard_section_csr button {
+        .barcode-scanner-common-container__dashboard_section_csr button {
             font-family: 'Cairo', sans-serif !important;
             background-color: #4CAF50 !important;
             color: white !important;
@@ -368,13 +394,101 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-        #barcode-scanner-container__dashboard_section_csr button:hover {
+        .barcode-scanner-common-container__dashboard_section_csr button:hover {
             background-color: #45a049 !important;
         }
-        #barcode-scanner-container__dashboard_section_csr select,
-        #barcode-scanner-container__dashboard_section_csr span {
+        .barcode-scanner-common-container__dashboard_section_csr select,
+        .barcode-scanner-common-container__dashboard_section_csr span {
             font-family: 'Cairo', sans-serif !important;
             border-radius: 8px !important;
+        }
+
+        /* --- تنسيقات لمودال اختيار مصدر الباركود (الجهاز/الهاتف) --- */
+        #scan-source-modal .modal-content {
+            width: 90%;
+            max-width: 400px; /* حجم أصغر لمودال الاختيار */
+            height: auto;
+            max-height: 90%;
+            text-align: center;
+        }
+        #scan-source-modal .modal-content h4 {
+            margin-bottom: 20px;
+        }
+        #scan-source-modal .option-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        #scan-source-modal .option-btn {
+            width: 100%;
+            background-color: #3f51b5;
+            color: white;
+            justify-content: center; /* توسيط النص والأيقونة */
+        }
+        #scan-source-modal .option-btn:hover {
+            background-color: #303f9f;
+        }
+
+        /* --- تنسيقات لمودال QR الهاتف --- */
+        #phone-qr-modal .modal-content {
+            width: 90%;
+            max-width: 450px;
+            height: auto;
+            max-height: 90%;
+            text-align: center;
+        }
+        #phone-qr-modal #qr-code-display {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 8px;
+        }
+        #phone-qr-modal .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3f51b5;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #phone-qr-modal p.instruction {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+
+        /* --- تنسيقات للمودال الخاص بمسح الباركود للبحث --- */
+        #barcode-search-modal .modal-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            width: 95%; /* نفس حجم مودال المنتج تقريباً */
+            height: 95%;
+            max-width: 1000px; /* يمكن أن يكون أكبر قليلاً لمسح مريح */
+            max-height: 700px;
+        }
+        #barcode-search-modal h4 {
+            margin-bottom: 30px;
+        }
+        #barcode-search-modal #reader-search { /* حاوية الماسح في مودال البحث */
+            width: 100%;
+            max-width: 600px; /* عرض الماسح نفسه */
+            height: 400px; /* ارتفاع الماسح */
+        }
+        #barcode-search-modal .scanner-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
         }
 
 
@@ -430,9 +544,14 @@
                 padding: 8px; /* تقليل البادينغ في الجوال */
                 font-size: 0.9em;
             }
-            .modal-content {
+            .modal-content, #barcode-search-modal .modal-content, #scan-source-modal .modal-content, #phone-qr-modal .modal-content {
                 width: 95%; /* عرض أكبر للمودال في الشاشات الصغيرة */
+                height: auto; /* الارتفاع يتكيف مع المحتوى */
+                max-height: 95%; /* أقصى ارتفاع */
                 padding: 20px;
+            }
+            #barcode-search-modal #reader-search {
+                height: 250px; /* تقليل ارتفاع الماسح في الجوال */
             }
         }
     </style>
@@ -461,16 +580,17 @@
                 <h2>إدارة المخزون</h2>
                 <div class="user-info">
                     <span>مرحباً، <span id="current-user-name"></span></span>
+                    <i class="fas fa-user-shield manager-icon" id="manager-access-btn" title="تفعيل صلاحيات المسؤول"></i>
                 </div>
             </header>
 
             <section id="inventory-content" class="content-section">
                 <h3>قائمة المنتجات</h3>
                 <div class="inventory-controls">
-                    <button id="add-product-btn" class="main-action-btn"><i class="fas fa-plus"></i> إضافة منتج جديد</button>
+                    <button id="add-product-btn" class="main-action-btn" disabled><i class="fas fa-plus"></i> إضافة منتج جديد</button>
                     <div class="search-bar">
                         <input type="text" id="inventory-search" placeholder="ابحث باسم المنتج أو الباركود...">
-                        <button id="scan-barcode-inventory" class="secondary-action-btn"><i class="fas fa-barcode"></i> مسح باركود</button>
+                        <button id="scan-barcode-inventory" class="secondary-action-btn"><i class="fas fa-barcode"></i> مسح باركود للبحث</button>
                     </div>
                 </div>
 
@@ -495,7 +615,7 @@
 
                 <div id="product-modal" class="modal">
                     <div class="modal-content">
-                        <span class="close-button">&times;</span>
+                        <span class="close-button" id="close-product-modal-btn">&times;</span>
                         <h4 id="modal-title">إضافة منتج جديد</h4>
                         <form id="product-form">
                             <input type="hidden" id="product-id"> <div class="form-group">
@@ -558,7 +678,7 @@
                                 <label for="product-barcode">باركود/QR:</label>
                                 <input type="text" id="product-barcode">
                                 <button type="button" id="scan-barcode-form-btn" class="secondary-action-btn"><i class="fas fa-qrcode"></i> مسح باركود</button>
-                                <div id="barcode-scanner-container" style="width: 100%; max-width: 300px; margin: 10px auto; display: none;"></div>
+                                <div id="barcode-scanner-container" class="barcode-scanner-common-container" style="display: none;"></div>
                             </div>
 
                             <div class="form-group">
@@ -570,16 +690,51 @@
                         </form>
                     </div>
                 </div>
+
+                <div id="barcode-search-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button" id="close-search-modal-btn">&times;</span>
+                        <h4>مسح باركود للبحث عن منتج</h4>
+                        <div id="reader-search" class="barcode-scanner-common-container"></div>
+                        <div class="scanner-controls">
+                            <button class="secondary-action-btn" id="cancel-search-scan-btn"><i class="fas fa-times"></i> إلغاء</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="scan-source-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button" id="close-source-modal-btn">&times;</span>
+                        <h4>كيف تريد مسح الباركود؟</h4>
+                        <div class="option-buttons">
+                            <button class="option-btn" id="scan-from-current-device-btn"><i class="fas fa-camera"></i> الجهاز الحالي</button>
+                            <button class="option-btn" id="scan-from-phone-btn"><i class="fas fa-mobile-alt"></i> الهاتف</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="phone-qr-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button" id="close-phone-qr-modal-btn">&times;</span>
+                        <h4>امسح هذا الرمز بهاتفك</h4>
+                        <div id="qr-code-display"></div>
+                        <p class="instruction">استخدم هاتفك لمسح هذا الرمز، ثم امسح الباركود.</p>
+                        <div class="loader" id="phone-qr-loader"></div>
+                        <p id="phone-scan-status-message" style="color: #3f51b5; font-weight: bold;"></p>
+                    </div>
+                </div>
+
             </section>
         </main>
     </div>
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-        import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, deleteDoc, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"; // أضفنا onSnapshot
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا)
@@ -599,9 +754,18 @@
         const db = getFirestore(app);   // تهيئة Firestore
         const auth = getAuth(app);     // تهيئة Authentication
 
+        // --- كلمات السر للمسؤول (Hardcoded - غير آمنة في الإنتاج) ---
+        // في المستقبل، يمكن تخزين هذه الكلمات في Firestore وجلبها
+        const MANAGER_PASSWORD_ACCESS = "0000"; // كلمة سر تفعيل صلاحيات المسؤول (CRUD)
+        const MANAGER_PASSWORD_ADD_EDIT_DELETE = "0000"; // كلمة سر تأكيد التعديل أو الحذف (كانت 0000)
+        const MANAGER_PASSWORD_ADD_FEATURE = "0000+"; // كلمة سر خاصة لعملية الإضافة (كانت 0000+)
+
+        let managerAccessEnabled = false; // حالة تفعيل صلاحيات المسؤول
+
         // --- الحصول على عناصر واجهة المستخدم (DOM Elements) ---
         const currentUserSpan = document.getElementById('current-user-name');
         const logoutBtn = document.getElementById('logout-btn');
+        const managerAccessBtn = document.getElementById('manager-access-btn');
 
         // عناصر واجهة المستخدم لصفحة إدارة المخزون
         const addProductBtn = document.getElementById('add-product-btn');
@@ -609,9 +773,9 @@
         const scanBarcodeInventoryBtn = document.getElementById('scan-barcode-inventory'); // الزر في شريط البحث
         const productsTableBody = document.querySelector('#products-table tbody'); // جسم الجدول لعرض المنتجات
 
-        // عناصر واجهة المستخدم للنموذج المنبثق (Modal)
+        // عناصر واجهة المستخدم لنموذج إضافة/تعديل المنتج (Modal)
         const productModal = document.getElementById('product-modal');
-        const closeButton = productModal.querySelector('.close-button');
+        const closeButtonProductModal = document.getElementById('close-product-modal-btn'); // زر إغلاق مودال المنتج
         const modalTitle = document.getElementById('modal-title');
         const productForm = document.getElementById('product-form');
         const productIdInput = document.getElementById('product-id');
@@ -623,11 +787,62 @@
         const productSalePriceInput = document.getElementById('product-sale-price');
         const productBarcodeInput = document.getElementById('product-barcode');
         const productDescriptionInput = document.getElementById('product-description');
-        const scanBarcodeFormBtn = document.getElementById('scan-barcode-form-btn'); // الزر داخل النموذج
-        const barcodeScannerContainer = document.getElementById('barcode-scanner-container'); // حاوية الماسح داخل النموذج
+        const scanBarcodeFormBtn = document.getElementById('scan-barcode-form-btn'); // الزر داخل نموذج المنتج
+        const barcodeScannerContainer = document.getElementById('barcode-scanner-container'); // حاوية الماسح داخل نموذج المنتج
 
-        // متغير لحالة ماسح الباركود
+        // عناصر المودال الخاص بمسح الباركود للبحث
+        const barcodeSearchModal = document.getElementById('barcode-search-modal');
+        const closeButtonSearchModal = document.getElementById('close-search-modal-btn'); // زر إغلاق مودال البحث
+        const readerSearchContainer = document.getElementById('reader-search'); // حاوية الماسح في مودال البحث
+        const cancelSearchScanBtn = document.getElementById('cancel-search-scan-btn'); // زر إلغاء في مودال البحث
+
+        // عناصر مودال اختيار مصدر مسح الباركود
+        const scanSourceModal = document.getElementById('scan-source-modal');
+        const closeSourceModalBtn = document.getElementById('close-source-modal-btn');
+        const scanFromCurrentDeviceBtn = document.getElementById('scan-from-current-device-btn');
+        const scanFromPhoneBtn = document.getElementById('scan-from-phone-btn');
+
+        // عناصر مودال عرض QR للمسح بالهاتف
+        const phoneQrModal = document.getElementById('phone-qr-modal');
+        const closePhoneQrModalBtn = document.getElementById('close-phone-qr-modal-btn');
+        const qrCodeDisplay = document.getElementById('qr-code-display');
+        const phoneQrLoader = document.getElementById('phone-qr-loader');
+        const phoneScanStatusMessage = document.getElementById('phone-scan-status-message');
+
+        // متغير لحالة ماسح الباركود (يُستخدم للماسحين)
         let html5QrCode = null;
+        let currentScanPurpose = null; // 'addEdit' أو 'search'
+        let currentSessionId = null; // لمعرف جلسة المسح بالهاتف
+
+        // --- وظائف عامة للتحكم في الأزرار والصلاحيات ---
+        function setAccessButtonsState(enabled) {
+            addProductBtn.disabled = !enabled;
+            // يتم تفعيل/تعطيل أزرار التعديل والحذف بشكل ديناميكي بعد تحميل المنتجات في الجدول
+            document.querySelectorAll('.edit-btn').forEach(btn => btn.disabled = !enabled);
+            document.querySelectorAll('.delete-btn').forEach(btn => btn.disabled = !enabled);
+
+            if (enabled) {
+                managerAccessBtn.classList.add('active-access');
+            } else {
+                managerAccessBtn.classList.remove('active-access');
+            }
+        }
+
+        /**
+         * دالة للتحقق من كلمة السر قبل تنفيذ عملية حساسة.
+         * @param {string} requiredPassword - كلمة السر المطلوبة.
+         * @param {string} actionMessage - رسالة تظهر للمستخدم في الـ prompt.
+         * @returns {boolean} - true إذا كانت كلمة السر صحيحة، false وإلا.
+         */
+        function promptForPassword(requiredPassword, actionMessage) {
+            const enteredPassword = prompt(actionMessage + "\nيرجى إدخال كلمة السر للمتابعة:");
+            if (enteredPassword === requiredPassword) {
+                return true;
+            } else {
+                alert("كلمة سر غير صحيحة. لا يمكن متابعة العملية.");
+                return false;
+            }
+        }
 
         // --- منطق المصادقة والتحويل لهذه الصفحة ---
         onAuthStateChanged(auth, (user) => {
@@ -635,6 +850,8 @@
                 // المستخدم مسجل الدخول، عرض اسمه وتحميل المنتجات
                 currentUserSpan.textContent = user.email;
                 fetchProducts(); // جلب المنتجات عند تحميل الصفحة
+                // تعيين حالة الأزرار الأولية (معطلة)
+                setAccessButtonsState(managerAccessEnabled);
                 console.log("User is logged in on inventory.html:", user.email);
             } else {
                 // المستخدم غير مسجل الدخول، قم بتوجيهه إلى صفحة تسجيل الدخول
@@ -652,6 +869,23 @@
             } catch (error) {
                 console.error("Logout error from inventory.html:", error.message);
                 alert("حدث خطأ أثناء تسجيل الخروج. يرجى المحاولة مرة أخرى.");
+            }
+        });
+
+        // --- وظائف المسؤول والصلاحيات ---
+        managerAccessBtn.addEventListener('click', () => {
+            if (managerAccessEnabled) {
+                // إذا كانت الصلاحيات مفعلة، قم بإلغاء تفعيلها
+                managerAccessEnabled = false;
+                setAccessButtonsState(false);
+                alert('تم إلغاء صلاحيات المسؤول.');
+            } else {
+                // إذا كانت الصلاحيات غير مفعلة، اطلب كلمة السر لتفعيلها
+                if (promptForPassword(MANAGER_PASSWORD_ACCESS, "تفعيل صلاحيات المسؤول")) {
+                    managerAccessEnabled = true;
+                    setAccessButtonsState(true);
+                    alert('تم تفعيل صلاحيات المسؤول.');
+                }
             }
         });
 
@@ -685,18 +919,28 @@
                         <td>${(product.purchasePrice || 0).toFixed(2)} ج.م</td>
                         <td>${(product.salePrice || 0).toFixed(2)} ج.م</td>
                         <td class="action-buttons">
-                            <button class="edit-btn" data-id="${doc.id}"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
+                            <button class="edit-btn" data-id="${doc.id}" ${!managerAccessEnabled ? 'disabled' : ''}><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${doc.id}" ${!managerAccessEnabled ? 'disabled' : ''}><i class="fas fa-trash"></i></button>
                         </td>
                     `;
                 });
 
                 // إضافة مستمعي الأحداث لأزرار التعديل والحذف بعد تحميل المنتجات
                 document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.addEventListener('click', (e) => openProductModalForEdit(e.currentTarget.dataset.id));
+                    button.addEventListener('click', (e) => {
+                        if (!managerAccessEnabled) return; // تأكد من أن صلاحيات المسؤول مفعلة
+                        if (promptForPassword(MANAGER_PASSWORD_ADD_EDIT_DELETE, "تأكيد التعديل")) {
+                            openProductModalForEdit(e.currentTarget.dataset.id);
+                        }
+                    });
                 });
                 document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', (e) => deleteProduct(e.currentTarget.dataset.id));
+                    button.addEventListener('click', (e) => {
+                        if (!managerAccessEnabled) return; // تأكد من أن صلاحيات المسؤول مفعلة
+                        if (promptForPassword(MANAGER_PASSWORD_ADD_EDIT_DELETE, "تأكيد الحذف")) {
+                            deleteProduct(e.currentTarget.dataset.id);
+                        }
+                    });
                 });
 
             } catch (error) {
@@ -709,6 +953,14 @@
          * لفتح النموذج المنبثق لإضافة منتج جديد.
          */
         function openAddProductModal() {
+            if (!managerAccessEnabled) { // تأكد من أن صلاحيات المسؤول مفعلة
+                alert("يرجى تفعيل صلاحيات المسؤول أولاً (من أيقونة الدرع أعلى الصفحة).");
+                return;
+            }
+            if (!promptForPassword(MANAGER_PASSWORD_ADD_FEATURE, "تأكيد إضافة منتج جديد")) {
+                return;
+            }
+
             modalTitle.textContent = 'إضافة منتج جديد';
             productForm.reset(); // مسح أي بيانات سابقة من النموذج
             productIdInput.value = ''; // التأكد من أن الـ ID فارغ (لعملية الإضافة)
@@ -834,7 +1086,7 @@
          * بدء ماسح الباركود باستخدام html5-qrcode.
          * @param {string} containerId - الـ ID الخاص بالعنصر الذي سيعرض الكاميرا (مثلاً 'barcode-scanner-container').
          * @param {function} onScanSuccess - دالة يتم استدعاؤها عند المسح الناجح.
-         * @param {function} onScanError - دالة يتم استدعاؤها عند وجود خطأ في المسح (ليس بالضرورة خطأ، قد يكون عدم وجود باركود).
+         * @param {function} onScanError - دالة يتم استدعاؤها عند وجود خطأ في المسح.
          */
         function startBarcodeScanner(containerId, onScanSuccess, onScanError) {
             stopBarcodeScanner(); // التأكد من إيقاف أي ماسح يعمل مسبقاً
@@ -861,7 +1113,13 @@
             if (html5QrCode && html5QrCode.isScanning) {
                 html5QrCode.stop().then(() => {
                     console.log("QR Code scanner stopped.");
-                    barcodeScannerContainer.innerHTML = ''; // إزالة محتوى الكاميرا من الحاوية
+                    // إزالة محتوى الكاميرا من الحاوية النشطة فقط
+                    if (document.getElementById('barcode-scanner-container')) {
+                        document.getElementById('barcode-scanner-container').innerHTML = '';
+                    }
+                    if (document.getElementById('reader-search')) {
+                        document.getElementById('reader-search').innerHTML = '';
+                    }
                 }).catch(err => {
                     console.error("Error stopping QR Code scanner:", err);
                 });
@@ -869,45 +1127,206 @@
             html5QrCode = null; // إعادة تعيين لضمان تهيئة جديدة عند الحاجة
         }
 
+        /**
+         * دالة لتوليد معرّف جلسة فريد.
+         * @returns {string} معرّف جلسة فريد.
+         */
+        function generateSessionId() {
+            return 'scan_' + Date.now() + Math.random().toString(36).substring(2, 9);
+        }
+
+        /**
+         * دالة لفتح مودال اختيار مصدر الباركود.
+         * @param {string} purpose - الغرض من المسح ('addEdit' أو 'search').
+         */
+        function openScanSourceModal(purpose) {
+            currentScanPurpose = purpose; // حفظ الغرض من المسح
+            scanSourceModal.style.display = 'flex';
+        }
+
+        /**
+         * دالة لإغلاق مودال اختيار مصدر الباركود.
+         */
+        function closeScanSourceModal() {
+            scanSourceModal.style.display = 'none';
+        }
+
+        /**
+         * دالة لفتح مودال مسح الباركود على الجهاز الحالي (داخل المودال الأصلي).
+         * @param {HTMLElement} scannerContainer - عنصر HTML الذي سيعرض الماسح.
+         * @param {function} onScanSuccessCallback - الدالة التي ستنفذ بعد المسح الناجح.
+         */
+        function startCurrentDeviceScan(scannerContainer, onScanSuccessCallback) {
+            scannerContainer.style.display = 'block'; // إظهار حاوية الماسح
+            startBarcodeScanner(scannerContainer.id, onScanSuccessCallback, (errorMessage) => {
+                console.warn(`QR Code Scan Error: ${errorMessage}`);
+            });
+        }
+
+        /**
+         * دالة لفتح مودال QR الهاتف.
+         */
+        async function startPhoneScan() {
+            closeScanSourceModal(); // أغلق مودال الاختيار
+
+            currentSessionId = generateSessionId(); // توليد معرف جلسة جديد
+            phoneQrModal.style.display = 'flex'; // إظهار مودال QR
+
+            // تهيئة حالة التحميل والرسالة
+            phoneQrLoader.style.display = 'block';
+            phoneScanStatusMessage.textContent = 'في انتظار مسح هاتفك...';
+            qrCodeDisplay.innerHTML = ''; // مسح أي QR سابق
+
+            // إنشاء QR Code
+            const githubPagesBaseUrl = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/') + '/'; // الحصول على المسار الأساسي
+            const scannerPageUrl = githubPagesBaseUrl + 'phone-barcode-scanner.html?session=' + currentSessionId;
+            
+            console.log("QR Code URL:", scannerPageUrl);
+
+            new QRious({
+                element: qrCodeDisplay,
+                value: scannerPageUrl,
+                size: 200,
+                padding: 10
+            });
+
+            // بدء الاستماع لـ Firestore لمعرف الجلسة هذا
+            const sessionDocRef = doc(db, 'scannerSessions', currentSessionId);
+            const unsubscribe = onSnapshot(sessionDocRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().scannedValue) {
+                    const scannedValue = docSnap.data().scannedValue;
+                    console.log("Scanned value from phone:", scannedValue);
+                    phoneScanStatusMessage.textContent = 'تم المسح بنجاح! جاري معالجة البيانات...';
+                    phoneQrLoader.style.display = 'none';
+                    unsubscribe(); // إيقاف الاستماع
+
+                    // معالجة القيمة الممسوحة بناءً على الغرض الأصلي
+                    if (currentScanPurpose === 'addEdit') {
+                        productBarcodeInput.value = scannedValue;
+                        closePhoneQrModal();
+                        // لا نغلق ProductModal هنا، المستخدم سيكمل الإدخال
+                    } else if (currentScanPurpose === 'search') {
+                        inventorySearchInput.value = scannedValue;
+                        // محاكاة حدث 'input' لتشغيل البحث
+                        const event = new Event('input', { bubbles: true });
+                        inventorySearchInput.dispatchEvent(event);
+                        closePhoneQrModal();
+                        // لا نغلق barcodeSearchModal هنا، المستخدم سيكمل البحث
+                    }
+                    // حذف مستند الجلسة من Firestore لتنظيف البيانات (بعد قليل من التأخير)
+                    setTimeout(() => {
+                        deleteDoc(sessionDocRef).catch(e => console.error("Error deleting session doc:", e));
+                    }, 5000); // احذف بعد 5 ثوانٍ
+                } else if (docSnap.exists() && docSnap.data().status === 'error') {
+                    phoneScanStatusMessage.textContent = 'حدث خطأ في المسح من الهاتف.';
+                    phoneQrLoader.style.display = 'none';
+                    unsubscribe();
+                    setTimeout(() => closePhoneQrModal(), 3000);
+                }
+            }, (error) => {
+                console.error("Error listening to session document:", error);
+                phoneScanStatusMessage.textContent = 'حدث خطأ في الاتصال.';
+                phoneQrLoader.style.display = 'none';
+                unsubscribe();
+                setTimeout(() => closePhoneQrModal(), 3000);
+            });
+        }
+
+        /**
+         * لغلق مودال QR الهاتف.
+         */
+        function closePhoneQrModal() {
+            phoneQrModal.style.display = 'none';
+            stopBarcodeScanner(); // إذا كان هناك أي ماسح يعمل بالخطأ
+            currentSessionId = null;
+            currentScanPurpose = null;
+        }
+
+        /**
+         * دالة لفتح مودال مسح الباركود للبحث.
+         */
+        function openBarcodeSearchModal() {
+            barcodeSearchModal.style.display = 'flex';
+            // لا تبدأ المسح هنا مباشرة، بل اظهر مودال الاختيار أولاً
+            openScanSourceModal('search');
+        }
+
+        /**
+         * دالة لغلق مودال مسح الباركود للبحث.
+         */
+        function closeBarcodeSearchModal() {
+            barcodeSearchModal.style.display = 'none';
+            stopBarcodeScanner();
+        }
 
         // --- مستمعي الأحداث لعناصر واجهة المستخدم ---
 
-        // زر "إضافة منتج جديد"
-        addProductBtn.addEventListener('click', openAddProductModal);
+        // زر "إضافة منتج جديد" - يفتح مودال الاختيار
+        addProductBtn.addEventListener('click', openAddProductModal); // هذه الدالة الآن تتضمن التحقق من كلمة السر
 
-        // زر إغلاق النموذج المنبثق
-        closeButton.addEventListener('click', closeProductModal);
+        // زر إغلاق نموذج المنتج
+        closeButtonProductModal.addEventListener('click', closeProductModal);
 
-        // إغلاق النموذج عند النقر خارج المحتوى (على الخلفية الشفافة للمودال)
+        // إغلاق نموذج المنتج عند النقر خارج المحتوى
         window.addEventListener('click', (event) => {
             if (event.target == productModal) {
                 closeProductModal();
             }
         });
 
-        // زر "مسح باركود" في شريط البحث العلوي (ميزة مستقبلية للبحث المباشر)
+        // زر "مسح باركود للبحث" في شريط البحث العلوي - يفتح مودال الاختيار
         scanBarcodeInventoryBtn.addEventListener('click', () => {
-            alert('هذا الزر مخصص للبحث المباشر عن المنتجات بالباركود (ميزة قادمة). لاستخدام الماسح، يرجى النقر على زر "مسح باركود" داخل نموذج "إضافة/تعديل منتج".');
+            openBarcodeSearchModal();
         });
 
-        // مسح الباركود داخل نموذج إضافة/تعديل المنتج (يفتح الماسح داخل المودال)
+        // زر "مسح باركود" داخل نموذج إضافة/تعديل المنتج - يفتح مودال الاختيار
         scanBarcodeFormBtn.addEventListener('click', () => {
-            barcodeScannerContainer.style.display = 'block'; // إظهار حاوية الماسح
-            startBarcodeScanner("barcode-scanner-container", // استخدام ID الحاوية
-                (decodedText, decodedResult) => {
-                    // عند نجاح المسح
-                    productBarcodeInput.value = decodedText; // وضع الباركود الممسوح في حقل الإدخال
-                    stopBarcodeScanner(); // إيقاف الماسح بعد المسح الناجح
-                    barcodeScannerContainer.style.display = 'none'; // إخفاء حاوية الماسح
-                    console.log(`QR Code detected: ${decodedText}`);
-                    // هنا يمكنك إضافة منطق للبحث عن المنتج بالباركود هذا وملء النموذج
-                    // إذا كان المنتج موجوداً، أو تركه كإضافة منتج جديد إذا لم يكن
-                },
-                (errorMessage) => {
-                    // عند حدوث خطأ في المسح (مثل عدم وجود باركود في مجال الرؤية)
-                    console.warn(`QR Code Scan Error: ${errorMessage}`);
-                }
-            );
+            productBarcodeInput.focus(); // ركز على حقل الباركود لسهولة الإدخال اليدوي إذا تم الإلغاء
+            openScanSourceModal('addEdit'); // فتح مودال الاختيار للغرض addEdit
+        });
+
+        // إغلاق مودال البحث عن الباركود
+        closeButtonSearchModal.addEventListener('click', closeBarcodeSearchModal);
+        cancelSearchScanBtn.addEventListener('click', closeBarcodeSearchModal);
+        window.addEventListener('click', (event) => {
+            if (event.target == barcodeSearchModal) {
+                closeBarcodeSearchModal();
+            }
+        });
+
+        // مستمعي أحداث مودال اختيار مصدر الباركود
+        closeSourceModalBtn.addEventListener('click', closeScanSourceModal);
+        window.addEventListener('click', (event) => {
+            if (event.target == scanSourceModal) {
+                closeScanSourceModal();
+            }
+        });
+        scanFromCurrentDeviceBtn.addEventListener('click', () => {
+            closeScanSourceModal();
+            if (currentScanPurpose === 'addEdit') {
+                startCurrentDeviceScan(barcodeScannerContainer, (decodedText) => {
+                    productBarcodeInput.value = decodedText;
+                    stopBarcodeScanner();
+                    barcodeScannerContainer.style.display = 'none';
+                });
+            } else if (currentScanPurpose === 'search') {
+                startCurrentDeviceScan(readerSearchContainer, (decodedText) => {
+                    inventorySearchInput.value = decodedText;
+                    const event = new Event('input', { bubbles: true });
+                    inventorySearchInput.dispatchEvent(event);
+                    stopBarcodeScanner();
+                    closeBarcodeSearchModal();
+                });
+            }
+        });
+        scanFromPhoneBtn.addEventListener('click', startPhoneScan);
+
+        // مستمعي أحداث مودال QR الهاتف
+        closePhoneQrModalBtn.addEventListener('click', closePhoneQrModal);
+        window.addEventListener('click', (event) => {
+            if (event.target == phoneQrModal) {
+                closePhoneQrModal();
+            }
         });
 
         // البحث عن المنتجات
@@ -950,18 +1369,28 @@
                         <td>${(product.purchasePrice || 0).toFixed(2)} ج.م</td>
                         <td>${(product.salePrice || 0).toFixed(2)} ج.م</td>
                         <td class="action-buttons">
-                            <button class="edit-btn" data-id="${product.id}"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" data-id="${product.id}"><i class="fas fa-trash"></i></button>
+                            <button class="edit-btn" data-id="${product.id}" ${!managerAccessEnabled ? 'disabled' : ''}><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${product.id}" ${!managerAccessEnabled ? 'disabled' : ''}><i class="fas fa-trash"></i></button>
                         </td>
                     `;
                 });
 
                 // إعادة ربط مستمعي الأحداث لأزرار التعديل والحذف لنتائج البحث
                 document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.addEventListener('click', (e) => openProductModalForEdit(e.currentTarget.dataset.id));
+                    button.addEventListener('click', (e) => {
+                        if (!managerAccessEnabled) return;
+                        if (promptForPassword(MANAGER_PASSWORD_ADD_EDIT_DELETE, "تأكيد التعديل")) {
+                            openProductModalForEdit(e.currentTarget.dataset.id);
+                        }
+                    });
                 });
                 document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', (e) => deleteProduct(e.currentTarget.dataset.id));
+                    button.addEventListener('click', (e) => {
+                        if (!managerAccessEnabled) return;
+                        if (promptForPassword(MANAGER_PASSWORD_ADD_EDIT_DELETE, "تأكيد الحذف")) {
+                            deleteProduct(e.currentTarget.dataset.id);
+                        }
+                    });
                 });
 
             } catch (error) {
