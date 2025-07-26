@@ -50,7 +50,7 @@
             margin-bottom: 20px;
             border: 2px solid #3f51b5;
             border-radius: 8px;
-            overflow: hidden;
+            overflow: hidden; /* لضمان الحواف المستديرة للماسح نفسه */
         }
 
         /* تنسيقات لوحة تحكم الماسح (html5-qrcode) */
@@ -124,12 +124,13 @@
     </div>
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-        import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"; // نحتاج updateDoc
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js"; // نحتاج onAuthStateChanged للمصادقة
+        // تم تغيير updateDoc إلى setDoc
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا)
         const firebaseConfig = {
@@ -146,7 +147,7 @@
         const app = initializeApp(firebaseConfig);
         // const analytics = getAnalytics(app); 
         const db = getFirestore(app);   // تهيئة Firestore
-        const auth = getAuth(app);     // تهيئة Authentication (مطلوبة هنا)
+        const auth = getAuth(app);     // تهيئة Authentication
 
         // --- عناصر DOM ---
         const readerPhoneDiv = document.getElementById('reader-phone');
@@ -168,6 +169,7 @@
         } else {
             phoneScannerStatus.textContent = 'جاري تهيئة الكاميرا...';
             phoneScannerLoader.style.display = 'block';
+            
             // تأكد من أن المستخدم مسجل الدخول قبل بدء الماسح
             onAuthStateChanged(auth, (user) => {
                 if (user) {
@@ -196,11 +198,13 @@
 
                     try {
                         const sessionDocRef = doc(db, 'scannerSessions', sessionId);
-                        await updateDoc(sessionDocRef, {
+                        // ******** تم التغيير هنا من updateDoc إلى setDoc مع merge: true **********
+                        await setDoc(sessionDocRef, {
                             scannedValue: decodedText,
                             status: 'scanned',
                             scannedAt: new Date().toISOString() // تاريخ المسح
-                        });
+                        }, { merge: true }); // Merge: true مهم لإنشاء المستند إذا لم يكن موجوداً
+                        
                         phoneScannerStatus.textContent = 'تم الإرسال بنجاح! يمكنك إغلاق هذه الصفحة.';
                         phoneScannerStatus.classList.add('success-message');
                         phoneScannerLoader.style.display = 'none';
