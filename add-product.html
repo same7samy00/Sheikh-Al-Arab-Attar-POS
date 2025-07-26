@@ -8,7 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* تنسيقات عامة مشابهة لـ inventory.html للحفاظ على الاتساق */
+        /* الألوان المستخدمة: أزرق (#3f51b5), أبيض (#ffffff), أسود (#000000) */
+        /* درجات من الرمادي: #333, #555, #ddd, #f4f7f6, #e0e0e0, #f9f9f9 */
+        /* درجات من الأخضر: #4CAF50, #45a049, #e8f5e9 */
+        /* درجات من الأحمر: #f44336, #d32f2f */
+        /* الحواف المستديرة: 8px لجميع العناصر ذات الصلة */
+        /* الخطوط: 'Cairo' بالكامل للتصميم، 'Reem Kufi Ink' للشعار */
+
         body {
             font-family: 'Cairo', sans-serif;
             direction: rtl;
@@ -17,18 +23,16 @@
             padding: 0;
             background-color: #f4f7f6;
             display: flex;
-            flex-direction: column; /* لترتيب الشريط الجانبي والرأس والمحتوى */
+            flex-direction: column;
             min-height: 100vh;
             color: #333;
             font-size: 0.9em;
         }
-        #app { /* هنا لا يوجد الشريط الجانبي في نفس حاوية flex */
+        #app {
             display: flex;
             flex-direction: column;
             width: 100%;
         }
-        /* الشريط الجانبي ليس موجودًا هنا بشكل مباشر، ولكن قد تحتاج إلى إعادة تصميم للرأس أو استخدام نظام تنقل مختلف إذا كانت صفحة مستقلة تمامًا */
-        /* لأغراض هذا الطلب، سنبقى على تصميم "المحتوى الرئيسي" */
 
         header {
             background-color: #fff;
@@ -38,43 +42,41 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            margin: 20px; /* ليكون له هامش حوله */
+            margin: 20px;
         }
-        h2 {
+        header h2 {
             color: #3f51b5;
             margin: 0;
-        }
-
-        .user-info {
-            display: none; /* إخفاء معلومات المستخدم في هذه الصفحة البسيطة إذا لم تكن مطلوبة */
+            font-size: 1.8em; /* حجم أكبر للعنوان */
         }
 
         .content-section {
             background-color: #fff;
-            padding: 20px;
+            padding: 30px; /* زيادة البادينغ الداخلي */
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin: 0 20px 20px 20px; /* هامش من الجوانب والأسفل */
-            flex-grow: 1; /* لتأخذ المساحة المتبقية */
-            overflow-y: auto; /* للسماح بالتمرير داخل القسم إذا كان المحتوى كبيرًا */
+            margin: 0 20px 20px 20px;
+            flex-grow: 1;
+            overflow-y: auto;
         }
-        h3 {
+        .content-section h3 {
             color: #3f51b5;
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 25px; /* زيادة المسافة بعد العنوان الفرعي */
+            font-size: 1.6em;
+            text-align: center; /* توسيط عنوان القسم */
         }
 
         /* تنسيق نموذج المنتج الجديد */
         #product-form-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px; /* مسافة بين الخانات */
+            gap: 25px; /* زيادة المسافة بين الخانات لتهوية التصميم */
             justify-content: space-between;
         }
         #product-form-container .form-group {
-            flex: 1 1 calc(50% - 10px); /* خانتان في الصف */
-            margin-bottom: 0;
+            flex: 1 1 calc(50% - 15px); /* خانتان في الصف، مع مراعاة الفجوة الأكبر */
+            margin-bottom: 0; /* الفجوة تتولى المسافات */
         }
         /* حقول معينة تأخذ عرضاً كاملاً */
         #product-form-container .form-group:nth-last-child(2), /* الباركود */
@@ -84,9 +86,10 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px; /* مسافة أكبر بين Label والحقل */
             font-weight: bold;
             color: #555;
+            font-size: 1.05em; /* حجم خط أكبر للLabels */
         }
         .form-group input[type="text"],
         .form-group input[type="number"],
@@ -97,12 +100,22 @@
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 1em;
+            font-size: 1.1em; /* حجم خط أكبر للمدخلات */
             direction: rtl;
             box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #3f51b5; /* لون الحدود عند التركيز */
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2); /* ظل خفيف عند التركيز */
+            outline: none; /* إزالة الخط الأزرق الافتراضي */
         }
         .form-group textarea {
             resize: vertical;
+            min-height: 80px; /* ارتفاع أدنى لمنطقة النص */
         }
 
         .barcode-scan-buttons {
@@ -112,7 +125,6 @@
             position: relative; /* لتموضع Loader المسح */
         }
         .barcode-scan-buttons input {
-            margin-bottom: 0;
             padding-left: 35px; /* مسافة لـ Loader */
         }
 
@@ -125,55 +137,67 @@
             border: 2px solid #f3f3f3;
             border-top: 2px solid #3f51b5;
             border-radius: 50%;
-            width: 15px;
-            height: 15px;
+            width: 18px; /* حجم أكبر قليلاً */
+            height: 18px;
             animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
+            display: none;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
+        /* أزرار الإجراءات في النموذج */
         .submit-btn {
             background-color: #4CAF50;
             color: white;
-            padding: 12px 25px;
+            padding: 14px 30px; /* بادينغ أكبر للأزرار الرئيسية */
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1.1em;
-            margin-top: 20px;
+            font-size: 1.2em; /* خط أكبر */
+            margin-top: 30px; /* مسافة أكبر */
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: background-color 0.3s ease;
+            gap: 10px; /* مسافة أكبر بين الأيقونة والنص */
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         .submit-btn:hover {
             background-color: #45a049;
+            transform: translateY(-2px); /* تأثير رفع بسيط */
+        }
+        .submit-btn:active {
+            transform: translateY(0);
         }
 
         .action-buttons-group {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: flex-end; /* لمحاذاة الأزرار لليسار في RTL */
-            flex-wrap: wrap; /* للسماح بنزول الأزرار */
+            gap: 15px; /* مسافة أكبر بين الأزرار */
+            margin-top: 30px; /* مسافة أكبر عن النموذج */
+            justify-content: center; /* توسيط الأزرار */
+            flex-wrap: wrap;
         }
         .action-buttons-group button {
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
+            font-size: 1.05em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
             display: flex;
             align-items: center;
             gap: 8px;
             justify-content: center;
         }
+        .action-buttons-group button:hover {
+            transform: translateY(-2px);
+        }
+        .action-buttons-group button:active {
+            transform: translateY(0);
+        }
+
         .action-buttons-group .add-another-btn {
             background-color: #3f51b5;
             color: white;
@@ -187,6 +211,15 @@
         }
         .action-buttons-group .back-to-inventory-btn:hover {
             background-color: #546e7a;
+        }
+        .secondary-action-btn { /* زر مسح الباركود بالهاتف */
+            background-color: #2196F3; /* لون أزرق مميز */
+            color: white;
+            padding: 10px 15px; /* بادينغ مناسب */
+            font-size: 0.95em;
+        }
+        .secondary-action-btn:hover {
+            background-color: #1976D2;
         }
 
 
@@ -587,13 +620,29 @@
             }
 
             try {
-                await addDoc(collection(db, 'products'), productData);
-                showToast('تم إضافة المنتج بنجاح!', "success");
+                // إذا كان الوضع تعديل (productId موجود في URL)
+                const urlParams = new URLSearchParams(window.location.search);
+                const productId = urlParams.get('productId');
+
+                if (productId) {
+                    const productDocRef = doc(db, 'products', productId);
+                    await updateDoc(productDocRef, productData);
+                    showToast('تم تحديث المنتج بنجاح!', "success");
+                } else {
+                    await addDoc(collection(db, 'products'), productData);
+                    showToast('تم إضافة المنتج بنجاح!', "success");
+                }
+                
                 productAddForm.reset(); // مسح النموذج بعد الإضافة
                 productNameInput.focus(); // ركز على أول حقل
+                // إذا كان الوضع تعديل، يمكن العودة إلى صفحة المخزون بعد التعديل
+                if (productId) {
+                    setTimeout(() => { window.location.href = 'inventory.html'; }, 1000);
+                }
+
             } catch (error) {
-                console.error("Error adding product:", error);
-                showToast('حدث خطأ أثناء إضافة المنتج. يرجى المحاولة مرة أخرى.', "error");
+                console.error("Error saving product:", error);
+                showToast('حدث خطأ أثناء حفظ المنتج. يرجى المحاولة مرة أخرى.', "error");
             }
         });
 
@@ -602,6 +651,10 @@
             productAddForm.reset();
             showToast("النموذج جاهز لإضافة منتج جديد.", "info");
             productNameInput.focus(); // ركز على أول حقل
+            // إزالة productId من URL إذا كنا نضيف منتجًا جديدًا بعد تعديل
+            const url = new URL(window.location.href);
+            url.searchParams.delete('productId');
+            window.history.replaceState({}, document.title, url.toString());
         });
 
         // زر العودة لإدارة المخزون
@@ -616,7 +669,53 @@
         });
 
         // بدء الاستماع إلى جلسة الماسح عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', startListeningToSharedSession);
+        document.addEventListener('DOMContentLoaded', () => {
+            startListeningToSharedSession();
+            
+            // تحقق إذا كان هناك productId في URL (وضع التعديل)
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('productId');
+            if (productId) {
+                // قم بتحميل بيانات المنتج لملء النموذج
+                loadProductForEdit(productId);
+            }
+        });
+
+        // دالة لتحميل بيانات المنتج لوضع التعديل
+        async function loadProductForEdit(productId) {
+            try {
+                const productDocRef = doc(db, 'products', productId);
+                const productDocSnap = await getDoc(productDocRef); 
+                
+                if (productDocSnap.exists()) {
+                    const productData = productDocSnap.data();
+                    // قم بملء الحقول ببيانات المنتج
+                    productAddForm.querySelector('#product-id').value = productId;
+                    productNameInput.value = productData.name || '';
+                    productCategorySelect.value = productData.category || '';
+                    productUnitSelect.value = productData.unit || '';
+                    productQuantityInput.value = productData.availableQuantity || 0;
+                    productPurchasePriceInput.value = productData.purchasePrice || 0;
+                    productSalePriceInput.value = productData.salePrice || 0;
+                    productBarcodeInput.value = productData.barcode || '';
+                    productDescriptionInput.value = productData.description || '';
+                    
+                    productAddForm.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> تحديث المنتج';
+                    document.querySelector('h3').textContent = 'تعديل المنتج';
+                    showToast('تم تحميل بيانات المنتج للتعديل.', 'info');
+                } else {
+                    showToast('المنتج غير موجود أو تم حذفه. سيتم تحويلك لصفحة إضافة جديدة.', "error");
+                    // إذا لم يتم العثور على المنتج، أعد توجيهه لصفحة إضافة جديدة بعد فترة قصيرة
+                    setTimeout(() => {
+                        window.location.href = 'add-product.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error("Error loading product for edit:", error);
+                showToast('حدث خطأ أثناء جلب بيانات المنتج للتعديل.', "error");
+            }
+        }
+
     </script>
 </body>
 </html>
