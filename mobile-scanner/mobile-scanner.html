@@ -7,49 +7,74 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* الألوان والخطوط الأساسية من تصميمك العام */
+        /* أزرق (#3f51b5), أبيض (#ffffff), أسود (#000000) */
+        /* رمادي: #333, #555, #ddd, #f4f7f6, #e0e0e0, #f9f9f9 */
+        /* أخضر: #4CAF50, #45a049, #e8f5e9 */
+        /* أحمر: #f44336, #d32f2f */
+        /* حواف مستديرة: 8px */
+        /* الخط: 'Cairo' */
+
         body {
             font-family: 'Cairo', sans-serif;
             direction: rtl;
             text-align: center;
             margin: 0;
-            padding: 20px; /* Adjust padding to give space around content */
+            padding: 20px;
             background-color: #f4f7f6;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Align content to start from top */
+            justify-content: flex-start;
             min-height: 100vh;
             color: #333;
+            box-sizing: border-box;
+            font-size: 1em; /* حجم خط أساسي أكبر قليلاً للهاتف */
         }
         h1 {
             color: #3f51b5;
-            margin-bottom: 20px;
+            margin-bottom: 25px; /* مسافة أكبر */
+            font-size: 2em; /* حجم عنوان أكبر */
         }
-        #reader-container { /* Container for the camera feed */
+
+        #reader-container {
             width: 100%;
-            max-width: 400px; /* Max width for scanner */
-            height: 300px; /* Fixed height for scanner */
-            /* Remove borders/shadows to avoid "card" look */
-            overflow: hidden; /* Ensure video fills container */
-            margin-bottom: 20px;
-            display: none; /* Hidden by default until scan requested */
-            background-color: #eee; /* Placeholder background */
+            max-width: 300px; /* حجم مربع ثابت للكاميرا */
+            height: 300px; /* حجم مربع ثابت للكاميرا */
+            background-color: #eee; /* لون خلفية خفيف لمنطقة الكاميرا */
+            border-radius: 8px; /* حواف مستديرة */
+            overflow: hidden;
+            margin-bottom: 25px; /* مسافة أكبر */
+            display: none; /* مخفي افتراضياً */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* ظل خفيف */
+            position: relative; /* لتحديد موضع أي تراكب داخلي */
         }
         #reader-container video {
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover; /* Ensure video fills container */
+            object-fit: cover; /* يضمن ملء الفيديو للمربع */
+        }
+
+        /* تنسيق الخطوط المربعة التي تظهر حول الباركود في html5-qrcode */
+        div.html5-qrcode-box-focus-area {
+            border-width: 5px !important; /* سمك الحدود */
+            border-style: solid !important;
+            border-color: #4CAF50 !important; /* لون أخضر جذاب */
+            border-radius: 8px; /* حواف مستديرة لمربع التركيز */
         }
 
         .status-message {
-            margin-top: 10px;
-            padding: 10px;
-            /* Remove borders/shadows to avoid "card" look */
+            margin-top: 15px; /* مسافة أكبر */
+            padding: 12px; /* بادينغ أكبر */
             border-radius: 8px;
             font-weight: bold;
             width: 90%;
             max-width: 400px;
             box-sizing: border-box;
+            background-color: #e0e0e0;
+            color: #333;
+            font-size: 1.05em; /* حجم خط أكبر */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08); /* ظل خفيف */
         }
         .status-message.info {
             background-color: #e3f2fd;
@@ -64,35 +89,80 @@
             color: #f44336;
         }
         .action-button {
-            background-color: #607d8b;
+            font-family: 'Cairo', sans-serif; /* خط كايرو للأزرار */
+            background-color: #607d8b; /* رمادي مزرق */
             color: white;
-            padding: 10px 20px;
+            padding: 14px 30px; /* بادينغ كبير لأزرار احترافية */
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            margin-top: 20px;
+            font-size: 1.15em; /* حجم خط أكبر قليلاً */
+            margin-top: 30px; /* مسافة أكبر بين العناصر */
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px; /* مسافة أكبر بين الأيقونة والنص */
             justify-content: center;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* ظل واضح للأزرار */
+            width: 90%; /* لتأخذ عرضاً جيداً على الهاتف */
+            max-width: 300px; /* أقصى عرض للأزرار */
         }
         .action-button:hover {
             background-color: #546e7a;
+            transform: translateY(-3px); /* تأثير رفع أكبر */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25); /* ظل أكبر عند التمرير */
         }
+        .action-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-button#stop-scan-btn {
+            background-color: #f44336; /* أحمر لزر الإيقاف */
+        }
+        .action-button#stop-scan-btn:hover {
+            background-color: #d32f2f;
+        }
+        .action-button i {
+            font-size: 1.3em; /* حجم أيقونة أكبر قليلاً */
+        }
+
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3f51b5;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 35px; /* Loader أكبر قليلاً */
+            height: 35px;
             animation: spin 1s linear infinite;
-            margin: 10px auto;
+            margin: 15px auto; /* مسافة أكبر */
             display: none;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.6em;
+                margin-bottom: 20px;
+            }
+            #reader-container {
+                height: 250px;
+                max-width: 250px; /* ضبط الحجم على الشاشات الأصغر */
+            }
+            .status-message {
+                font-size: 1em;
+                padding: 10px;
+            }
+            .action-button {
+                font-size: 1em;
+                padding: 12px 25px;
+                margin-top: 20px;
+            }
         }
     </style>
 </head>
@@ -104,14 +174,14 @@
     <div class="status-message" id="status-message-phone">جاري التحميل...</div>
     <div class="loader" id="loader-phone"></div>
     <button class="action-button" id="disconnect-btn-phone"><i class="fas fa-times"></i> قطع الاتصال</button>
-    <button class="action-button" id="stop-scan-btn" style="display: none; background-color: #f44336;"><i class="fas fa-stop"></i> إيقاف المسح</button>
+    <button class="action-button" id="stop-scan-btn" style="display: none;"><i class="fas fa-stop"></i> إيقاف المسح</button>
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getFirestore, doc, updateDoc, onSnapshot, Timestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-        // Firebase Configuration (Replace with your actual config)
+        // معلومات تهيئة تطبيق Firebase الخاص بك (Replace with your actual config)
         const firebaseConfig = {
             apiKey: "AIzaSyC5ls-rPdJ65x5BoMGwAOpdcPtD585C2ys",
             authDomain: "pharmacy-inventory-bf04a.firebaseapp.com",
@@ -168,7 +238,11 @@
             updateStatusPhone('ضع باركود المنتج أمام الكاميرا...', 'loading');
 
             html5QrCode = new Html5Qrcode("reader-container");
-            const qrCodeConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
+            // تحديد حجم مربع التركيز للكاميرا
+            const qrCodeConfig = { 
+                fps: 10, 
+                qrbox: { width: 250, height: 250 } // حجم مربع المسح المرئي داخل الكاميرا
+            };
 
             try {
                 await html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onProductBarcodeScanned, onScanError);
@@ -359,7 +433,7 @@
             
             // Signal desktop that phone is now ready to receive requests (initial state)
             try {
-                await updateDoc(sessionDocRef, {
+                await updateDoc(doc(db, 'scannerSessions', sessionId), {
                     status: 'phoneReady', // Phone is ready to receive scan requests
                     connectedAt: Timestamp.now()
                 });
@@ -377,7 +451,8 @@
             }
             connectionAttemptInterval = setInterval(() => {
                 console.log("Attempting to reconnect/check session status...");
-                if (!sessionUnsubscribe) { // Only try to connect if not already listening
+                // Only try to establish new connection if no listener is active or if desktop signalled disconnect
+                if (!sessionUnsubscribe) { 
                    connectToSharedSession();
                 } else {
                     // If listener is active, just update own status if desktop shows disconnected
