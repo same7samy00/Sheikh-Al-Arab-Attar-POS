@@ -153,7 +153,8 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
         // تم إضافة onSnapshot هنا لكي تستمع الصفحة لإشارات الكمبيوتر
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"; 
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        // لا نحتاج getAuth, onAuthStateChanged هنا
+        // import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا)
         const firebaseConfig = {
@@ -170,7 +171,7 @@
         const app = initializeApp(firebaseConfig);
         // const analytics = getAnalytics(app); 
         const db = getFirestore(app);   // تهيئة Firestore
-        const auth = getAuth(app);     // تهيئة Authentication (مطلوبة هنا)
+        // const auth = getAuth(app); // لا نحتاج Authentication هنا
 
         // --- عناصر DOM ---
         const readerPhoneDiv = document.getElementById('reader-phone');
@@ -196,18 +197,8 @@
             phoneScannerStatus.textContent = 'جاري تهيئة الكاميرا...';
             phoneScannerLoader.style.display = 'block';
             
-            // تأكد من أن المستخدم مسجل الدخول قبل بدء الماسح
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // إذا كان المستخدم مسجل الدخول، ابدأ الاستماع للجلسة
-                    listenToSessionForPhone(sessionId);
-                } else {
-                    phoneScannerStatus.textContent = 'يرجى تسجيل الدخول أولاً لإجراء المسح.';
-                    phoneScannerStatus.classList.add('error-message');
-                    // يمكنك توجيه المستخدم لصفحة تسجيل الدخول هنا إذا أردت
-                    // window.location.replace('login.html'); 
-                }
-            });
+            // لا نتحقق من تسجيل الدخول هنا بعد الآن، نبدأ مباشرة
+            listenToSessionForPhone(sessionId);
         }
 
         /**
@@ -232,16 +223,17 @@
             html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, 
                 async (decodedText, decodedResult) => {
                     // عند المسح الناجح
+                    // أوقف الكاميرا مؤقتاً لمنع المسح المتكرر
+                    isCameraPaused = true;
+                    // توقف Html5Qrcode يدوياً لضمان تنظيف الموارد
+                    await html5QrCode.stop().catch(e => console.warn("Error stopping scanner after scan:", e)); 
+                    readerPhoneDiv.innerHTML = ''; // تنظيف الحاوية
+                    
                     phoneScannerLoader.style.display = 'block';
                     phoneScannerStatus.textContent = 'تم المسح! جاري إرسال البيانات...';
                     phoneScannerStatus.classList.remove('error-message', 'success-message');
 
                     try {
-                        // أوقف الكاميرا مؤقتاً لمنع المسح المتكرر
-                        isCameraPaused = true;
-                        await html5QrCode.stop(); // إيقاف الكاميرا فعلياً
-                        readerPhoneDiv.innerHTML = ''; // تنظيف الحاوية
-
                         const sessionDocRef = doc(db, 'scannerSessions', sessionId);
                         await setDoc(sessionDocRef, {
                             scannedValue: decodedText,
@@ -384,9 +376,6 @@
                 sessionUnsubscribePhone();
                 sessionUnsubscribePhone = null;
             }
-            // يمكن هنا إرسال إشارة للكمبيوتر بأن الهاتف قطع الاتصال
-            // لتنظيف الجلسة من جانب الكمبيوتر أيضاً إذا لم تكن قد تمت
-            // ولكن لأغراض هذا المشروع، لن نفعل ذلك لتجنب تعقيد زائد حالياً
         });
     </script>
 </body>
