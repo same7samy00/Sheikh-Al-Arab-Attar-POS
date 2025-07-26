@@ -8,8 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
-        /* الألوان: أزرق (#3f51b5), أبيض (#ffffff), أسود (#000000) */
-        /* درجات من الرمادي: #333, #555, #ddd, #f4f7f6, #e0e0e0 */
+        /* الألوان الجديدة من الصورة: */
+        /* Dark Blue: #3674B5 */
+        /* Medium Blue: #578FCA */
+        /* Light Blue: #A1E3F9 */
+        /* Light Green: #D1F8EF */
+        /* White: #ffffff */
+        /* Gray: #333, #555, #ddd, #f4f7f6, #e0e0e0 */
         /* الحواف المستديرة: 8px */
         /* الخطوط: Cairo بالكامل */
 
@@ -35,7 +40,7 @@
         /* الشريط الجانبي للتنقل */
         #sidebar {
             width: 250px;
-            background-color: #0026ff; /* لون أزرق داكن جذاب */
+            background-color: #3674B5; /* Dark Blue from palette */
             color: #fff;
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* ظل خفيف على الجانب الأيمن */
@@ -46,12 +51,15 @@
 
         .logo h1 {
             font-family: 'Reem Kufi Ink', sans-serif; /* خط خاص للشعار */
-            color: #fff;
+            color: #ffffff; /* White color for logo text */
             text-align: center;
             padding: 20px 0;
             margin: 0;
             font-size: 2.2em;
+            /* تم حذف حركة الشعار هنا */
         }
+
+        /* تم حذف Keyframes لحركة الشعار هنا */
 
         #sidebar nav ul {
             list-style: none; /* إزالة نقاط القائمة */
@@ -75,7 +83,7 @@
 
         #sidebar nav ul li a:hover,
         #sidebar nav ul li a.active {
-            background-color: #5c6bc0; /* لون أزرق أفتح عند التحديد أو التمرير */
+            background-color: #578FCA; /* Medium Blue for hover/active */
         }
 
         #sidebar nav ul li a i {
@@ -119,7 +127,7 @@
         .summary-cards .card {
             flex: 1; /* لجعل البطاقات تتوسع لتأخذ المساحة المتاحة */
             min-width: 250px; /* الحد الأدنى لعرض البطاقة */
-            background-color: #e8f5e9; /* لون خلفية خفيف للبطاقات (أخضر فاتح جداً) */
+            background-color: #A1E3F9; /* Light Blue from palette */
             padding: 20px;
             border-radius: 8px; /* حواف مستديرة 8px */
             text-align: center;
@@ -128,13 +136,13 @@
 
         .summary-cards .card h4 {
             margin-top: 0;
-            color: #3f51b5; /* لون عنوان البطاقة (أزرق داكن) */
+            color: #3674B5; /* Dark Blue for card title */
         }
 
         .summary-cards .card p {
             font-size: 1.8em; /* حجم خط كبير للأرقام */
             font-weight: bold;
-            color: #4CAF50; /* لون الأرقام (أخضر زاهي) */
+            color: #3674B5; /* Dark Blue for numbers (or consider #578FCA for a slightly different tone) */
             margin: 0;
         }
 
@@ -215,13 +223,16 @@
                 <div class="summary-cards">
                     <div class="card">
                         <h4>إجمالي مبيعات اليوم</h4>
-                        <p id="daily-sales">--- ج.م</p> </div>
+                        <p id="daily-sales">--- ج.م</p>
+                    </div>
                     <div class="card">
                         <h4>إجمالي ديون العملاء</h4>
-                        <p id="total-debts">--- ج.م</p> </div>
+                        <p id="total-debts">--- ج.م</p>
+                    </div>
                     <div class="card">
                         <h4>منتجات على وشك النفاذ</h4>
-                        <p id="low-stock-products">--- منتجات</p> </div>
+                        <p id="low-stock-products">--- منتجات</p>
+                    </div>
                 </div>
             </section>
         </main>
