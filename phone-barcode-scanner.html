@@ -221,6 +221,8 @@
             html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, 
                 async (decodedText, decodedResult) => {
                     // عند المسح الناجح
+                    // أوقف الكاميرا مؤقتًا لمنع المسح المتكرر لنفس الباركود
+                    stopScanner(); 
                     phoneScannerLoader.style.display = 'block';
                     phoneScannerStatus.textContent = 'تم المسح! جاري إرسال البيانات...';
                     phoneScannerStatus.classList.remove('error-message', 'success-message');
@@ -236,13 +238,16 @@
                         phoneScannerStatus.textContent = 'تم الإرسال بنجاح! امسح باركود آخر.';
                         phoneScannerStatus.classList.add('success-message');
                         phoneScannerLoader.style.display = 'none';
-                        // لا نوقف الماسح هنا، بل نتركه يعمل باستمرار
+                        // أعد تشغيل الماسح بعد ثانية واحدة ليكون جاهزاً للمسح التالي
+                        setTimeout(() => {
+                            startScanner();
+                        }, 1000); // انتظر ثانية واحدة
                     } catch (e) {
                         console.error("Error sending scanned value to Firestore:", e);
                         phoneScannerStatus.textContent = 'خطأ في إرسال البيانات: ' + e.message;
                         phoneScannerStatus.classList.add('error-message');
                         phoneScannerLoader.style.display = 'none';
-                        // في حالة الخطأ، لا نوقف الماسح، بل نحاول مرة أخرى بعد فترة
+                        // في حالة الخطأ، أعد تشغيل الماسح بعد فترة
                         setTimeout(startScanner, 2000); 
                     }
                 },
