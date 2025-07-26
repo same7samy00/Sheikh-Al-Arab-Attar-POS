@@ -165,8 +165,143 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            padding-left: 10px; /* لا حاجة لمسافة لـ Loader هنا، سنضع الودر في الزر نفسه */
-            padding-right: 10px; /* لضمان التناسق */
+            padding-left: 10px;
+            padding-right: 10px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-search-bar input:focus {
+            border-color: #3f51b5;
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+            outline: none;
+        }
+
+        /* --- توحيد تصميم الأزرار --- */
+        /* هذا النمط الأساسي يطبق على جميع الأزرار ذات الصلة */
+        .primary-btn, /* الأزرار الرئيسية مثل إتمام البيع */
+        .secondary-btn, /* الأزرار الثانوية مثل إلغاء البيع / إضافة خصم / طباعة */
+        .action-icon-btn, /* أزرار الأيقونات مثل مسح الباركود */
+        .modal-btn /* الأزرار داخل النوافذ العائمة */ {
+            font-family: 'Cairo', sans-serif;
+            padding: 12px 25px; /* بادينغ موحد لمعظم الأزرار */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05em; /* حجم خط موحد */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* مسافة بين الأيقونة والنص */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* ظل خفيف موحد */
+            position: relative; /* لتمكين تأثير الوميض */
+            overflow: hidden; /* لضمان عدم خروج الوميض عن الزر */
+        }
+        /* تأثيرات Hover و Active الموحدة */
+        .primary-btn:hover, .secondary-btn:hover, .action-icon-btn:hover, .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .primary-btn:active, .secondary-btn:active, .action-icon-btn:active, .modal-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* ألوان محددة لأنواع الأزرار */
+        .primary-btn { /* لإتمام البيع، إضافة عميل */
+            background-color: #4CAF50; /* أخضر */
+            color: white;
+        }
+        .primary-btn:hover { background-color: #45a049; }
+
+        .secondary-btn { /* إلغاء البيع، إضافة خصم، طباعة إيصال */
+            background-color: #607d8b; /* رمادي مزرق */
+            color: white;
+        }
+        .secondary-btn:hover { background-color: #546e7a; }
+
+        /* الأزرار داخل المودالات (تصميم موحد) */
+        .modal-btn {
+            background-color: #3f51b5; /* أزرق داكن */
+            color: white;
+            padding: 10px 20px; /* بادينغ أصغر قليلاً */
+            font-size: 1em;
+        }
+        .modal-btn:hover { background-color: #303f9f; }
+
+        .modal-btn.cancel-modal-btn {
+            background-color: #f44336; /* أحمر للإلغاء داخل المودال */
+            color: white;
+        }
+        .modal-btn.cancel-modal-btn:hover { background-color: #d32f2f; }
+
+        .action-icon-btn { /* زر مسح الباركود (أيقونة فقط) */
+            background-color: #3f51b5; /* أزرق داكن */
+            color: white;
+            padding: 10px; /* بادينغ متساوي للأيقونة */
+            width: 45px; /* عرض ثابت لجعله دائريًا تقريبًا */
+            height: 45px; /* ارتفاع ثابت */
+            border-radius: 50%; /* لجعل الزر دائريًا */
+            gap: 0; /* لا يوجد gap للأزرار الأيقونية */
+        }
+        .action-icon-btn i {
+            font-size: 1.2em; /* حجم الأيقونة */
+            margin: 0;
+        }
+        .action-icon-btn:hover {
+            background-color: #303f9f;
+        }
+        
+        /* Loader داخل الزر (يختفي ويظهر الأيقونة) */
+        .action-icon-btn .button-loader,
+        .secondary-action-btn .button-loader { /* لودر لزر الطباعة أيضاً */
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #fff; /* لون أبيض ليتناسب مع لون الزر */
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            animation: spin 1s linear infinite;
+            display: none; /* مخفي افتراضياً */
+            margin-right: 8px; /* مسافة بين الـ loader والنص */
+        }
+        .action-icon-btn.loading i,
+        .secondary-action-btn.loading i {
+            display: none;
+        }
+        .action-icon-btn.loading .button-loader,
+        .secondary-action-btn.loading .button-loader {
+            display: block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- تأثير الوميض (Pulse Effect) للأزرار أثناء المسح --- */
+        .action-icon-btn.scanning-pulse {
+            animation: scan-button-pulse 1s infinite alternate;
+        }
+        @keyframes scan-button-pulse {
+            0% { 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(33, 150, 243, 0.4); /* لون أزرق */
+                background-color: #2196F3; /* لون خلفية زر المسح بالهاتف */
+            }
+            100% { 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(33, 150, 243, 0);
+                background-color: #2196F3;
+            }
+        }
+        .secondary-action-btn.scanning-pulse {
+            animation: default-button-pulse 1s infinite alternate;
+        }
+        @keyframes default-button-pulse {
+            0% { 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(96, 125, 139, 0.4); /* لون رمادي مزرق */
+                background-color: #607d8b;
+            }
+            100% { 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(96, 125, 139, 0);
+                background-color: #607d8b;
+            }
         }
 
         /* قائمة المنتجات المعروضة بعد البحث */
@@ -176,17 +311,19 @@
             border: 1px solid #eee;
             border-radius: 8px;
             margin-bottom: 15px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* ظل داخلي خفيف */
         }
         #product-search-results .product-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #f9f9f9;
+            padding: 12px 15px; /* بادينغ أكبر */
+            border-bottom: 1px solid #f0f0f0; /* خط فاصل أفتح */
             background-color: #fff;
+            transition: background-color 0.2s ease;
         }
         #product-search-results .product-item:hover {
-            background-color: #f0f0f0;
+            background-color: #f9f9f9;
             cursor: pointer;
         }
         #product-search-results .product-item:last-child {
@@ -199,11 +336,11 @@
         .product-item .info h5 {
             margin: 0 0 5px 0;
             color: #333;
-            font-size: 1em;
+            font-size: 1.05em; /* حجم خط أكبر */
         }
         .product-item .info span {
             color: #555;
-            font-size: 0.85em;
+            font-size: 0.88em; /* حجم خط أكبر قليلاً */
         }
         .product-item .add-btn {
             background-color: #4CAF50;
@@ -212,27 +349,30 @@
             border-radius: 5px;
             padding: 8px 12px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
             font-family: 'Cairo', sans-serif;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .product-item .add-btn:hover {
             background-color: #45a049;
+            transform: translateY(-1px);
         }
 
         /* سلة التسوق (Cart) */
         #cart-items {
             flex-grow: 1;
-            max-height: 400px; /* ارتفاع أقصى لسلة التسوق */
+            max-height: 400px;
             overflow-y: auto;
             border: 1px solid #eee;
             border-radius: 8px;
             margin-bottom: 15px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
         #cart-items .cart-item {
             display: flex;
             align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #f9f9f9;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
             background-color: #fff;
         }
         #cart-items .cart-item:last-child {
@@ -246,33 +386,47 @@
         .cart-item .details h5 {
             margin: 0 0 5px 0;
             color: #333;
-            font-size: 1em;
+            font-size: 1.05em;
         }
         .cart-item .details span {
             color: #555;
-            font-size: 0.85em;
+            font-size: 0.88em;
         }
         .cart-item .quantity-controls {
             display: flex;
             align-items: center;
             gap: 5px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
         }
         .cart-item .quantity-controls button {
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px 8px;
+            background-color: #e0e0e0;
+            border: none;
+            padding: 6px 10px;
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.2s ease;
         }
         .cart-item .quantity-controls button:hover {
-            background-color: #e0e0e0;
+            background-color: #d0d0d0;
         }
         .cart-item .quantity-controls span {
-            min-width: 20px;
+            min-width: 25px;
             text-align: center;
             font-weight: bold;
+            color: #333;
+        }
+        /* لتحديد كمية الجرامات */
+        .cart-item .quantity-controls input[type="number"] {
+            font-family: 'Cairo', sans-serif;
+            width: 60px; /* عرض مناسب */
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 0.9em;
+            box-sizing: border-box;
         }
         .cart-item .remove-btn {
             background-color: #f44336;
@@ -284,6 +438,7 @@
             transition: background-color 0.3s ease;
             font-family: 'Cairo', sans-serif;
             margin-right: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .cart-item .remove-btn:hover {
             background-color: #d32f2f;
@@ -298,12 +453,12 @@
         .cart-summary-totals div {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 1em;
+            margin-bottom: 10px; /* مسافة أكبر */
+            font-size: 1.05em;
         }
         .cart-summary-totals .total {
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.3em; /* حجم أكبر للإجمالي الكلي */
             color: #3f51b5; /* أزرق */
         }
 
@@ -312,7 +467,7 @@
             padding-top: 15px;
             border-top: 1px solid #eee;
         }
-        .payment-section .form-group {
+        .payment-section .modal-form-group { /* استخدام modal-form-group للتنسيق الموحد */
             margin-bottom: 15px;
         }
         .payment-section label {
@@ -320,11 +475,12 @@
             margin-bottom: 5px;
             font-weight: bold;
             color: #555;
+            font-size: 1em;
         }
         .payment-section input[type="number"],
         .payment-section select {
             font-family: 'Cairo', sans-serif;
-            width: calc(100% - 24px); /* عرض كامل مع بادينغ */
+            width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -339,155 +495,56 @@
             box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
             outline: none;
         }
+        /* تنسيق خاص لـ customer-search-results */
+        #customer-search-results {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-top: 5px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        #customer-search-results .customer-item {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            text-align: right;
+        }
+        #customer-search-results .customer-item:hover {
+            background-color: #f9f9f9;
+        }
+        #customer-search-results .customer-item:last-child {
+            border-bottom: none;
+        }
+
 
         /* أزرار الإجراءات في نقطة البيع (إتمام البيع، إلغاء، إضافة خصم) */
         .pos-actions {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 15px; /* مسافة أكبر */
+            margin-top: 25px; /* مسافة أكبر */
         }
-        .pos-actions button {
-            font-family: 'Cairo', sans-serif;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        /* الأزرار هنا تستخدم primary-btn و secondary-btn */
+        .pos-actions .primary-btn, .pos-actions .secondary-btn {
+            width: 100%; /* تأخذ عرضاً كاملاً */
+            padding: 14px 25px; /* بادينغ أكبر */
+            font-size: 1.15em; /* حجم خط أكبر */
         }
-        .pos-actions button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .pos-actions button:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .pos-actions .complete-sale-btn {
-            background-color: #4CAF50; /* أخضر */
-            color: white;
-        }
-        .pos-actions .complete-sale-btn:hover {
-            background-color: #45a049;
-        }
-
-        .pos-actions .cancel-sale-btn {
-            background-color: #f44336; /* أحمر */
-            color: white;
-        }
-        .pos-actions .cancel-sale-btn:hover {
-            background-color: #d32f2f;
-        }
-
         .pos-actions .add-discount-btn {
-            background-color: #3f51b5; /* أزرق داكن */
-            color: white;
-            font-size: 0.9em; /* زر أصغر قليلاً */
-            padding: 10px 20px;
+            background-color: #3f51b5;
         }
         .pos-actions .add-discount-btn:hover {
             background-color: #303f9f;
         }
-        /* زر أيقونة الهاتف (نسخ من تصميمك الموحد) */
-        .action-icon-btn {
-            background-color: #3f51b5; /* أزرق داكن */
-            color: white;
-            padding: 10px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0;
-            position: relative;
-            overflow: hidden;
+        .pos-actions .print-receipt-btn {
+            background-color: #A1E3F9; /* لون مميز للطباعة (Light Blue) */
+            color: #3674B5; /* لون نص داكن */
+            font-weight: bold;
         }
-        .action-icon-btn i {
-            font-size: 1.2em;
-            margin: 0;
-        }
-        .action-icon-btn:hover {
-            background-color: #303f9f;
-        }
-        .action-icon-btn.status-disconnected {
-            background-color: #f44336;
-        }
-        .action-icon-btn.status-disconnected:hover {
-            background-color: #d32f2f;
-        }
-        .action-icon-btn.status-connecting {
-            background-color: #FFA000;
-            animation: pulse 1s infinite alternate;
-        }
-        .action-icon-btn.status-connected {
-            background-color: #4CAF50;
-        }
-        .action-icon-btn.status-connected:hover {
-            background-color: #45a049;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.1); opacity: 0.7; }
-        }
-
-        /* Loader داخل الأزرار (وميض) */
-        .scanning-pulse {
-            animation: scan-button-pulse 1s infinite alternate;
-        }
-        @keyframes scan-button-pulse {
-            0% { 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(33, 150, 243, 0.4); /* لون أزرق */
-                background-color: #2196F3; /* لون خلفية زر المسح بالهاتف */
-            }
-            100% { 
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(33, 150, 243, 0);
-                background-color: #2196F3;
-            }
-        }
-        .product-search-bar .action-icon-btn.scanning-pulse {
-            animation: search-button-pulse 1s infinite alternate;
-        }
-        @keyframes search-button-pulse {
-            0% { 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 rgba(96, 125, 139, 0.4); /* لون رمادي مزرق */
-                background-color: #607d8b;
-            }
-            100% { 
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 10px rgba(96, 125, 139, 0);
-                background-color: #607d8b;
-            }
-        }
-        /* Loader داخل زر الطباعة */
-        .print-receipt-btn.loading {
-            background-color: #555;
-            cursor: not-allowed;
-        }
-        .print-receipt-btn .button-loader {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #fff;
-            border-radius: 50%;
-            width: 15px;
-            height: 15px;
-            animation: spin 1s linear infinite;
-            display: none;
-            margin-right: 8px;
-        }
-        .print-receipt-btn.loading i { display: none; }
-        .print-receipt-btn.loading .button-loader { display: block; }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .pos-actions .print-receipt-btn:hover {
+            background-color: #8acfe5;
+            color: #3674B5;
         }
 
 
@@ -517,7 +574,7 @@
             animation-duration: 0.4s;
             box-sizing: border-box;
             width: 90vw;
-            max-width: 500px;
+            max-width: 500px; /* حجم معقول للمودالات */
             height: auto;
             max-height: 90vh;
             text-align: center;
@@ -526,6 +583,7 @@
             from {top: -300px; opacity: 0}
             to {top: 0; opacity: 1}
         }
+        /* أيقونة الإغلاق في الزاوية العلوية اليمنى (لـ RTL) */
         .close-button {
             color: #aaa;
             font-size: 28px;
@@ -533,7 +591,8 @@
             cursor: pointer;
             position: absolute;
             top: 10px;
-            right: 15px;
+            right: 15px; /* في الزاوية اليمنى لـ RTL */
+            left: unset;
         }
         .close-button:hover, .close-button:focus {
             color: black;
@@ -558,7 +617,7 @@
         .modal-form-group input[type="number"],
         .modal-form-group select {
             font-family: 'Cairo', sans-serif;
-            width: calc(100% - 24px);
+            width: calc(100% - 24px); /* عرض كامل مع بادينغ */
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -566,29 +625,52 @@
             direction: rtl;
             box-sizing: border-box;
         }
-        .modal-form-group button {
-            font-family: 'Cairo', sans-serif;
+        /* الأزرار داخل المودالات (تستخدم الآن .modal-btn) */
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end; /* محاذاة لليسار في RTL */
+            gap: 10px;
+            margin-top: 20px;
+        }
+        /* لا حاجة لـ submit-btn-modal و cancel-btn-modal منفصلين، نستخدم .modal-btn */
+        /* .modal-form-group .submit-btn-modal, .modal-form-group .cancel-btn-modal { ... } */
+
+
+        /* --- تنسيقات التوست (نسخ من تصميمك الموحد) --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .toast {
+            background-color: #333;
+            color: white;
             padding: 10px 20px;
-            border: none;
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(100%);
+            animation: slideInToast 0.5s forwards;
+            min-width: 250px;
+            max-width: 350px;
+            text-align: right;
+            font-size: 0.9em;
         }
-        .modal-form-group .submit-btn-modal {
-            background-color: #2196F3;
-            color: white;
+        .toast.success { background-color: #4CAF50; }
+        .toast.error { background-color: #f44336; }
+        .toast.hide { animation: fadeOutToast 0.5s forwards; }
+        @keyframes slideInToast {
+            from { opacity: 0; transform: translateY(100%); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .modal-form-group .submit-btn-modal:hover {
-            background-color: #1976D2;
-        }
-        .modal-form-group .cancel-btn-modal {
-            background-color: #f44336;
-            color: white;
-            margin-right: 10px;
-        }
-        .modal-form-group .cancel-btn-modal:hover {
-            background-color: #d32f2f;
+        @keyframes fadeOutToast {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(100%); }
         }
 
 
@@ -643,6 +725,16 @@
             .modal-content {
                 width: 95vw;
                 padding: 15px;
+            }
+            .action-button, .primary-btn, .secondary-btn, .modal-btn {
+                padding: 12px 15px; /* تصغير البادينغ على الجوال */
+                font-size: 1em;
+            }
+            .action-icon-btn {
+                width: 40px;
+                height: 40px;
+                padding: 8px;
+                font-size: 1.1em;
             }
         }
     </style>
@@ -728,7 +820,7 @@
                             <label for="customer-search-input">العميل (للدين):</label>
                             <input type="text" id="customer-search-input" placeholder="ابحث عن عميل أو أضف جديد">
                             <div id="customer-search-results" style="max-height: 150px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; margin-top: 5px;"></div>
-                            <button id="add-new-customer-btn" class="add-discount-btn" style="width: 100%; margin-top: 10px; font-size:0.9em; gap:5px;"><i class="fas fa-user-plus"></i> إضافة عميل جديد</button>
+                            <button id="add-new-customer-btn" class="modal-btn" style="width: 100%; margin-top: 10px; font-size:0.9em; gap:5px;"><i class="fas fa-user-plus"></i> إضافة عميل جديد</button>
                         </div>
                         <div class="modal-form-group" id="change-due-group">
                             <span>الباقي للعميل:</span>
@@ -736,10 +828,10 @@
                         </div>
 
                         <div class="pos-actions">
-                            <button id="complete-sale-btn" class="complete-sale-btn"><i class="fas fa-check"></i> إتمام البيع</button>
-                            <button id="cancel-sale-btn" class="cancel-sale-btn"><i class="fas fa-times"></i> إلغاء البيع</button>
-                            <button id="add-discount-btn" class="add-discount-btn"><i class="fas fa-tags"></i> إضافة خصم</button>
-                            <button id="print-receipt-btn" class="add-discount-btn print-receipt-btn"><span class="button-loader"></span><i class="fas fa-print"></i> طباعة إيصال</button>
+                            <button id="complete-sale-btn" class="primary-btn"><i class="fas fa-check"></i> إتمام البيع</button>
+                            <button id="cancel-sale-btn" class="secondary-btn"><i class="fas fa-times"></i> إلغاء البيع</button>
+                            <button id="add-discount-btn" class="secondary-btn"><i class="fas fa-tags"></i> إضافة خصم</button>
+                            <button id="print-receipt-btn" class="secondary-btn print-receipt-btn"><span class="button-loader"></span><i class="fas fa-print"></i> طباعة إيصال</button>
                         </div>
                     </div>
                 </div>
@@ -762,8 +854,10 @@
                 <label for="discount-value">قيمة الخصم:</label>
                 <input type="number" id="discount-value" step="0.01" min="0" value="0.00">
             </div>
-            <button class="submit-btn-modal" id="apply-discount-btn">تطبيق الخصم</button>
-            <button class="cancel-btn-modal" id="remove-discount-btn">إزالة الخصم</button>
+            <div class="modal-actions">
+                <button class="modal-btn" id="apply-discount-btn">تطبيق الخصم</button>
+                <button class="modal-btn cancel-modal-btn" id="remove-discount-btn">إزالة الخصم</button>
+            </div>
         </div>
     </div>
 
@@ -779,7 +873,9 @@
                 <label for="new-customer-phone">رقم الهاتف (اختياري):</label>
                 <input type="text" id="new-customer-phone">
             </div>
-            <button class="submit-btn-modal" id="save-new-customer-btn">حفظ العميل</button>
+            <div class="modal-actions">
+                <button class="modal-btn" id="save-new-customer-btn">حفظ العميل</button>
+            </div>
         </div>
     </div>
 
@@ -791,7 +887,9 @@
                 <div class="modal-form-group">
                     <input type="password" id="password-input" placeholder="أدخل كلمة السر" required>
                 </div>
-                <button type="submit" class="submit-btn-modal"><i class="fas fa-check"></i> تأكيد</button>
+                <div class="modal-actions">
+                    <button type="submit" class="modal-btn"><i class="fas fa-check"></i> تأكيد</button>
+                </div>
                 <p id="password-error-message" style="display: none; color: #f44336; margin-top: 10px; font-size: 0.9em;">كلمة السر غير صحيحة.</p>
             </form>
         </div>
@@ -802,7 +900,7 @@
     <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, doc, getDoc, runTransaction, increment } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, doc, getDoc, runTransaction, increment, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         // معلومات تهيئة تطبيق Firebase الخاص بك (تأكد من مطابقتها)
@@ -821,7 +919,7 @@
         const auth = getAuth(app);
 
         // --- معرف الجلسة المشترك (يجب أن يتطابق مع inventory.html و mobile-scanner.html) ---
-        const SHARED_SCANNER_SESSION_ID = "YOUR_STORE_UNIQUE_SCANNER_ID_12345"; // !!! يجب أن يتطابق مع الملفات الأخرى !!!
+        const SHARED_SCANNER_SESSION_ID = "SHEIKH_ALARAB_SCANNER_SESSION"; // !!! قم بتغيير هذا ليكون معرفًا فريدًا لمتجرك !!!
         const MANAGER_PASSWORD = "0000"; // كلمة السر للمسؤول
 
         let managerAccessEnabled = localStorage.getItem('managerAccessEnabled') === 'true'; // حالة صلاحيات المسؤول
@@ -1168,28 +1266,39 @@
                         <h5>${product.name}</h5>
                         <span>${(product.salePrice || 0).toFixed(2)} ج.م / ${product.unit} | باركود: ${product.barcode || 'N/A'} | الكمية: ${product.availableQuantity}</span>
                     </div>
-                    <button class="add-btn" data-product-id="${product.id}" data-product-name="${product.name}" data-sale-price="${product.salePrice}" data-available-quantity="${product.availableQuantity}"><i class="fas fa-plus"></i></button>
+                    <button class="add-btn" data-product-id="${product.id}" data-product-name="${product.name}" data-sale-price="${product.salePrice}" data-available-quantity="${product.availableQuantity}" data-unit="${product.unit}"><i class="fas fa-plus"></i></button>
                 `;
                 productSearchResults.appendChild(productItemDiv);
             });
         }
 
         // --- وظائف سلة التسوق ---
-        function addToCart(productId, productName, salePrice, availableQuantity) {
+        function addToCart(productId, productName, salePrice, availableQuantity, unit) {
             let item = cart.find(i => i.id === productId);
+            const isWeightUnit = ['كيلو جرام', 'جرام', 'لتر', 'مليلتر'].includes(unit);
 
             if (item) {
+                if (isWeightUnit) {
+                    // لا نزيد تلقائيًا للوحدات الوزنية، بل نطلب من المستخدم التحديد
+                    showToast(`المنتج "${productName}" موجود بالفعل. يرجى تعديل الكمية في الفاتورة.`, 'info');
+                    return;
+                }
+                // للوحدات العددية (قطعة، حبة، عبوة، إلخ)
                 if (item.quantity + 1 > availableQuantity) {
-                    showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity}.`, 'error');
+                    showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity} ${unit}.`, 'error');
                     return;
                 }
                 item.quantity++;
             } else {
-                if (1 > availableQuantity) {
-                    showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity}.`, 'error');
+                if (1 > availableQuantity && !isWeightUnit) { // للوحدات العددية
+                    showToast(`الكمية المتاحة لـ ${productName} هي ${availableQuantity} ${unit}.`, 'error');
                     return;
                 }
-                cart.push({ id: productId, name: productName, price: salePrice, quantity: 1, maxQuantity: availableQuantity });
+                // إضافة المنتج لأول مرة
+                cart.push({ id: productId, name: productName, price: salePrice, quantity: isWeightUnit ? 0.01 : 1, maxQuantity: availableQuantity, unit: unit });
+                if (isWeightUnit) {
+                    showToast(`أضف "${productName}". يرجى تحديد الكمية بالجرامات/الكيلو في الفاتورة.`, 'info');
+                }
             }
             renderCart();
             calculateTotals();
@@ -1201,18 +1310,26 @@
             calculateTotals();
         }
 
-        function updateCartQuantity(productId, change) {
+        function updateCartQuantity(productId, newQuantity) {
             let item = cart.find(i => i.id === productId);
             if (item) {
-                const newQuantity = item.quantity + change;
+                // للوحدات الوزنية، الكمية يمكن أن تكون كسوراً
+                // للوحدات العددية، يجب أن تكون الكمية عدداً صحيحاً
+                if (!['كيلو جرام', 'جرام', 'لتر', 'مليلتر'].includes(item.unit) && newQuantity % 1 !== 0) {
+                    showToast(`كمية المنتج "${item.name}" يجب أن تكون عدداً صحيحاً.`, 'error');
+                    return;
+                }
+                
                 if (newQuantity <= 0) {
                     removeFromCart(productId);
                 } else if (newQuantity > item.maxQuantity) {
-                    showToast(`الكمية القصوى لـ ${item.name} هي ${item.maxQuantity}.`, 'error');
+                    showToast(`الكمية القصوى المتاحة لـ ${item.name} هي ${item.maxQuantity} ${item.unit}.`, 'error');
+                    // يمكن إعادة تعيين الكمية إلى maxQuantity هنا إذا أردت
+                    item.quantity = item.maxQuantity;
                 } else {
                     item.quantity = newQuantity;
-                    renderCart();
                 }
+                renderCart(); // إعادة عرض سلة التسوق بعد التحديث
             }
             calculateTotals();
         }
@@ -1225,38 +1342,51 @@
             }
 
             cart.forEach(item => {
+                const isWeightUnit = ['كيلو جرام', 'جرام', 'لتر', 'مليلتر'].includes(item.unit);
+                const quantityInputHtml = isWeightUnit ?
+                    `<input type="number" value="${item.quantity.toFixed(3)}" step="0.001" min="0.001" data-id="${item.id}" class="weight-quantity-input">` :
+                    `<button data-action="decrease" data-id="${item.id}"><i class="fas fa-minus"></i></button>
+                    <span>${item.quantity}</span>
+                    <button data-action="increase" data-id="${item.id}"><i class="fas fa-plus"></i></button>`;
+
                 const cartItemDiv = document.createElement('div');
                 cartItemDiv.classList.add('cart-item');
                 cartItemDiv.innerHTML = `
                     <div class="details">
                         <h5>${item.name}</h5>
-                        <span>${item.price.toFixed(2)} ج.م/وحدة</span>
+                        <span>${item.price.toFixed(2)} ج.م/${item.unit}</span>
                     </div>
                     <div class="quantity-controls">
-                        <button data-action="decrease" data-id="${item.id}"><i class="fas fa-minus"></i></button>
-                        <span>${item.quantity}</span>
-                        <button data-action="increase" data-id="${item.id}"><i class="fas fa-plus"></i></button>
+                        ${quantityInputHtml}
                     </div>
                     <button class="remove-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
                 `;
                 cartItemsContainer.appendChild(cartItemDiv);
-            });
 
-            // إضافة مستمعي الأحداث لأزرار الكمية والإزالة
-            cartItemsContainer.querySelectorAll('.quantity-controls button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const productId = e.currentTarget.dataset.id;
-                    const action = e.currentTarget.dataset.action;
-                    updateCartQuantity(productId, action === 'increase' ? 1 : -1);
-                });
-            });
-            cartItemsContainer.querySelectorAll('.remove-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
+                // إضافة مستمعي الأحداث لأزرار الكمية والإزالة وحقل الإدخال الوزني
+                if (isWeightUnit) {
+                    cartItemDiv.querySelector('.weight-quantity-input').addEventListener('input', (e) => {
+                        const newVal = parseFloat(e.target.value);
+                        if (!isNaN(newVal)) {
+                            updateCartQuantity(item.id, newVal);
+                        }
+                    });
+                } else {
+                    cartItemDiv.querySelectorAll('.quantity-controls button').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const productId = e.currentTarget.dataset.id;
+                            const action = e.currentTarget.dataset.action;
+                            updateCartQuantity(productId, item.quantity + (action === 'increase' ? 1 : -1));
+                        });
+                    });
+                }
+                cartItemDiv.querySelector('.remove-btn').addEventListener('click', (e) => {
                     const productId = e.currentTarget.dataset.id;
                     removeFromCart(productId);
                 });
             });
         }
+
 
         function calculateTotals() {
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -1268,8 +1398,7 @@
                 discountAmount = currentDiscount.value;
             }
             
-            // التأكد من أن الخصم لا يتجاوز الإجمالي الفرعي
-            discountAmount = Math.min(discountAmount, subtotal);
+            discountAmount = Math.min(discountAmount, subtotal); // التأكد من أن الخصم لا يتجاوز الإجمالي
 
             let total = subtotal - discountAmount;
 
@@ -1301,10 +1430,13 @@
             showToast("تم إلغاء البيع بنجاح.", "info");
         }
 
-        // --- وظائف إدارة العملاء (مبسطة) ---
+        // --- وظائف إدارة العملاء ---
         async function searchCustomers(searchTerm) {
-            customerSearchResults.innerHTML = ''; // مسح النتائج السابقة
-            if (searchTerm.length < 2) return;
+            customerSearchResults.innerHTML = '';
+            if (searchTerm.length < 2) {
+                customerSearchResults.innerHTML = '<p style="text-align: center; color: #555;">أدخل حرفين على الأقل.</p>';
+                return;
+            }
 
             try {
                 const customersRef = collection(db, 'customers');
@@ -1319,7 +1451,7 @@
                 querySnapshot.forEach(doc => {
                     const customer = doc.data();
                     const div = document.createElement('div');
-                    div.style = "padding: 8px; border-bottom: 1px solid #eee; cursor: pointer;";
+                    div.classList.add('customer-item'); // إضافة كلاس للتصميم
                     div.textContent = `${customer.name} (دين: ${customer.outstandingBalance || 0} ج.م)`;
                     div.dataset.id = doc.id;
                     div.dataset.name = customer.name;
@@ -1328,7 +1460,8 @@
                         selectedCustomer = { id: doc.id, name: customer.name, outstandingBalance: customer.outstandingBalance || 0 };
                         customerSearchInput.value = customer.name;
                         customerSearchResults.innerHTML = ''; // إخفاء النتائج
-                        showToast(`تم اختيار العميل: ${customer.name}`, 'info');
+                        showToast(`تم اختيار العميل: ${customer.name}`, 'success');
+                        calculateTotals(); // إعادة حساب الإجمالي لتحديث الباقي/الدين
                     });
                     customerSearchResults.appendChild(div);
                 });
@@ -1357,6 +1490,7 @@
                 customerSearchInput.value = newCustomer.name;
                 closeAddCustomerModal();
                 showToast(`تم إضافة العميل: ${newCustomer.name} بنجاح.`, 'success');
+                calculateTotals(); // إعادة حساب الإجمالي لتحديث الباقي/الدين
             } catch (error) {
                 console.error("Error adding new customer:", error);
                 showToast("خطأ في إضافة عميل جديد.", "error");
@@ -1394,14 +1528,24 @@
                     return;
                 }
                 outstandingBalanceChange = totalAmount - cashPaid; // إذا دفع جزءاً، الباقي دين
-                if (outstandingBalanceChange < 0 && paymentMethod === 'debt') {
-                    showToast("لا يمكن أن يكون هناك باقي للعميل في طريقة دفع 'آجل' فقط.", "error");
+                if (paymentMethod === 'debt' && cashPaid > 0 && cashPaid < totalAmount) {
+                    // في وضع الدين، إذا دفع جزءاً، فلا يزال يعتبر دين
+                } else if (paymentMethod === 'debt' && cashPaid > totalAmount) {
+                    showToast("لا يمكن أن يكون هناك باقي للعميل في طريقة دفع 'آجل' فقط إذا كان المبلغ المدفوع أكبر من الإجمالي.", "error");
+                    return;
+                }
+            }
+            
+            // تأكيد مع صلاحيات المسؤول للخصم
+            if (currentDiscount.value > 0 && !managerAccessEnabled) {
+                const password = await openPasswordModal("تأكيد كلمة سر المسؤول لتطبيق الخصم");
+                if (password !== MANAGER_PASSWORD) {
+                    showToast("كلمة السر غير صحيحة. لا يمكن تطبيق الخصم.", "error");
                     return;
                 }
             }
 
             try {
-                // استخدام Firestore Transaction لضمان تحديث المخزون والديون بشكل آمن
                 await runTransaction(db, async (transaction) => {
                     // 1. تحديث كميات المنتجات في المخزون
                     for (const item of cart) {
@@ -1414,7 +1558,7 @@
                         const currentQuantity = productDoc.data().availableQuantity;
                         const newQuantity = currentQuantity - item.quantity;
                         if (newQuantity < 0) {
-                            throw `كمية غير كافية من المنتج: ${item.name}. المتاح: ${currentQuantity}, المطلوب: ${item.quantity}`;
+                            throw `كمية غير كافية من المنتج: ${item.name}. المتاح: ${currentQuantity} ${item.unit}, المطلوب: ${item.quantity} ${item.unit}`;
                         }
                         transaction.update(productRef, { availableQuantity: newQuantity });
                     }
@@ -1438,7 +1582,8 @@
                             productId: item.id,
                             productName: item.name,
                             quantity: item.quantity,
-                            unitPrice: item.price
+                            unitPrice: item.price,
+                            unit: item.unit
                         })),
                         subtotal: subtotal,
                         discount: discountAmount,
@@ -1498,7 +1643,7 @@
                             ${saleDetails.items.map(item => `
                                 <tr>
                                     <td style="padding: 5px; border: 1px solid #ddd;">${item.name}</td>
-                                    <td style="padding: 5px; border: 1px solid #ddd;">${item.quantity}</td>
+                                    <td style="padding: 5px; border: 1px solid #ddd;">${item.quantity} ${item.unit}</td>
                                     <td style="padding: 5px; border: 1px solid #ddd;">${item.price.toFixed(2)}</td>
                                     <td style="padding: 5px; border: 1px solid #ddd;">${(item.quantity * item.price).toFixed(2)}</td>
                                 </tr>
@@ -1532,13 +1677,15 @@
         scanBarcodePosBtn.addEventListener('click', () => requestScanFromPhone('pos_scan'));
 
         productSearchResults.addEventListener('click', (e) => {
-            if (e.target.classList.contains('add-btn') || e.target.closest('.add-btn')) {
-                const btn = e.target.closest('.add-btn');
+            // حدث النقر على زر "إضافة" المنتج
+            const addBtn = e.target.closest('.add-btn');
+            if (addBtn) {
                 const productId = btn.dataset.productId;
                 const productName = btn.dataset.productName;
                 const salePrice = parseFloat(btn.dataset.salePrice);
                 const availableQuantity = parseFloat(btn.dataset.availableQuantity);
-                addToCart(productId, productName, salePrice, availableQuantity);
+                const unit = btn.dataset.unit; // الحصول على الوحدة
+                addToCart(productId, productName, salePrice, availableQuantity, unit); // تمرير الوحدة
             }
         });
 
@@ -1546,7 +1693,7 @@
             if (e.target.value === 'cash') {
                 cashPaidGroup.style.display = 'block';
                 customerSelectGroup.style.display = 'none';
-                cashPaidInput.value = parseFloat(totalDisplay.textContent) || 0; // املأ المبلغ الإجمالي تلقائيا
+                cashPaidInput.value = (parseFloat(totalDisplay.textContent) || 0).toFixed(2); // املأ المبلغ الإجمالي تلقائيا
             } else if (e.target.value === 'debt') {
                 cashPaidGroup.style.display = 'none';
                 cashPaidInput.value = '0.00';
@@ -1572,7 +1719,14 @@
         closeAddCustomerModalBtn.addEventListener('click', () => addCustomerModal.style.display = 'none');
         addCustomerModal.addEventListener('click', (event) => { if (event.target === addCustomerModal) addCustomerModal.style.display = 'none'; });
 
-        addDiscountBtn.addEventListener('click', () => {
+        addDiscountBtn.addEventListener('click', async () => { // إضافة async هنا
+            if (!managerAccessEnabled) {
+                const password = await openPasswordModal("تأكيد كلمة سر المسؤول لتطبيق الخصم");
+                if (password !== MANAGER_PASSWORD) {
+                    showToast("كلمة السر غير صحيحة. لا يمكن تطبيق الخصم.", "error");
+                    return;
+                }
+            }
             discountModal.style.display = 'flex';
             discountTypeSelect.value = currentDiscount.type;
             discountValueInput.value = currentDiscount.value;
