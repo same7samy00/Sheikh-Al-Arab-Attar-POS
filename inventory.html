@@ -26,6 +26,7 @@
             display: flex; /* لتمكين التخطيط المرن (Flexbox) للشريط الجانبي والمحتوى */
             min-height: 100vh;
             color: #333; /* لون نص داكن افتراضي */
+            font-size: 0.9em; /* تصغير الخط العام قليلاً بناءً على طلبك */
         }
 
         /* الحاوية الرئيسية للتطبيق */
@@ -281,7 +282,7 @@
             align-items: center; /* توسيط محتوى المودال عمودياً */
         }
 
-        /* تنسيق المحتوى داخل المودال ليصبح بملء الشاشة تقريباً */
+        /* تنسيق المحتوى داخل المودال ليصبح بملء الشاشة تقريباً (تصميم احترافي) */
         .modal-content {
             background-color: #fefefe;
             padding: 30px;
@@ -426,7 +427,7 @@
             justify-content: center; /* توسيط النص والأيقونة */
         }
         #scan-source-modal .option-btn:hover {
-            background-color: #303f9f;
+            background-color: #303f90; /* لون أزرق أغمق عند التمرير */
         }
 
         /* --- تنسيقات لمودال QR الهاتف --- */
@@ -438,7 +439,7 @@
             text-align: center;
         }
         #phone-qr-modal #qr-code-display {
-            width: 200px;
+            width: 200px; /* لتحديد حجم الـ QR */
             height: 200px;
             margin: 20px auto;
             border: 1px solid #ddd;
@@ -494,6 +495,9 @@
 
         /* --- التعديلات المتجاوبة (Responsive) العامة والمحددة لصفحة المخزون --- */
         @media (max-width: 768px) {
+            body {
+                font-size: 0.9em; /* تصغير الخط أكثر على الجوال */
+            }
             #app {
                 flex-direction: column; /* جعل الشريط الجانبي والمحتوى فوق بعضهما */
             }
@@ -647,7 +651,7 @@
                                     <option value="لتر">لتر</option>
                                     <option value="قطعة">قطعة</option>
                                     <option value="حبة">حبة</option>
-                                    <option value="عبوة">عبوة</option>
+                                    <option value="عبوة">عبوة</output>
                                     <option value="كيس">كيس</option>
                                     <option value="مجموعة">مجموعة</option>
                                     <option value="جرام">جرام</option>
@@ -717,8 +721,7 @@
                     <div class="modal-content">
                         <span class="close-button" id="close-phone-qr-modal-btn">&times;</span>
                         <h4>امسح هذا الرمز بهاتفك</h4>
-                        <div id="qr-code-display"></div>
-                        <p class="instruction">استخدم هاتفك لمسح هذا الرمز، ثم امسح الباركود.</p>
+                        <canvas id="qr-code-display"></canvas> <p class="instruction">استخدم هاتفك لمسح هذا الرمز، ثم امسح الباركود.</p>
                         <div class="loader" id="phone-qr-loader"></div>
                         <p id="phone-scan-status-message" style="color: #3f51b5; font-weight: bold;"></p>
                     </div>
@@ -734,7 +737,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-        import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, deleteDoc, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"; // أضفنا onSnapshot
+        import { getFirestore, collection, getDocs, query, where, Timestamp, addDoc, updateDoc, deleteDoc, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         // معلومات تهيئة تطبيق Firebase الخاص بك (تم تكرارها هنا)
@@ -754,11 +757,9 @@
         const db = getFirestore(app);   // تهيئة Firestore
         const auth = getAuth(app);     // تهيئة Authentication
 
-        // --- كلمات السر للمسؤول (Hardcoded - غير آمنة في الإنتاج) ---
-        // في المستقبل، يمكن تخزين هذه الكلمات في Firestore وجلبها
-        const MANAGER_PASSWORD_ACCESS = "0000"; // كلمة سر تفعيل صلاحيات المسؤول (CRUD)
-        const MANAGER_PASSWORD_ADD_EDIT_DELETE = "0000"; // كلمة سر تأكيد التعديل أو الحذف (كانت 0000)
-        const MANAGER_PASSWORD_ADD_FEATURE = "0000+"; // كلمة سر خاصة لعملية الإضافة (كانت 0000+)
+        // --- كلمة السر للمسؤول (Hardcoded - غير آمنة في الإنتاج!) ---
+        // في المستقبل، يمكن تخزين هذه الكلمة في Firestore وجلبها لزيادة الأمان.
+        const MANAGER_PASSWORD = "0000"; 
 
         let managerAccessEnabled = false; // حالة تفعيل صلاحيات المسؤول
 
@@ -805,7 +806,7 @@
         // عناصر مودال عرض QR للمسح بالهاتف
         const phoneQrModal = document.getElementById('phone-qr-modal');
         const closePhoneQrModalBtn = document.getElementById('close-phone-qr-modal-btn');
-        const qrCodeDisplay = document.getElementById('qr-code-display');
+        const qrCodeDisplayCanvas = document.getElementById('qr-code-display'); // تم تغييرها إلى canvas
         const phoneQrLoader = document.getElementById('phone-qr-loader');
         const phoneScanStatusMessage = document.getElementById('phone-scan-status-message');
 
@@ -813,6 +814,7 @@
         let html5QrCode = null;
         let currentScanPurpose = null; // 'addEdit' أو 'search'
         let currentSessionId = null; // لمعرف جلسة المسح بالهاتف
+        let qrCodeInstance = null; // للاحتفاظ بنسخة من QRious
 
         // --- وظائف عامة للتحكم في الأزرار والصلاحيات ---
         function setAccessButtonsState(enabled) {
@@ -881,7 +883,7 @@
                 alert('تم إلغاء صلاحيات المسؤول.');
             } else {
                 // إذا كانت الصلاحيات غير مفعلة، اطلب كلمة السر لتفعيلها
-                if (promptForPassword(MANAGER_PASSWORD_ACCESS, "تفعيل صلاحيات المسؤول")) {
+                if (promptForPassword(MANAGER_PASSWORD, "تفعيل صلاحيات المسؤول")) {
                     managerAccessEnabled = true;
                     setAccessButtonsState(true);
                     alert('تم تفعيل صلاحيات المسؤول.');
@@ -929,15 +931,15 @@
                 document.querySelectorAll('.edit-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         if (!managerAccessEnabled) return; // تأكد من أن صلاحيات المسؤول مفعلة
-                        if (promptForPassword(MANAGER_PASSWORD_ADD_EDIT_DELETE, "تأكيد التعديل")) {
-                            openProductModalForEdit(e.currentTarget.dataset.id);
-                        }
+                        // لا نطلب كلمة السر مرة أخرى هنا، فقط عند تفعيل الصلاحيات
+                        openProductModalForEdit(e.currentTarget.dataset.id);
                     });
                 });
                 document.querySelectorAll('.delete-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         if (!managerAccessEnabled) return; // تأكد من أن صلاحيات المسؤول مفعلة
-                        if (promptForPassword(MANAGER_PASSWORD_ADD_EDIT_DELETE, "تأكيد الحذف")) {
+                        // لا نطلب كلمة السر مرة أخرى هنا، فقط عند تفعيل الصلاحيات
+                        if (confirm('هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
                             deleteProduct(e.currentTarget.dataset.id);
                         }
                     });
@@ -957,10 +959,7 @@
                 alert("يرجى تفعيل صلاحيات المسؤول أولاً (من أيقونة الدرع أعلى الصفحة).");
                 return;
             }
-            if (!promptForPassword(MANAGER_PASSWORD_ADD_FEATURE, "تأكيد إضافة منتج جديد")) {
-                return;
-            }
-
+            // لا نطلب كلمة السر مرة أخرى هنا، فقط عند تفعيل الصلاحيات
             modalTitle.textContent = 'إضافة منتج جديد';
             productForm.reset(); // مسح أي بيانات سابقة من النموذج
             productIdInput.value = ''; // التأكد من أن الـ ID فارغ (لعملية الإضافة)
@@ -1008,7 +1007,7 @@
         }
 
         /**
-         * لغلق النموذج المنبثق.
+         * لغلق النموذج المنبثق (مودال المنتج).
          */
         function closeProductModal() {
             productModal.style.display = 'none'; // إخفاء المودال
@@ -1062,31 +1061,13 @@
             }
         });
 
-        /**
-         * وظيفة لحذف منتج.
-         * @param {string} productId - ID المستند للمنتج المراد حذفه.
-         */
-        async function deleteProduct(productId) {
-            if (confirm('هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
-                try {
-                    await deleteDoc(doc(db, 'products', productId));
-                    alert('تم حذف المنتج بنجاح!');
-                    console.log("Product deleted:", productId);
-                    fetchProducts(); // إعادة جلب وعرض المنتجات لتحديث الجدول
-                } catch (error) {
-                    console.error("Error deleting product:", error);
-                    alert('حدث خطأ أثناء حذف المنتج. يرجى المحاولة مرة أخرى.');
-                }
-            }
-        }
-
         // --- وظائف مسح الباركود/QR Code (باستخدام html5-qrcode) ---
 
         /**
          * بدء ماسح الباركود باستخدام html5-qrcode.
-         * @param {string} containerId - الـ ID الخاص بالعنصر الذي سيعرض الكاميرا (مثلاً 'barcode-scanner-container').
+         * @param {string} containerId - الـ ID الخاص بالعنصر الذي سيعرض الكاميرا (مثلاً 'barcode-scanner-container' أو 'reader-search').
          * @param {function} onScanSuccess - دالة يتم استدعاؤها عند المسح الناجح.
-         * @param {function} onScanError - دالة يتم استدعاؤها عند وجود خطأ في المسح.
+         * @param {function} onScanError - دالة يتم استدعاؤها عند وجود خطأ في المسح (ليس بالضرورة خطأ، قد يكون عدم وجود باركود).
          */
         function startBarcodeScanner(containerId, onScanSuccess, onScanError) {
             stopBarcodeScanner(); // التأكد من إيقاف أي ماسح يعمل مسبقاً
@@ -1114,12 +1095,8 @@
                 html5QrCode.stop().then(() => {
                     console.log("QR Code scanner stopped.");
                     // إزالة محتوى الكاميرا من الحاوية النشطة فقط
-                    if (document.getElementById('barcode-scanner-container')) {
-                        document.getElementById('barcode-scanner-container').innerHTML = '';
-                    }
-                    if (document.getElementById('reader-search')) {
-                        document.getElementById('reader-search').innerHTML = '';
-                    }
+                    if (barcodeScannerContainer) barcodeScannerContainer.innerHTML = '';
+                    if (readerSearchContainer) readerSearchContainer.innerHTML = '';
                 }).catch(err => {
                     console.error("Error stopping QR Code scanner:", err);
                 });
@@ -1136,7 +1113,7 @@
         }
 
         /**
-         * دالة لفتح مودال اختيار مصدر الباركود.
+         * دالة لفتح مودال اختيار مصدر مسح الباركود.
          * @param {string} purpose - الغرض من المسح ('addEdit' أو 'search').
          */
         function openScanSourceModal(purpose) {
@@ -1152,7 +1129,7 @@
         }
 
         /**
-         * دالة لفتح مودال مسح الباركود على الجهاز الحالي (داخل المودال الأصلي).
+         * دالة لبدء المسح على الجهاز الحالي.
          * @param {HTMLElement} scannerContainer - عنصر HTML الذي سيعرض الماسح.
          * @param {function} onScanSuccessCallback - الدالة التي ستنفذ بعد المسح الناجح.
          */
@@ -1164,7 +1141,7 @@
         }
 
         /**
-         * دالة لفتح مودال QR الهاتف.
+         * دالة لفتح مودال QR الهاتف وبدء الاستماع.
          */
         async function startPhoneScan() {
             closeScanSourceModal(); // أغلق مودال الاختيار
@@ -1175,57 +1152,66 @@
             // تهيئة حالة التحميل والرسالة
             phoneQrLoader.style.display = 'block';
             phoneScanStatusMessage.textContent = 'في انتظار مسح هاتفك...';
-            qrCodeDisplay.innerHTML = ''; // مسح أي QR سابق
+            phoneScanStatusMessage.classList.remove('error-message', 'success-message');
 
-            // إنشاء QR Code
+            qrCodeDisplayCanvas.innerHTML = ''; // مسح أي محتوى سابق
+            // التأكد من تهيئة QRious بشكل صحيح
+            if (!qrCodeInstance) {
+                qrCodeInstance = new QRious({
+                    element: qrCodeDisplayCanvas,
+                    size: 200,
+                    padding: 10
+                });
+            }
+
             const githubPagesBaseUrl = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/') + '/'; // الحصول على المسار الأساسي
             const scannerPageUrl = githubPagesBaseUrl + 'phone-barcode-scanner.html?session=' + currentSessionId;
             
             console.log("QR Code URL:", scannerPageUrl);
-
-            new QRious({
-                element: qrCodeDisplay,
-                value: scannerPageUrl,
-                size: 200,
-                padding: 10
-            });
-
+            qrCodeInstance.value = scannerPageUrl; // تحديث قيمة QR Code
+            
             // بدء الاستماع لـ Firestore لمعرف الجلسة هذا
             const sessionDocRef = doc(db, 'scannerSessions', currentSessionId);
             const unsubscribe = onSnapshot(sessionDocRef, (docSnap) => {
-                if (docSnap.exists() && docSnap.data().scannedValue) {
-                    const scannedValue = docSnap.data().scannedValue;
-                    console.log("Scanned value from phone:", scannedValue);
-                    phoneScanStatusMessage.textContent = 'تم المسح بنجاح! جاري معالجة البيانات...';
-                    phoneQrLoader.style.display = 'none';
-                    unsubscribe(); // إيقاف الاستماع
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.scannedValue) {
+                        const scannedValue = data.scannedValue;
+                        console.log("Scanned value from phone:", scannedValue);
+                        phoneScanStatusMessage.textContent = 'تم المسح بنجاح! جاري معالجة البيانات...';
+                        phoneScanStatusMessage.classList.add('success-message');
+                        phoneQrLoader.style.display = 'none';
+                        unsubscribe(); // إيقاف الاستماع
 
-                    // معالجة القيمة الممسوحة بناءً على الغرض الأصلي
-                    if (currentScanPurpose === 'addEdit') {
-                        productBarcodeInput.value = scannedValue;
-                        closePhoneQrModal();
-                        // لا نغلق ProductModal هنا، المستخدم سيكمل الإدخال
-                    } else if (currentScanPurpose === 'search') {
-                        inventorySearchInput.value = scannedValue;
-                        // محاكاة حدث 'input' لتشغيل البحث
-                        const event = new Event('input', { bubbles: true });
-                        inventorySearchInput.dispatchEvent(event);
-                        closePhoneQrModal();
-                        // لا نغلق barcodeSearchModal هنا، المستخدم سيكمل البحث
+                        // معالجة القيمة الممسوحة بناءً على الغرض الأصلي
+                        if (currentScanPurpose === 'addEdit') {
+                            productBarcodeInput.value = scannedValue;
+                            closePhoneQrModal();
+                            // لا نغلق ProductModal هنا، المستخدم سيكمل الإدخال
+                        } else if (currentScanPurpose === 'search') {
+                            inventorySearchInput.value = scannedValue;
+                            // محاكاة حدث 'input' لتشغيل البحث
+                            const event = new Event('input', { bubbles: true });
+                            inventorySearchInput.dispatchEvent(event);
+                            closePhoneQrModal();
+                            // لا نغلق barcodeSearchModal هنا، المستخدم سيكمل البحث
+                        }
+                        // حذف مستند الجلسة من Firestore لتنظيف البيانات (بعد قليل من التأخير)
+                        setTimeout(() => {
+                            deleteDoc(sessionDocRef).catch(e => console.error("Error deleting session doc:", e));
+                        }, 5000); // احذف بعد 5 ثوانٍ
+                    } else if (data.status === 'error') {
+                        phoneScanStatusMessage.textContent = 'حدث خطأ في المسح من الهاتف.';
+                        phoneScanStatusMessage.classList.add('error-message');
+                        phoneQrLoader.style.display = 'none';
+                        unsubscribe();
+                        setTimeout(() => closePhoneQrModal(), 3000);
                     }
-                    // حذف مستند الجلسة من Firestore لتنظيف البيانات (بعد قليل من التأخير)
-                    setTimeout(() => {
-                        deleteDoc(sessionDocRef).catch(e => console.error("Error deleting session doc:", e));
-                    }, 5000); // احذف بعد 5 ثوانٍ
-                } else if (docSnap.exists() && docSnap.data().status === 'error') {
-                    phoneScanStatusMessage.textContent = 'حدث خطأ في المسح من الهاتف.';
-                    phoneQrLoader.style.display = 'none';
-                    unsubscribe();
-                    setTimeout(() => closePhoneQrModal(), 3000);
                 }
             }, (error) => {
                 console.error("Error listening to session document:", error);
                 phoneScanStatusMessage.textContent = 'حدث خطأ في الاتصال.';
+                phoneScanStatusMessage.classList.add('error-message');
                 phoneQrLoader.style.display = 'none';
                 unsubscribe();
                 setTimeout(() => closePhoneQrModal(), 3000);
@@ -1312,7 +1298,7 @@
             } else if (currentScanPurpose === 'search') {
                 startCurrentDeviceScan(readerSearchContainer, (decodedText) => {
                     inventorySearchInput.value = decodedText;
-                    const event = new Event('input', { bubbles: true });
+                    const event = new Event('input', { bubbles: true }); // محاكاة حدث input
                     inventorySearchInput.dispatchEvent(event);
                     stopBarcodeScanner();
                     closeBarcodeSearchModal();
@@ -1332,7 +1318,7 @@
         // البحث عن المنتجات
         inventorySearchInput.addEventListener('input', async (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            productsTableBody.innerHTML = ''; // مسح الجدول للنتائج الجديدة
+            productsTableBody.innerHTML = ''; // مسح الجدول للنتائج الجديدة (إصلاح مشكلة التكرار)
             
             try {
                 const productsRef = collection(db, 'products');
@@ -1379,15 +1365,13 @@
                 document.querySelectorAll('.edit-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         if (!managerAccessEnabled) return;
-                        if (promptForPassword(MANAGER_PASSWORD_ADD_EDIT_DELETE, "تأكيد التعديل")) {
-                            openProductModalForEdit(e.currentTarget.dataset.id);
-                        }
+                        openProductModalForEdit(e.currentTarget.dataset.id);
                     });
                 });
                 document.querySelectorAll('.delete-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         if (!managerAccessEnabled) return;
-                        if (promptForPassword(MANAGER_PASSWORD_ADD_EDIT_DELETE, "تأكيد الحذف")) {
+                        if (confirm('هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
                             deleteProduct(e.currentTarget.dataset.id);
                         }
                     });
