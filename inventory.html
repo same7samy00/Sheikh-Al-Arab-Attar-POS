@@ -791,11 +791,11 @@
                                 <label for="product-unit">الوحدة الأساسية:</label>
                                 <select id="product-unit" required>
                                     <option value="">اختر وحدة</option>
-                                    <option value="كيلو جرام">كيلو جرام</output>
+                                    <option value="كيلو جرام">كيلو جرام</option>
                                     <option value="لتر">لتر</option>
                                     <option value="قطعة">قطعة</option>
                                     <option value="حبة">حبة</option>
-                                    <option value="عبوة">عبوة</option>
+                                    <option value="عبوة">عبوة</output>
                                     <option value="كيس">كيس</option>
                                     <option value="مجموعة">مجموعة</option>
                                     <option value="جرام">جرام</option>
@@ -921,11 +921,9 @@
         const currentUserSpan = document.getElementById('current-user-name');
         const logoutBtn = document.getElementById('logout-btn');
         const managerAccessBtn = document.getElementById('manager-access-btn');
-        const toggleScanMethodBtnProduct = document.getElementById('toggle-scan-method-product-btn'); // زر تبديل طريقة المسح لنموذج المنتج
-        const toggleScanMethodBtnInventory = document.createElement('button'); // زر تبديل جديد لشريط البحث
-        toggleScanMethodBtnInventory.id = 'toggle-scan-method-inventory-btn';
-        toggleScanMethodBtnInventory.className = 'secondary-action-btn';
-        toggleScanMethodBtnInventory.style.marginLeft = '10px'; // مسافة عن زر المسح
+        // تم إزالة زر ربط الهاتف من HTML: const connectPhoneBtn = document.getElementById('connect-phone-btn');
+        // const connectPhoneBtnText = connectPhoneBtn.querySelector('span');
+
 
         // عناصر واجهة المستخدم لصفحة إدارة المخزون
         const addProductBtn = document.getElementById('add-product-btn');
@@ -989,7 +987,12 @@
 
         // --- تهيئة زر تبديل طريقة المسح في شريط البحث ---
         const searchBar = document.querySelector('.search-bar');
+        const toggleScanMethodBtnInventory = document.createElement('button'); // زر تبديل جديد لشريط البحث
+        toggleScanMethodBtnInventory.id = 'toggle-scan-method-inventory-btn';
+        toggleScanMethodBtnInventory.className = 'secondary-action-btn';
+        toggleScanMethodBtnInventory.style.marginLeft = '10px'; // مسافة عن زر المسح
         searchBar.appendChild(toggleScanMethodBtnInventory); // أضفه بعد زر "مسح باركود للبحث"
+
 
         // --- دالة لإظهار الإشعارات العائمة (Toasts) ---
         function showToast(message, type = 'info') { // type: 'success', 'error', 'info'
@@ -1087,7 +1090,6 @@
                             console.log("Stored session ID does not exist in Firestore. Resetting.");
                             activePhoneScanSessionId = null;
                             localStorage.removeItem('activePhoneScanSessionId');
-                            // لا توجد حاجة لتحديث زر الربط، لأنه لم يعد موجوداً بهذا الشكل
                         }
                     } catch (e) {
                         console.error("Error checking stored session ID:", e);
@@ -1465,8 +1467,8 @@
                         
                         if (purposeFromSession === 'addEdit') {
                             productBarcodeInput.value = scannedValue;
-                            // لا نغلق المودال، فقط نضع القيمة
                             showToast('تم مسح الباركود بنجاح.', 'success');
+                            // لا نغلق ProductModal هنا، فقط نضع القيمة
                         } else if (purposeFromSession === 'search') {
                             inventorySearchInput.value = scannedValue;
                             const event = new Event('input', { bubbles: true });
@@ -1533,12 +1535,10 @@
          */
         async function initiatePhoneScanFromSourceModal() {
             localStorage.setItem('lastScanMethod', 'phone'); // حفظ التفضيل
-            // إغلاق مودال اختيار المصدر فوراً، لأن المسح سيبدأ على الهاتف أو سيتم إعداد الـ QR
-            closeScanSourceModal(); 
+            closeSourceModalBtn.click(); // إغلاق مودال اختيار المصدر
             
             // إظهار حاوية الـ QR داخل مودال المصدر (ستكون هذه هي النافذة الوحيدة الظاهرة مؤقتاً للـ QR)
-            // بما أننا أغلقنا scanSourceModal، يمكننا فتح مودال جديد أو استخدام توست مع QR
-            // لتبسيط الموضوع وعدم تداخل المودالات، لن نستخدم مودال للـ QR بعد الآن.
+            // بما أننا أغلقنا scanSourceModal، لن نعرض الـ QR هنا
             // سنركز على إرسال الإشارة للهاتف مباشرة.
 
             // إذا لم يكن هناك sessionId نشط، قم بإنشاء واحد
@@ -1612,7 +1612,8 @@
         // زر "مسح باركود للبحث" في شريط البحث العلوي
         scanBarcodeInventoryBtn.addEventListener('click', async () => {
             currentScanPurpose = 'search'; // تحديد الغرض
-            openBarcodeSearchModal(); // افتح مودال البحث كخلفية (لأن المستخدم طلب ذلك)
+            // افتح مودال البحث كخلفية (لأن المستخدم طلب ذلك)
+            openBarcodeSearchModal(); 
 
             // مباشرة ابدأ المسح بناءً على lastScanMethod
             if (lastScanMethod === 'currentDevice') {
@@ -1633,7 +1634,7 @@
                 initiatePhoneScanFromSourceModal(); // هذه الدالة الآن لا تفتح مودالاً جديداً
             } else {
                 // إذا لم يتم تحديد طريقة مسح مسبقاً، اعرض مودال الاختيار
-                openScanSourceModal('search');
+                openScanSourceModal('search'); 
             }
         });
 
@@ -1712,9 +1713,9 @@
         });
         // عند اختيار "الجهاز الحالي" من مودال المصدر
         scanFromCurrentDeviceBtn.addEventListener('click', () => {
-            localStorage.setItem('lastScanMethod', 'currentDevice'); 
+            localStorage.setItem('lastScanMethod', 'currentDevice'); // حفظ التفضيل
             closeSourceModalBtn.click(); // إغلاق مودال المصدر
-            // سيتم التعامل مع بدء المسح بواسطة زر مسح الباركود الأصلي الذي تم النقر عليه
+            // يتم التعامل مع بدء المسح بواسطة زر مسح الباركود الأصلي الذي تم النقر عليه
             // وذلك لأننا لم نعد نتجاوز مودال المصدر بشكل كامل في initiateScan
         });
         // عند اختيار "الهاتف" من مودال المصدر
