@@ -1786,6 +1786,20 @@
                 showToast("حدث خطأ أثناء البحث عن المنتجات.", "error");
             }
         });
-    </script>
+    
+        document.getElementById('toggle-scan-method-product-btn')?.addEventListener('click', toggleScanMethodBtnProduct);
+        document.getElementById('toggle-scan-method-inventory-btn')?.addEventListener('click', toggleScanMethodBtnProduct);
+
+        function toggleScanMethodBtnProduct() {
+            lastScanMethod = lastScanMethod === 'currentDevice' ? 'phone' : 'currentDevice';
+            localStorage.setItem('lastScanMethod', lastScanMethod);
+            updateScanMethodToggleButton();
+        }
+
+        function openBarcodeSearchModal() {
+            barcodeSearchModal.style.display = 'flex';
+            readerSearchContainer.style.display = 'block';
+        }
+</script>
 </body>
 </html>
