@@ -137,7 +137,7 @@
             gap: 15px; /* مسافة بين العناصر */
         }
 
-        .main-action-btn, .secondary-action-btn, .submit-btn, .option-btn, #toggle-scan-method-btn { /* أضفنا option-btn هنا */
+        .main-action-btn, .secondary-action-btn, .submit-btn, .option-btn { /* أضفنا option-btn هنا */
             font-family: 'Cairo', sans-serif; /* خط كايرو للأزرار */
             padding: 10px 20px;
             border: none;
@@ -185,27 +185,6 @@
         .submit-btn:hover:not(:disabled) {
             background-color: #1976D2;
         }
-
-        /* زر تبديل طريقة المسح */
-        #toggle-scan-method-btn {
-            background-color: #3f51b5;
-            color: white;
-            padding: 8px 12px; /* أصغر قليلا ليتناسب بجانب الحقول */
-            font-size: 0.9em;
-        }
-        #toggle-scan-method-btn:hover {
-            background-color: #303f9f;
-        }
-        /* لكي يظهر بجانب حقل الباركود */
-        .form-group .barcode-scan-buttons #toggle-scan-method-btn {
-            margin-top: 0;
-            margin-right: 10px; /* مسافة عن حقل الباركود */
-        }
-        /* توسيط الأيقونة والنص داخل الزر */
-        #toggle-scan-method-btn i {
-            margin-right: 5px;
-        }
-
 
         /* شريط البحث */
         .search-bar {
@@ -513,31 +492,7 @@
         }
 
         /* --- تنسيقات للمودال الخاص بمسح الباركود للبحث --- */
-        #barcode-search-modal .modal-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            width: 95vw;
-            height: 95vh;
-            max-width: 1000px;
-            max-height: 700px;
-        }
-        #barcode-search-modal h4 {
-            margin-bottom: 30px;
-        }
-        #barcode-search-modal #reader-search { /* حاوية الماسح في مودال البحث */
-            width: 100%;
-            max-width: 600px;
-            height: 400px;
-        }
-        #barcode-search-modal .scanner-controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            justify-content: center;
-        }
+        /* This modal will be removed as per new requirements */
 
 
         /* --- تنسيقات مودال كلمة السر الاحترافي --- */
@@ -678,16 +633,13 @@
                 font-size: 0.9em;
             }
             /* المودالات تملأ الشاشة بالكامل في الجوال */
-            .modal-content, #barcode-search-modal .modal-content, #scan-source-modal .modal-content, #password-modal .modal-content {
+            .modal-content, #scan-source-modal .modal-content, #password-modal .modal-content {
                 width: 100vw;
                 height: 100vh;
                 max-width: none;
                 max-height: none;
                 padding: 15px; /* تقليل البادينغ على الجوال */
                 border-radius: 0; /* إزالة الحواف في الجوال لملء الشاشة بالكامل */
-            }
-            #barcode-search-modal #reader-search {
-                height: 250px; /* تقليل ارتفاع الماسح في الجوال */
             }
             #toast-container {
                 bottom: 10px;
@@ -795,7 +747,7 @@
                                     <option value="لتر">لتر</option>
                                     <option value="قطعة">قطعة</option>
                                     <option value="حبة">حبة</option>
-                                    <option value="عبوة">عبوة</output>
+                                    <option value="عبوة">عبوة</option>
                                     <option value="كيس">كيس</option>
                                     <option value="مجموعة">مجموعة</option>
                                     <option value="جرام">جرام</option>
@@ -824,10 +776,10 @@
 
                             <div class="form-group">
                                 <label for="product-barcode">باركود/QR:</label>
-                                <div class="barcode-scan-buttons"> <input type="text" id="product-barcode" style="flex-grow: 1;">
-                                    <button type="button" id="scan-barcode-form-btn" class="secondary-action-btn"><i class="fas fa-qrcode"></i></button>
-                                    <button type="button" id="toggle-scan-method-product-btn" class="secondary-action-btn" title="تبديل طريقة المسح"></button> </div>
-                                <div id="barcode-scanner-container" class="barcode-scanner-common-container" style="display: none;"></div>
+                                <div class="barcode-scan-buttons"> 
+                                    <input type="text" id="product-barcode" style="flex-grow: 1;">
+                                    <button type="button" id="scan-barcode-form-btn" class="secondary-action-btn"><i class="fas fa-qrcode"></i> مسح بالهاتف</button>
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -837,34 +789,6 @@
 
                             <button type="submit" class="submit-btn"><i class="fas fa-save"></i> حفظ المنتج</button>
                         </form>
-                    </div>
-                </div>
-
-                <div id="barcode-search-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-button" id="close-search-modal-btn">&times;</span>
-                        <h4>مسح باركود للبحث عن منتج</h4>
-                        <div id="reader-search" class="barcode-scanner-common-container" style="display: none;"></div>
-                        <div class="scanner-controls">
-                            <button class="secondary-action-btn" id="cancel-search-scan-btn"><i class="fas fa-times"></i> إلغاء</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="scan-source-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-button" id="close-source-modal-btn">&times;</span>
-                        <h4 id="scan-source-modal-title">كيف تريد مسح الباركود؟</h4>
-                        <div class="option-buttons">
-                            <button class="option-btn" id="scan-from-current-device-btn"><i class="fas fa-camera"></i> الجهاز الحالي</button>
-                            <button class="option-btn" id="scan-from-phone-btn"><i class="fas fa-mobile-alt"></i> الهاتف</button>
-                        </div>
-                        <div id="phone-qr-setup-container" style="display: none; margin-top: 20px;">
-                            <canvas id="qr-code-display"></canvas>
-                            <p class="instruction">امسح هذا الرمز بهاتفك لربط الماسح.</p>
-                            <div class="loader" id="phone-qr-loader"></div>
-                            <p id="phone-scan-status-message" style="color: #3f51b5; font-weight: bold;"></p>
-                        </div>
                     </div>
                 </div>
                 
@@ -921,9 +845,6 @@
         const currentUserSpan = document.getElementById('current-user-name');
         const logoutBtn = document.getElementById('logout-btn');
         const managerAccessBtn = document.getElementById('manager-access-btn');
-        // تم إزالة زر ربط الهاتف من HTML: const connectPhoneBtn = document.getElementById('connect-phone-btn');
-        // const connectPhoneBtnText = connectPhoneBtn.querySelector('span');
-
 
         // عناصر واجهة المستخدم لصفحة إدارة المخزون
         const addProductBtn = document.getElementById('add-product-btn');
@@ -946,24 +867,6 @@
         const productBarcodeInput = document.getElementById('product-barcode');
         const productDescriptionInput = document.getElementById('product-description');
         const scanBarcodeFormBtn = document.getElementById('scan-barcode-form-btn'); // الزر داخل نموذج المنتج
-        const barcodeScannerContainer = document.getElementById('barcode-scanner-container'); // حاوية الماسح داخل نموذج المنتج
-
-        // عناصر المودال الخاص بمسح الباركود للبحث
-        const barcodeSearchModal = document.getElementById('barcode-search-modal');
-        const closeButtonSearchModal = document.getElementById('close-search-modal-btn'); // زر إغلاق مودال البحث
-        const readerSearchContainer = document.getElementById('reader-search'); // حاوية الماسح في مودال البحث
-        const cancelSearchScanBtn = document.getElementById('cancel-search-scan-btn'); // زر إلغاء في مودال البحث
-
-        // عناصر مودال اختيار مصدر مسح الباركود
-        const scanSourceModal = document.getElementById('scan-source-modal');
-        const closeSourceModalBtn = document.getElementById('close-source-modal-btn');
-        const scanSourceModalTitle = document.getElementById('scan-source-modal-title');
-        const scanFromCurrentDeviceBtn = document.getElementById('scan-from-current-device-btn');
-        const scanFromPhoneBtn = document.getElementById('scan-from-phone-btn');
-        const phoneQrSetupContainer = document.getElementById('phone-qr-setup-container'); // حاوية الـ QR داخل مودال المصدر
-        const qrCodeDisplayCanvas = document.getElementById('qr-code-display'); // كانفاس عرض الـ QR
-        const phoneQrLoader = document.getElementById('phone-qr-loader'); // لودر الـ QR
-        const phoneScanStatusMessage = document.getElementById('phone-scan-status-message'); // رسالة حالة الـ QR
 
         // عناصر مودال كلمة السر للمسؤول
         const passwordModal = document.getElementById('password-modal');
@@ -977,22 +880,10 @@
 
 
         // --- متغيرات حالة المسح بالباركود ---
-        let html5QrCode = null; // نسخة من قارئ الباركود للجهاز الحالي
         let currentScanPurpose = null; // الغرض من المسح: 'addEdit' أو 'search'
         // معرف جلسة المسح بالهاتف، مستمر عبر localStorage
         let activePhoneScanSessionId = localStorage.getItem('activePhoneScanSessionId') || null; 
-        let qrCodeInstance = null; // نسخة من مولد QRious
         let phoneSessionUnsubscribe = null; // وظيفة إلغاء الاشتراك في listener Firestore
-        let lastScanMethod = localStorage.getItem('lastScanMethod') || 'currentDevice'; // لتذكر آخر اختيار
-
-        // --- تهيئة زر تبديل طريقة المسح في شريط البحث ---
-        const searchBar = document.querySelector('.search-bar');
-        const toggleScanMethodBtnInventory = document.createElement('button'); // زر تبديل جديد لشريط البحث
-        toggleScanMethodBtnInventory.id = 'toggle-scan-method-inventory-btn';
-        toggleScanMethodBtnInventory.className = 'secondary-action-btn';
-        toggleScanMethodBtnInventory.style.marginLeft = '10px'; // مسافة عن زر المسح
-        searchBar.appendChild(toggleScanMethodBtnInventory); // أضفه بعد زر "مسح باركود للبحث"
-
 
         // --- دالة لإظهار الإشعارات العائمة (Toasts) ---
         function showToast(message, type = 'info') { // type: 'success', 'error', 'info'
@@ -1097,7 +988,6 @@
                         localStorage.removeItem('activePhoneScanSessionId');
                     }
                 }
-                updateScanMethodToggleButton(); // تحديث زر التبديل عند التحميل
 
             } else {
                 console.log("User is not logged in. Redirecting to login.html.");
@@ -1231,8 +1121,6 @@
             productForm.reset(); 
             productIdInput.value = ''; 
             productModal.style.display = 'flex'; 
-            stopBarcodeScanner(); // أوقف أي ماسح يعمل في الخلفية قبل فتح المودال
-            barcodeScannerContainer.style.display = 'none'; // تأكد من إخفاء حاوية الماسح
         }
 
         /**
@@ -1260,8 +1148,6 @@
                     productDescriptionInput.value = productData.description || '';
                     
                     productModal.style.display = 'flex'; 
-                    stopBarcodeScanner(); 
-                    barcodeScannerContainer.style.display = 'none'; 
                 } else {
                     showToast('المنتج غير موجود أو تم حذفه!', "error");
                     console.error('Product not found for ID:', productId);
@@ -1277,7 +1163,6 @@
          */
         function closeProductModal() {
             productModal.style.display = 'none'; 
-            stopBarcodeScanner(); 
         }
 
         /**
@@ -1342,104 +1227,12 @@
             }
         }
 
-        // --- وظائف مسح الباركود/QR Code (باستخدام html5-qrcode) ---
-
-        /**
-         * بدء ماسح الباركود باستخدام html5-qrcode.
-         * @param {string} containerId - الـ ID الخاص بالعنصر الذي سيعرض الكاميرا.
-         * @param {function} onScanSuccess - دالة يتم استدعاؤها عند المسح الناجح.
-         * @param {function} onScanError - دالة يتم استدعاؤها عند وجود خطأ في المسح.
-         */
-        function startBarcodeScanner(containerId, onScanSuccess, onScanError) {
-            stopBarcodeScanner(); // تأكد من إيقاف أي ماسح آخر يعمل
-
-            // يجب تمرير معرف العنصر كنص وليس العنصر نفسه
-            html5QrCode = new Html5Qrcode(containerId); 
-
-            const qrCodeConfig = { 
-                fps: 10, 
-                qrbox: { width: 250, height: 250 } 
-            };
-
-            html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onScanSuccess, onScanError)
-                .then(() => {
-                    console.log(`Scanner started on ${containerId}`);
-                    // showToast(`تم تشغيل الماسح على ${containerId}.`, 'info'); // يمكن تفعيل هذا لأغراض التصحيح
-                })
-                .catch(err => {
-                    console.error(`Unable to start scanning on ${containerId}: ${err}`);
-                    showToast('تعذر تشغيل الكاميرا. تأكد من إعطاء الصلاحيات اللازمة.', "error");
-                    // إخفاء الحاوية إذا فشل التشغيل
-                    document.getElementById(containerId).style.display = 'none';
-                });
-        }
-
-        /**
-         * إيقاف ماسح الباركود.
-         */
-        function stopBarcodeScanner() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => {
-                    console.log("QR Code scanner stopped.");
-                    // إزالة محتوى الكاميرا من الحاوية النشطة فقط
-                    if (barcodeScannerContainer) barcodeScannerContainer.innerHTML = '';
-                    if (readerSearchContainer) readerSearchContainer.innerHTML = '';
-                    if (qrCodeDisplayCanvas) qrCodeDisplayCanvas.innerHTML = ''; // لتنظيف الكانفاس في مودال المصدر
-                }).catch(err => {
-                    console.error("Error stopping QR Code scanner:", err);
-                });
-            }
-            html5QrCode = null; // إعادة تعيين لضمان تهيئة جديدة عند الحاجة
-        }
-
         /**
          * دالة لتوليد معرّف جلسة فريد.
          * @returns {string} معرّف جلسة فريد.
          */
         function generateSessionId() {
             return 'scan_' + Date.now() + Math.random().toString(36).substring(2, 9);
-        }
-
-        /**
-         * وظيفة لفتح مودال اختيار مصدر مسح الباركود.
-         * @param {string} purpose - الغرض من المسح ('addEdit' أو 'search').
-         */
-        function openScanSourceModal(purpose) {
-            currentScanPurpose = purpose; 
-            scanSourceModal.style.display = 'flex';
-
-            // إعادة ضبط محتوى الـ QR (إذا كان مرئياً)
-            phoneQrSetupContainer.style.display = 'none';
-            phoneQrLoader.style.display = 'none';
-            phoneScanStatusMessage.textContent = '';
-            qrCodeDisplayCanvas.innerHTML = ''; // تنظيف الكانفاس
-
-            // تحديد آخر خيار تم استخدامه
-            if (lastScanMethod === 'currentDevice') {
-                scanFromCurrentDeviceBtn.classList.add('selected'); // إضافة كلاس للتحديد
-                scanFromPhoneBtn.classList.remove('selected');
-            } else if (lastScanMethod === 'phone') {
-                scanFromCurrentDeviceBtn.classList.remove('selected');
-                scanFromPhoneBtn.classList.add('selected');
-            } else { // لا يوجد تفضيل محفوظ، لا تحدد شيئا
-                 scanFromCurrentDeviceBtn.classList.remove('selected');
-                 scanFromPhoneBtn.classList.remove('selected');
-            }
-            
-
-            // تحديث عنوان المودال
-            scanSourceModalTitle.textContent = "كيف تريد مسح الباركود لـ " + (purpose === 'addEdit' ? "إضافة المنتج؟" : "البحث عن المنتج؟");
-        }
-
-        /**
-         * دالة لإغلاق مودال اختيار مصدر الباركود.
-         */
-        function closeScanSourceModal() {
-            scanSourceModal.style.display = 'none';
-            stopBarcodeScanner(); // أوقف الماسح في حال كان يعمل داخل هذا المودال (لأجل الـ QR)
-            phoneQrSetupContainer.style.display = 'none'; // أخفِ الـ QR عند الإغلاق
-            phoneQrLoader.style.display = 'none';
-            phoneScanStatusMessage.textContent = '';
         }
 
         /**
@@ -1468,7 +1261,6 @@
                         if (purposeFromSession === 'addEdit') {
                             productBarcodeInput.value = scannedValue;
                             showToast('تم مسح الباركود بنجاح.', 'success');
-                            // لا نغلق ProductModal هنا، فقط نضع القيمة
                         } else if (purposeFromSession === 'search') {
                             inventorySearchInput.value = scannedValue;
                             const event = new Event('input', { bubbles: true });
@@ -1496,16 +1288,9 @@
                         }
                         activePhoneScanSessionId = null;
                         localStorage.removeItem('activePhoneScanSessionId');
-                        // لا نغلق المودالات تلقائيا، بل نترك المستخدم يتحكم
                     } else if (data.status === 'phoneReady' && !data.scannedValue) {
                         // الهاتف جاهز، ولكن لا يوجد مسح جديد
                         console.log("Phone is ready and waiting for scan.");
-                        // تحديث رسالة في مودال المصدر إذا كان مفتوحاً
-                        if(scanSourceModal.style.display === 'flex') {
-                            phoneQrLoader.style.display = 'none'; // أخفِ اللودر
-                            phoneScanStatusMessage.textContent = 'الهاتف جاهز للمسح... امسح الباركود الآن.';
-                            phoneScanStatusMessage.classList.remove('error-message', 'success-message');
-                        }
                     }
                 } else {
                     // المستند لم يعد موجوداً، ربما حذفه الكمبيوتر
@@ -1517,7 +1302,6 @@
                     activePhoneScanSessionId = null; 
                     localStorage.removeItem('activePhoneScanSessionId');
                     showToast('تم إنهاء جلسة اتصال الهاتف.', 'info');
-                    // لا نغلق المودالات تلقائيا، بل نترك المستخدم يتحكم
                 }
             }, (error) => {
                 console.error("Error listening to session document on desktop:", error);
@@ -1530,18 +1314,12 @@
         }
 
         /**
-         * دالة لبدء المسح عبر الهاتف. يتم استدعاؤها عند اختيار "الهاتف"
-         * من مودال اختيار المصدر.
+         * دالة لبدء المسح عبر الهاتف.
+         * @param {string} purpose - الغرض من المسح ('addEdit' أو 'search').
          */
-        async function initiatePhoneScanFromSourceModal() {
-            localStorage.setItem('lastScanMethod', 'phone'); // حفظ التفضيل
-            closeSourceModalBtn.click(); // إغلاق مودال اختيار المصدر
-            
-            // إظهار حاوية الـ QR داخل مودال المصدر (ستكون هذه هي النافذة الوحيدة الظاهرة مؤقتاً للـ QR)
-            // بما أننا أغلقنا scanSourceModal، لن نعرض الـ QR هنا
-            // سنركز على إرسال الإشارة للهاتف مباشرة.
+        async function initiatePhoneScan(purpose) {
+            currentScanPurpose = purpose; // Set the current purpose for the session
 
-            // إذا لم يكن هناك sessionId نشط، قم بإنشاء واحد
             if (!activePhoneScanSessionId) {
                 activePhoneScanSessionId = generateSessionId();
                 localStorage.setItem('activePhoneScanSessionId', activePhoneScanSessionId);
@@ -1549,10 +1327,10 @@
 
                 try {
                     await setDoc(doc(db, 'scannerSessions', activePhoneScanSessionId), {
-                        status: 'connecting', // حالة ابتدائية
+                        status: 'connecting', // Initial state
                         createdAt: Timestamp.now(),
                         scannedValue: null,
-                        purpose: currentScanPurpose // حفظ الغرض من المسح
+                        purpose: currentScanPurpose // Store the purpose for the phone
                     });
                     console.log("Session document created in Firestore:", activePhoneScanSessionId);
                 } catch (e) {
@@ -1563,18 +1341,18 @@
                     return; 
                 }
             } else {
-                // إذا كان هناك sessionId موجود، قم بتحديث الغرض منه وإعادة ضبط الحالة
+                // If an existing sessionId exists, update its purpose and reset status
                 try {
                     await updateDoc(doc(db, 'scannerSessions', activePhoneScanSessionId), {
                         purpose: currentScanPurpose,
-                        scannedValue: null, // إعادة ضبط القيمة الممسوحة القديمة
-                        status: 'readyForNextScan' // إشارة للهاتف بالاستعداد
+                        scannedValue: null, // Reset old scanned value
+                        status: 'readyForNextScan' // Signal phone to be ready
                     });
                     console.log("Reusing existing Session ID:", activePhoneScanSessionId);
                 } catch (e) {
                     console.error("Error updating existing session document:", e);
                     showToast('الجلسة السابقة غير صالحة. جاري إعادة الإنشاء.', "error");
-                    // إذا حدث خطأ في التحديث (المستند غير موجود أو غير صالح)، نبدأ من جديد
+                    // If update fails (doc not found/invalid), start fresh
                     activePhoneScanSessionId = generateSessionId();
                     localStorage.setItem('activePhoneScanSessionId', activePhoneScanSessionId);
                     await setDoc(doc(db, 'scannerSessions', activePhoneScanSessionId), {
@@ -1587,12 +1365,12 @@
                 }
             }
 
-            // بدء الاستماع للجلسة
+            // Start listening to the session
             listenToPhoneSession(activePhoneScanSessionId);
 
-            // لا تعرض QR هنا، فقط رسالة توست
             showToast('تم توجيه الهاتف للمسح. امسح الباركود الآن.', 'info');
         }
+
 
         // --- مستمعي الأحداث لعناصر واجهة المستخدم ---
 
@@ -1610,125 +1388,24 @@
         });
 
         // زر "مسح باركود للبحث" في شريط البحث العلوي
-        scanBarcodeInventoryBtn.addEventListener('click', async () => {
-            currentScanPurpose = 'search'; // تحديد الغرض
-            // افتح مودال البحث كخلفية (لأن المستخدم طلب ذلك)
-            openBarcodeSearchModal(); 
-
-            // مباشرة ابدأ المسح بناءً على lastScanMethod
-            if (lastScanMethod === 'currentDevice') {
-                readerSearchContainer.style.display = 'block'; // تأكد من إظهار الحاوية
-                startBarcodeScanner(readerSearchContainer.id, (decodedText) => {
-                    inventorySearchInput.value = decodedText;
-                    const event = new Event('input', { bubbles: true }); 
-                    inventorySearchInput.dispatchEvent(event);
-                    stopBarcodeScanner();
-                    closeBarcodeSearchModal(); 
-                    showToast('تم مسح الباركود بنجاح والبحث عن المنتج.', 'success');
-                }, (errorMessage) => {
-                    showToast('خطأ في مسح الباركود: ' + errorMessage, 'error');
-                    closeBarcodeSearchModal();
-                });
-            } else if (lastScanMethod === 'phone') {
-                // لا تفتح scanSourceModal ولا phoneQrModal، فقط أرسل الغرض للهاتف
-                initiatePhoneScanFromSourceModal(); // هذه الدالة الآن لا تفتح مودالاً جديداً
-            } else {
-                // إذا لم يتم تحديد طريقة مسح مسبقاً، اعرض مودال الاختيار
-                openScanSourceModal('search'); 
-            }
+        scanBarcodeInventoryBtn.addEventListener('click', () => {
+            initiatePhoneScan('search'); 
         });
 
         // زر "مسح باركود" داخل نموذج إضافة/تعديل المنتج
-        scanBarcodeFormBtn.addEventListener('click', async () => {
-            currentScanPurpose = 'addEdit'; // تحديد الغرض
-            productBarcodeInput.focus(); // ركز على حقل الباركود لسهولة الإدخال اليدوي إذا تم الإلغاء
-
-            // مباشرة ابدأ المسح بناءً على lastScanMethod
-            if (lastScanMethod === 'currentDevice') {
-                barcodeScannerContainer.style.display = 'block'; // تأكد من إظهار الحاوية
-                startBarcodeScanner(barcodeScannerContainer.id, (decodedText) => { 
-                    productBarcodeInput.value = decodedText;
-                    stopBarcodeScanner();
-                    barcodeScannerContainer.style.display = 'none';
-                    showToast('تم مسح الباركود بنجاح.', 'success');
-                }, (errorMessage) => {
-                    showToast('خطأ في مسح الباركود: ' + errorMessage, 'error');
-                });
-            } else if (lastScanMethod === 'phone') {
-                // لا تفتح scanSourceModal ولا phoneQrModal، فقط أرسل الغرض للهاتف
-                initiatePhoneScanFromSourceModal(); // هذه الدالة الآن لا تفتح مودالاً جديداً
-            } else {
-                // إذا لم يتم تحديد طريقة مسح مسبقاً، اعرض مودال الاختيار
-                openScanSourceModal('addEdit'); 
-            }
+        scanBarcodeFormBtn.addEventListener('click', () => {
+            productBarcodeInput.focus(); // Focus on the barcode field for manual input if scan isn't used
+            initiatePhoneScan('addEdit');
         });
         
-        // --- تحديث زر تبديل طريقة المسح ---
-        function updateScanMethodToggleButton() {
-            if (lastScanMethod === 'phone') {
-                toggleScanMethodBtnProduct.innerHTML = '<i class="fas fa-mobile-alt"></i>';
-                toggleScanMethodBtnProduct.title = 'المسح بالهاتف (محدد)';
-                toggleScanMethodBtnInventory.innerHTML = '<i class="fas fa-mobile-alt"></i>';
-                toggleScanMethodBtnInventory.title = 'المسح بالهاتف (محدد)';
-            } else {
-                toggleScanMethodBtnProduct.innerHTML = '<i class="fas fa-laptop"></i>';
-                toggleScanMethodBtnProduct.title = 'المسح بالجهاز الحالي (محدد)';
-                toggleScanMethodBtnInventory.innerHTML = '<i class="fas fa-laptop"></i>';
-                toggleScanMethodBtnInventory.title = 'المسح بالجهاز الحالي (محدد)';
-            }
-        }
-
-        // مستمع لزر التبديل في مودال المنتج
-        toggleScanMethodBtnProduct.addEventListener('click', () => {
-            lastScanMethod = (lastScanMethod === 'phone') ? 'currentDevice' : 'phone';
-            localStorage.setItem('lastScanMethod', lastScanMethod);
-            updateScanMethodToggleButton();
-            showToast('تم تغيير طريقة المسح المفضلة إلى: ' + (lastScanMethod === 'phone' ? 'الهاتف' : 'الجهاز الحالي'), 'info');
-        });
-
-        // مستمع لزر التبديل في شريط البحث
-        toggleScanMethodBtnInventory.addEventListener('click', () => {
-            lastScanMethod = (lastScanMethod === 'phone') ? 'currentDevice' : 'phone';
-            localStorage.setItem('lastScanMethod', lastScanMethod);
-            updateScanMethodToggleButton();
-            showToast('تم تغيير طريقة المسح المفضلة إلى: ' + (lastScanMethod === 'phone' ? 'الهاتف' : 'الجهاز الحالي'), 'info');
-        });
-
-
-        // إغلاق مودال البحث عن الباركود
-        closeButtonSearchModal.addEventListener('click', closeBarcodeSearchModal);
-        cancelSearchScanBtn.addEventListener('click', closeBarcodeSearchModal);
-        window.addEventListener('click', (event) => {
-            if (event.target == barcodeSearchModal) {
-                closeBarcodeSearchModal();
-            }
-        });
-
-        // مستمعي أحداث مودال اختيار مصدر الباركود
-        closeSourceModalBtn.addEventListener('click', closeScanSourceModal);
-        window.addEventListener('click', (event) => {
-            if (event.target == scanSourceModal) {
-                closeScanSourceModal();
-            }
-        });
-        // عند اختيار "الجهاز الحالي" من مودال المصدر
-        scanFromCurrentDeviceBtn.addEventListener('click', () => {
-            localStorage.setItem('lastScanMethod', 'currentDevice'); // حفظ التفضيل
-            closeSourceModalBtn.click(); // إغلاق مودال المصدر
-            // يتم التعامل مع بدء المسح بواسطة زر مسح الباركود الأصلي الذي تم النقر عليه
-            // وذلك لأننا لم نعد نتجاوز مودال المصدر بشكل كامل في initiateScan
-        });
-        // عند اختيار "الهاتف" من مودال المصدر
-        scanFromPhoneBtn.addEventListener('click', initiatePhoneScanFromSourceModal);
-        
-        // البحث عن المنتجات (تم إصلاح مشكلة التكرار)
+        // البحث عن المنتجات
         inventorySearchInput.addEventListener('input', async (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            productsTableBody.innerHTML = ''; // مسح الجدول للنتائج الجديدة (إصلاح مشكلة التكرار)
+            productsTableBody.innerHTML = ''; 
             
             try {
                 const productsRef = collection(db, 'products');
-                const productSnapshot = await getDocs(productsRef); // جلب كل المنتجات
+                const productSnapshot = await getDocs(productsRef);
                 
                 const filteredProducts = [];
                 productSnapshot.forEach(doc => {
@@ -1759,8 +1436,8 @@
                         <td>${(product.purchasePrice || 0).toFixed(2)} ج.م</td>
                         <td>${(product.salePrice || 0).toFixed(2)} ج.م</td>
                         <td class="action-buttons">
-                            <button class="edit-btn" data-id="${doc.id}" ${!managerAccessEnabled ? 'disabled' : ''}><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" data-id="${doc.id}" ${!managerAccessEnabled ? 'disabled' : ''}><i class="fas fa-trash"></i></button>
+                            <button class="edit-btn" data-id="${product.id}" ${!managerAccessEnabled ? 'disabled' : ''}><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-id="${product.id}" ${!managerAccessEnabled ? 'disabled' : ''}><i class="fas fa-trash"></i></button>
                         </td>
                     `;
                 });
@@ -1786,20 +1463,6 @@
                 showToast("حدث خطأ أثناء البحث عن المنتجات.", "error");
             }
         });
-    
-        document.getElementById('toggle-scan-method-product-btn')?.addEventListener('click', toggleScanMethodBtnProduct);
-        document.getElementById('toggle-scan-method-inventory-btn')?.addEventListener('click', toggleScanMethodBtnProduct);
-
-        function toggleScanMethodBtnProduct() {
-            lastScanMethod = lastScanMethod === 'currentDevice' ? 'phone' : 'currentDevice';
-            localStorage.setItem('lastScanMethod', lastScanMethod);
-            updateScanMethodToggleButton();
-        }
-
-        function openBarcodeSearchModal() {
-            barcodeSearchModal.style.display = 'flex';
-            readerSearchContainer.style.display = 'block';
-        }
-</script>
+    </script>
 </body>
 </html>
